@@ -1,0 +1,6 @@
+.rusty/
+.env
+/target
+.idea/
+*.patch
+
