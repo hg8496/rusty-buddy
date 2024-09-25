@@ -4,11 +4,12 @@ use crate::chat::service::ChatService;
 use crate::cli::spinner::{start_spinner, stop_spinner};
 use crate::cli::style::configure_mad_skin;
 use crate::cli::utils::{get_user_input, load_files_into_context};
+use crate::config;
+use crate::config::get_chat_sessions_dir;
 use crate::openai_api::openai_interface::OpenAIInterface;
+use crate::persona::get_persona;
 use std::error::Error;
 use std::path::Path;
-
-const CHAT_DIR: &str = ".rusty/chats";
 
 pub async fn run_chat(
     start_new: bool,
@@ -17,9 +18,13 @@ pub async fn run_chat(
     directory: Option<String>,
 ) -> Result<(), Box<dyn Error>> {
     let openai = OpenAIInterface::new();
-    let storage = DirectoryChatStorage::new(CHAT_DIR);
+    let storage = DirectoryChatStorage::new(config::get_chat_sessions_dir());
+    let default_persona = config::CONFIG.lock().unwrap().default_persona.clone();
+    println!("Get Persona {}", default_persona);
+    let persona = get_persona(default_persona.as_str());
+    println!("Persona: {:?}", persona);
     let mut chat_service = ChatService::new(openai, storage);
-    chat_service.add_system_message("You are an seasoned rust developer. Your are helping a dear colleage developing new features and anwering questions.");
+    chat_service.add_system_message(persona.unwrap().chat_prompt.as_str());
     let mut start_session = start_new;
     if continue_last {
         if let Some(last_session) = get_last_session_name()? {
@@ -86,6 +91,6 @@ pub async fn run_chat(
 
 // Helper function to get the name of the last session
 fn get_last_session_name() -> Result<Option<String>, Box<dyn Error>> {
-    let sessions = DirectoryChatStorage::new(CHAT_DIR).list_sessions()?;
+    let sessions = DirectoryChatStorage::new(get_chat_sessions_dir()).list_sessions()?;
     Ok(sessions.last().cloned())
 }

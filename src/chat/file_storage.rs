@@ -1,7 +1,7 @@
 use crate::chat::interface::{ChatStorage, Message, MessageRole};
 use std::fs;
 use std::io::{self, Read, Write};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 pub struct NilChatStorage {}
 
@@ -24,9 +24,9 @@ pub struct DirectoryChatStorage {
 }
 
 impl DirectoryChatStorage {
-    pub fn new(storage_dir: &str) -> Self {
+    pub fn new(storage_dir: PathBuf) -> Self {
         DirectoryChatStorage {
-            storage_dir: Path::new(storage_dir).to_path_buf(),
+            storage_dir: storage_dir,
         }
     }
 

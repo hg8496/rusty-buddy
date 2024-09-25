@@ -3,8 +3,9 @@ use dotenvy::dotenv;
 
 mod chat;
 mod cli; // Import the CLI module
+mod config;
 mod openai_api;
-// Import the OpenAI API module
+mod persona;
 
 #[tokio::main]
 async fn main() {
@@ -14,7 +15,7 @@ async fn main() {
 
     let matches = Command::new("Rusty CLI")
         .version("1.0")
-        .author("Your Name <you@example.com>")
+        .author("Christian Stolz <hg8496@cstolz.de>")
         .about("A command line interface for various tasks")
         .subcommand(Command::new("commitmessage").about("Summarize the output of `git diff`."))
         .subcommand(
@@ -83,6 +84,6 @@ async fn main() {
             cli::run_wish(directory, use_tools).await.unwrap();
         }
     } else {
-        println!("No valid command given. Use `rusty help` for more information.");
+        println!("No valid command given. Use `rusty-buddy help` for more information.");
     }
 }
