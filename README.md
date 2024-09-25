@@ -60,6 +60,52 @@ more.
   ```bash                                                                                                                                                                                                            
   rusty-buddy wish ./src --tools                                                                                                                                                                            
   ```                                                                                                                                                                                                                
+## Persona Feature
+
+The Rusty CLI supports customizable personas, allowing you to tailor chatbot interactions to your specific needs. Personas provide context and a specific tone or style of interaction, simulating an experienced developer in your desired programming language or environment.
+
+### Built-in Personas
+
+By default, Rusty-Buddy comes with several built-in personas:
+
+- **Rust Developer**
+- **Swift Developer**
+- **Java Developer**
+- **TypeScript Developer**
+
+### Setting Up Custom Personas
+
+To create and manage your own personas, you need to edit the configuration file that the Rusty CLI uses to control its behavior:
+
+1. **Locate the Configuration File:** This file is called `config.toml` and is located in the `.rusty` directory, typically within your home directory or project root.
+
+2. **Edit the Configuration File:** Add your custom personas in the `personas` array section of the file, defining each persona's `name` and `chat_prompt`.
+
+   Example:
+   ```toml
+   [[personas]]
+   name = "python"
+   chat_prompt = "You are an experienced Python developer assisting a colleague with feature development and answering questions related to Python programming."
+
+   [[personas]]
+   name = "go"
+   chat_prompt = "You are an experienced Go developer assisting a colleague with feature development and answering questions related to Go programming."
+   ```
+
+3. **Set the Default Persona:** Specify the persona you want to use by default in the `default_persona` field.
+
+   Example:
+   ```toml
+   default_persona = "python"
+   ```
+
+4. **Save and Restart:** After editing, save the `config.toml` file. Restart the Rusty CLI to apply the new configurations.
+
+### Using Personas
+
+The persona specified in `default_persona` will be used automatically when you start a new chat session. You do not need to pass any additional flags or arguments for personas when you run the CLI commands.
+
+This approach to persona management allows you to customize how the CLI interacts with you, making it a flexible tool that adapts to multiple programming environments and personal preferences.
 
 ## Contributing
 
