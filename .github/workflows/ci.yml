@@ -23,7 +23,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
       - name: Build
-        run: cargo build --verbose
+        run: cargo build --release
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
