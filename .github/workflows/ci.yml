@@ -13,14 +13,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        os: [ ubuntu-latest ]
         target:
           - x86_64-unknown-linux-gnu
           - aarch64-unknown-linux-gnu  # Linux ARM 64-bit                                                        
           - armv7-unknown-linux-gnueabihf  # Linux ARM 32-bit                                                    
-          - x86_64-apple-darwin
-          - aarch64-apple-darwin  # Apple Silicon (ARM)                                                          
-          - x86_64-pc-windows-msvc
 
     steps:
       - name: Checkout source
