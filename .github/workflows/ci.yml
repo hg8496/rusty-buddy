@@ -20,6 +20,10 @@ jobs:
           - armv7-unknown-linux-gnueabihf  # Linux ARM 32-bit                                                    
 
     steps:
+      - name: Set up environment for OpenSSL
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get update && sudo apt-get install -y libssl-dev pkg-config
+
       - name: Checkout source
         uses: actions/checkout@v2
 
