@@ -1,62 +1,63 @@
-name: Build CLI                                                                                                  
-                                                                                                                 
-on:                                                                                                              
-  push:                                                                                                          
-    branches: [main]                                                                                             
-  pull_request:                                                                                                  
-    branches: [main]                                                                                             
-  release:                                                                                                       
-    types: [created]                                                                                             
-                                                                                                                 
-jobs:                                                                                                            
-  build:                                                                                                         
-    runs-on: ${{ matrix.os }}                                                                                    
-    strategy:                                                                                                    
-      matrix:                                                                                                    
-        os: [ubuntu-latest, macos-latest, windows-latest]                                                        
-        target:                                                                                                  
-          - x86_64-unknown-linux-gnu                                                                             
+name: Build CLI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ created ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        target:
+          - x86_64-unknown-linux-gnu
           - aarch64-unknown-linux-gnu  # Linux ARM 64-bit                                                        
           - armv7-unknown-linux-gnueabihf  # Linux ARM 32-bit                                                    
-          - x86_64-apple-darwin                                                                                  
+          - x86_64-apple-darwin
           - aarch64-apple-darwin  # Apple Silicon (ARM)                                                          
-          - x86_64-pc-windows-msvc                                                                               
-                                                                                                                 
-    steps:                                                                                                       
-    - name: Checkout source                                                                                      
-      uses: actions/checkout@v2                                                                                  
-                                                                                                                 
-    - name: Install Rust toolchain                                                                               
-      uses: actions-rs/toolchain@v1                                                                              
-      with:                                                                                                      
-        toolchain: stable                                                                                        
-        target: ${{ matrix.target }}                                                                             
-        override: true                                                                                           
-                                                                                                                 
-    - name: Cache cargo registry                                                                                 
-      uses: actions/cache@v2                                                                                     
-      with:                                                                                                      
-        path: ~/.cargo/registry                                                                                  
-        key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}                                   
-        restore-keys: |                                                                                          
-          ${{ runner.os }}-cargo-registry-                                                                       
-                                                                                                                 
-    - name: Cache cargo index                                                                                    
-      uses: actions/cache@v2                                                                                     
-      with:                                                                                                      
-        path: ~/.cargo/git                                                                                       
-        key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}                                      
-        restore-keys: |                                                                                          
-          ${{ runner.os }}-cargo-index-                                                                          
-                                                                                                                 
-    - name: Build                                                                                                
-      uses: actions-rs/cargo@v1                                                                                  
-      with:                                                                                                      
-        command: build                                                                                           
-        args: --release --target ${{ matrix.target }}                                                            
-                                                                                                                 
-    - name: Upload artifact                                                                                      
-      uses: actions/upload-artifact@v4                                                                           
-      with:                                                                                                      
-        name: rusty-buddy-${{ matrix.target }}                                                                   
-        path: target/${{ matrix.target }}/release/rusty-buddy${{ matrix.os == 'windows-latest' && '.exe' || '' }}
+          - x86_64-pc-windows-msvc
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v2
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
+          override: true
+
+      - name: Cache cargo registry
+        uses: actions/cache@v2
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-                                                                       
+
+      - name: Cache cargo index
+        uses: actions/cache@v2
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-index-                                                                          
+
+      - name: Build
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --release --target ${{ matrix.target }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rusty-buddy-${{ matrix.target }}
+          path: target/${{ matrix.target }}/release/rusty-buddy${{ matrix.os == 'windows-latest' && '.exe' || '' }}
