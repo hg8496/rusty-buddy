@@ -20,11 +20,9 @@ pub async fn run_chat(
     let openai = OpenAIInterface::new();
     let storage = DirectoryChatStorage::new(config::get_chat_sessions_dir());
     let default_persona = config::CONFIG.lock().unwrap().default_persona.clone();
-    println!("Get Persona {}", default_persona);
-    let persona = get_persona(default_persona.as_str());
-    println!("Persona: {:?}", persona);
+    let persona = get_persona(default_persona.as_str()).unwrap();
     let mut chat_service = ChatService::new(openai, storage);
-    chat_service.add_system_message(persona.unwrap().chat_prompt.as_str());
+    chat_service.add_system_message(persona.chat_prompt.as_str());
     let mut start_session = start_new;
     if continue_last {
         if let Some(last_session) = get_last_session_name()? {
@@ -48,7 +46,7 @@ pub async fn run_chat(
             println!("Loading context.");
             let path = Path::new(&dir);
             let mut context = String::from("Use the following Context to assist the user.\n");
-            load_files_into_context(path, "rs", &mut context)?;
+            load_files_into_context(path, persona.file_types.as_slice(), &mut context)?;
             chat_service.add_system_message(&context.as_str());
         }
     }

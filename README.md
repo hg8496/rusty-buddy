@@ -75,25 +75,27 @@ By default, Rusty-Buddy comes with several built-in personas:
 
 ### Setting Up Custom Personas
 
-To create and manage your own personas, you need to edit the configuration file that the Rusty CLI uses to control its behavior:
+To create and manage your own personas, you need to edit the configuration file that the Rusty Buddy uses to control its behavior, and specify both the interaction style and the file types to be included in the context:
 
 1. **Locate the Configuration File:** This file is called `config.toml` and is located in the `.rusty` directory, typically within your home directory or project root.
-
-2. **Edit the Configuration File:** Add your custom personas in the `personas` array section of the file, defining each persona's `name` and `chat_prompt`.
-
+   
+2. **Edit the Configuration File:** Add your custom personas in the `personas` array section of the file, defining each persona's `name`, `chat_prompt`, and `file_types`.
+   
    Example:
    ```toml
    [[personas]]
    name = "python"
    chat_prompt = "You are an experienced Python developer assisting a colleague with feature development and answering questions related to Python programming."
+   file_types = ["py", "md"]
 
    [[personas]]
    name = "go"
    chat_prompt = "You are an experienced Go developer assisting a colleague with feature development and answering questions related to Go programming."
+   file_types = ["go"]
    ```
 
 3. **Set the Default Persona:** Specify the persona you want to use by default in the `default_persona` field.
-
+   
    Example:
    ```toml
    default_persona = "python"

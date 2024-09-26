@@ -34,7 +34,11 @@ pub async fn run_wish(directory: &str, use_tools: bool) -> Result<(), Box<dyn Er
     }
 
     // Load Rust files into context
-    load_files_into_context(path.as_path(), "rs", &mut context)?;
+    load_files_into_context(
+        path.as_path(),
+        vec!["rs".to_string()].as_slice(),
+        &mut context,
+    )?;
 
     // Create an introductory system message for the chat context
     let full_context = format!(
