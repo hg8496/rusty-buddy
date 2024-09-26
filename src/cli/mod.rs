@@ -4,6 +4,7 @@ mod spinner;
 mod style;
 pub mod utils;
 pub mod wish;
+mod createicon;
 
 pub async fn run_chat(
     start_new: bool,
@@ -20,4 +21,11 @@ pub async fn run_commitmessage() -> Result<(), Box<dyn std::error::Error>> {
 
 pub async fn run_wish(directory: &str, use_tools: bool) -> Result<(), Box<dyn std::error::Error>> {
     wish::run_wish(directory, use_tools).await
+}
+
+pub async fn run_createicon(
+    output_dir: &str,
+    sizes: Vec<u32>,
+) -> Result<(), Box<dyn std::error::Error>> {
+    createicon::run_createicon(output_dir, sizes).await
 }

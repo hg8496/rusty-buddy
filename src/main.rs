@@ -50,6 +50,27 @@ async fn main() {
                 ),
         )
         .subcommand(
+            Command::new("createicon")
+                .about("Create an icon using DALL·E based on user input")
+                .arg(
+                    Arg::new("output")
+                        .short('o')
+                        .long("output")
+                        .value_name("DIRECTORY")
+                        .default_value("./icons")
+                        .help("Output directory for the generated icons"),
+                )
+                .arg(
+                    Arg::new("sizes")
+                        .short('s')
+                        .long("sizes")
+                        .value_name("SIZES")
+                        .help("Comma-separated list of icon sizes to generate")
+                        .default_value("16,32,64,128,256,512")
+                        .action(ArgAction::Set),
+                ),
+        )
+        .subcommand(
             Command::new("wish")
                 .arg(
                     Arg::new("directory")
@@ -67,7 +88,17 @@ async fn main() {
         )
         .get_matches();
 
-    if let Some(_) = matches.subcommand_matches("commitmessage") {
+    if let Some(createicon_matches) = matches.subcommand_matches("createicon") {
+        let output_dir = createicon_matches.get_one::<String>("output").unwrap();
+        let sizes = createicon_matches
+            .get_one::<String>("sizes")
+            .unwrap()
+            .split(',')
+            .filter_map(|s| s.trim().parse::<u32>().ok())
+            .collect::<Vec<_>>();
+        cli::run_createicon(output_dir, sizes).await.unwrap();
+    }
+    else if let Some(_) = matches.subcommand_matches("commitmessage") {
         cli::run_commitmessage().await.unwrap();
     } else if let Some(chat_matches) = matches.subcommand_matches("chat") {
         let start_new = chat_matches.get_flag("new");
