@@ -21,11 +21,11 @@ jobs:
 
     steps:
       - name: Set up environment for OpenSSL
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-22.04'
         run: sudo apt-get update && sudo apt-get install -y libssl-dev pkg-config
 
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
