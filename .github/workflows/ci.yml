@@ -10,37 +10,41 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.config.os }}
     strategy:
       matrix:
         os: [ ubuntu-latest ]
-        target:
-          - x86_64-unknown-linux-gnu
-          - aarch64-unknown-linux-gnu  # Linux ARM 64-bit
-          - armv7-unknown-linux-gnueabihf  # Linux ARM 32-bit
-
+        config:
+          - os: ubuntu-20.04
+            rust_target: x86_64-unknown-linux-gnu
+            ext: ''
+            args: ''
+          - os: macos-latest
+            rust_target: x86_64-apple-darwin
+            ext: ''
+            args: ''
+          - os: macos-latest
+            rust_target: aarch64-apple-darwin
+            ext: ''
+            args: ''
+          - os: windows-latest
+            rust_target: x86_64-pc-windows-msvc
+            ext: '.exe'
+            args: ''
+          - os: windows-latest
+            rust_target: aarch64-pc-windows-msvc
+            ext: '.exe'
+            args: '--no-default-features --features native-tls-vendored'
+            
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
-      - name: Add target
-        run: rustup target add ${{ matrix.target }}
-      - name: Set up cross compile
-        run: |
-          case ${{ matrix.target }} in
-            aarch64-unknown-linux-gnu)
-              sudo dpkg --add-architecture arm64
-              sudo apt-get update && sudo apt-get install --assume-yes libssl-dev:arm64
-              ;;
-            armv7-unknown-linux-gnueabihf)
-              sudo dpkg --add-architecture armvhf
-              sudo apt-get update && sudo apt-get install --assume-yes libssl-dev:armvhf
-          esac
-        shell: bash
         
       - name: Build
-        run: cargo build --release --target ${{ matrix.target }}
+        run: cargo build --release
+        
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: rusty-buddy-${{ matrix.target }}
-          path: target/release/rusty-buddy${{ matrix.os == 'windows-latest' && '.exe' || '' }}
+          name: rusty-buddy-${{ matrix.config.target }}
+          path: target/release/rusty-buddy${{ matrix.config.os == 'windows-latest' && '.exe' || '' }}
