@@ -1,19 +1,16 @@
+use crate::cli::spinner::{start_spinner, stop_spinner};
+use crate::cli::utils::get_user_input;
 use async_openai::config::OpenAIConfig;
-use async_openai::types::{CreateImageRequestArgs, Image, ImageSize, ImageResponseFormat};
+use async_openai::types::{CreateImageRequestArgs, Image, ImageResponseFormat, ImageSize};
 use async_openai::Client;
 use base64::prelude::*;
+use dotenvy::dotenv;
 use std::error::Error;
 use std::fs;
 use std::path::Path;
 use std::sync::Arc;
-use crate::cli::utils::get_user_input;
-use crate::cli::spinner::{start_spinner, stop_spinner};
-use dotenvy::dotenv;
 
-pub async fn run_createicon(
-    output_dir: &str,
-    sizes: Vec<u32>,
-) -> Result<(), Box<dyn Error>> {
+pub async fn run_createicon(output_dir: &str, sizes: Vec<u32>) -> Result<(), Box<dyn Error>> {
     dotenv().ok(); // Load environment variables from .env file
     let openai_key = std::env::var("OPENAI_KEY")
         .expect("OPENAI_KEY must be set in .env file or environment variables");
@@ -28,9 +25,7 @@ pub async fn run_createicon(
     }
 
     // Create OpenAI client
-    let client = Client::with_config(
-        OpenAIConfig::default().with_api_key(openai_key),
-    );
+    let client = Client::with_config(OpenAIConfig::default().with_api_key(openai_key));
 
     // Create image request
     let request = CreateImageRequestArgs::default()
@@ -82,7 +77,12 @@ pub async fn run_createicon(
             let filepath = Path::new(output_dir).join(filename);
             resized_img.save(&filepath)?;
 
-            println!("Icon of size {}x{} saved to {:?}", size, size, filepath.display());
+            println!(
+                "Icon of size {}x{} saved to {:?}",
+                size,
+                size,
+                filepath.display()
+            );
         }
     }
     println!("Icon creation complete.");

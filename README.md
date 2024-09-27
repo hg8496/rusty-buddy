@@ -109,6 +109,34 @@ The persona specified in `default_persona` will be used automatically when you s
 
 This approach to persona management allows you to customize how the CLI interacts with you, making it a flexible tool that adapts to multiple programming environments and personal preferences.
 
+### Shell Completion
+
+Rusty Buddy CLI supports auto-completion for various shells, allowing you to complete commands, options, and arguments easily. This can enhance your productivity and reduce errors when using the CLI.
+
+#### Enabling Shell Completion
+
+To enable shell completion, use the `--completion` flag with the shell you need:
+
+For Bash: 
+```bash
+rusty-buddy --completion=bash >> ~/.bashrc
+```
+For Zsh:
+```zsh
+rusty-buddy --completion=zsh >> ~/.zshrc
+```
+For Fish:
+```shell
+rusty-buddy --completion=fish > ~/.config/fish/completions/rusty-buddy.fish
+```
+For PowerShell:
+```shell
+rusty-buddy --completion=powershell >> $PROFILE
+```
+Reload your shell configuration after adding the completion script to activate it.
+
+This feature provides tab-completion for commands and options, making it easier to use Rusty Buddy in your daily workflow.
+
 ## Contributing
 
 Contributions are welcome! Please fork this repository and make a pull request if you have any features, bug fixes, or improvements you want to contribute.

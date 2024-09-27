@@ -8,7 +8,7 @@ fn get_internal_persona_configs() -> Vec<Persona> {
         Persona {
             name: "rust".to_string(),
             chat_prompt: "You are an experienced Rust developer assisting a colleague with feature development and answering questions related to Rust programming.".to_string(),
-            file_types: vec!["rs".to_string(), "md".to_string(), "toml".to_string()],
+            file_types: vec!["rs".to_string(), "md".to_string(), "toml".to_string(), "yml".to_string()],
         },
         Persona {
             name: "swift".to_string(),

@@ -1,10 +1,10 @@
 pub mod chat;
 pub mod commitmessage;
+mod createicon;
 mod spinner;
 mod style;
 pub mod utils;
 pub mod wish;
-mod createicon;
 
 pub async fn run_chat(
     start_new: bool,
