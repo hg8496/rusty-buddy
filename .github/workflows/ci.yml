@@ -22,10 +22,32 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
+        
       - name: Add target                                                                                           
         run: rustup target add ${{ matrix.target }}
+        
+      - name: Set up sysroot and pkg-config
+        run: |
+          case ${{ matrix.target }} in
+            aarch64-unknown-linux-gnu)
+              sudo apt-get install -y gcc-aarch64-linux-gnu
+              export PKG_CONFIG_SYSROOT_DIR=/path/to/aarch64-sysroot
+              export PKG_CONFIG_PATH=/path/to/aarch64-pkgconfig
+              ;;
+            armv7-unknown-linux-gnueabihf)
+              sudo apt-get install -y gcc-arm-linux-gnueabihf
+              export PKG_CONFIG_SYSROOT_DIR=/path/to/armv7-sysroot
+              export PKG_CONFIG_PATH=/path/to/armv7-pkgconfig
+              ;;
+          esac
+        shell: bash
+                                                                                            
       - name: Build
-        run: cargo build --release --target ${{ matrix.target }} 
+        run: cargo build --release --target ${{ matrix.target }}
+        env:
+          PKG_CONFIG_SYSROOT_DIR: ${{ steps.set_up_sysroot.outputs.PKG_CONFIG_SYSROOT_DIR }}
+          PKG_CONFIG_PATH: ${{ steps.set_up_sysroot.outputs.PKG_CONFIG_PATH }}
+          
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
