@@ -11,8 +11,9 @@ pub async fn run_chat(
     continue_last: bool,
     load_name: Option<String>,
     directory: Option<String>,
+    persona_name: Option<String>,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    chat::run_chat(start_new, continue_last, load_name, directory).await
+    chat::run_chat(start_new, continue_last, load_name, directory, persona_name).await
 }
 
 pub async fn run_commitmessage() -> Result<(), Box<dyn std::error::Error>> {

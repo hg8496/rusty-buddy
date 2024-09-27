@@ -1,7 +1,7 @@
-use std::io;
 use clap::{value_parser, Arg, ArgAction, Command, ValueHint};
 use clap_complete::aot::{generate, Generator, Shell};
 use dotenvy::dotenv;
+use std::io;
 
 mod chat;
 mod cli; // Import the CLI module
@@ -17,7 +17,6 @@ async fn main() {
 
     let cmd = build_cli();
     let matches = cmd.get_matches();
-
     if let Some(generator) = matches.get_one::<Shell>("completion").copied() {
         print_completions(generator, &mut build_cli());
     } else if let Some(createicon_matches) = matches.subcommand_matches("createicon") {
@@ -36,8 +35,9 @@ async fn main() {
         let continue_last = chat_matches.get_flag("continue");
         let load_name = chat_matches.get_one::<String>("load").cloned();
         let directory = chat_matches.get_one::<String>("directory").cloned();
+        let persona_name = chat_matches.get_one::<String>("persona").cloned();
 
-        cli::run_chat(start_new, continue_last, load_name, directory)
+        cli::run_chat(start_new, continue_last, load_name, directory, persona_name)
             .await
             .unwrap();
     } else if let Some(wish_matches) = matches.subcommand_matches("wish") {
@@ -92,6 +92,14 @@ fn build_cli() -> Command {
                         .required(false)
                         .help("Directory to add to the chat context")
                         .value_hint(ValueHint::AnyPath),
+                )
+                .arg(
+                    Arg::new("persona")
+                        .short('p')
+                        .long("persona")
+                        .value_name("PERSONA")
+                        .help("Specify a persona for the chat session")
+                        .required(false),
                 ),
         )
         .subcommand(
