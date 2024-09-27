@@ -34,7 +34,9 @@ jobs:
             armv7-unknown-linux-gnueabihf)
               sudo dpkg --add-architecture armv7
               apt-get update && apt-get install --assume-yes libssl-dev:armv7
-
+          esac
+        shell: bash
+        
       - name: Build
         run: cargo build --release --target ${{ matrix.target }}
       - name: Upload artifact
