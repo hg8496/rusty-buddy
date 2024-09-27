@@ -1,15 +1,20 @@
 # Rusty Buddy
 
-Rusty Buddy is a command line tool that provides various utilities to assist in development, including chat support with a backend powered by OpenAI, a tool to generate commit messages from git diffs, and      
+Rusty Buddy is a command line tool that provides various utilities to assist in development, including chat support with
+a backend powered by OpenAI, a tool to generate commit messages from git diffs, and      
 more.
 
 ## Features
-- **Chat Interface**: Engage in a conversation with an AI assistant, with the content of your project. Load or save chat sessions.
+
+- **Chat Interface**: Engage in a conversation with an AI assistant, with the content of your project. Load or save chat
+  sessions.
 - **Commit Message Generator**: Automatically generate commit messages from `git diff` summaries.
 - **Wish Fulfillment**: Collects files from a specified directory and creates a context for interactions with AI.
-- **Tool Integration**: Use custom tools (like showing diffs, creating files and directories) to enhance the AI's capabilities.
+- **Tool Integration**: Use custom tools (like showing diffs, creating files and directories) to enhance the AI's
+  capabilities.
 
 ## Installation
+
 1. Clone this repository:
    ```bash                                                                                                                                                                                                           
    git clone https://github.com/hg8496/rusty-buddy.git                                                                                                                                                           
@@ -31,7 +36,9 @@ more.
    ```                                                                                                                                                                                                               
 
 ## Usage
+
 ### CLI Commands
+
 - **Commit Message**
 
   Generate a summary for staged changes in your git repository:
@@ -41,18 +48,36 @@ more.
   ```                                                                                                                                                                                                                
 
 - **Chat**
+  
+  Start a chat session with various options:
+  
+    - **Start a New Chat Session**
+      ```bash
+      rusty-buddy chat --new
+      ```
+      
+    - **Continue the Last Chat Session**
+      ```bash
+      rusty-buddy chat --continue
+      ```
+      
+    - **Load a Specific Chat Session by Name**
+      ```bash
+      rusty-buddy chat --load session_name
+      ```
+      
+    - **Specify a Directory to Add to the Chat Context**
+      ```bash
+      rusty-buddy chat --directory ./src
+      ```
+      
+    - **Use a Specific Persona for the Chat Session**
+      ```bash
+      rusty-buddy chat --persona rust
+      ```                                      
 
-  Start a new chat session or continue the last one:
-  ```bash                                                                                                                                                                                                            
-  rusty-buddy chat --new                                                                                                                                                                                               
-  rusty-buddy chat --continue                                                                                                                                                                                          
-  rusty-buddy chat --load session_name                                                                                                                                                                                 
-  ```                                                                                                                                                                                                                
-
-  Add a directory context to the chat:
-  ```bash                                                                                                                                                                                                            
-  rusty-buddy chat --directory ./src                                                                                                                                                                        
-  ```                                                                                                                                                                                                                
+  By default, if no session command is provided, a new chat is initiated. You can also set up and select different
+  personas for tailored interactions.
 
 - **Wish**
 
@@ -60,9 +85,12 @@ more.
   ```bash                                                                                                                                                                                                            
   rusty-buddy wish ./src --tools                                                                                                                                                                            
   ```                                                                                                                                                                                                                
+
 ## Persona Feature
 
-The Rusty CLI supports customizable personas, allowing you to tailor chatbot interactions to your specific needs. Personas provide context and a specific tone or style of interaction, simulating an experienced developer in your desired programming language or environment.
+The Rusty CLI supports customizable personas, allowing you to tailor chatbot interactions to your specific needs.
+Personas provide context and a specific tone or style of interaction, simulating an experienced developer in your
+desired programming language or environment.
 
 ### Built-in Personas
 
@@ -75,12 +103,15 @@ By default, Rusty-Buddy comes with several built-in personas:
 
 ### Setting Up Custom Personas
 
-To create and manage your own personas, you need to edit the configuration file that the Rusty Buddy uses to control its behavior, and specify both the interaction style and the file types to be included in the context:
+To create and manage your own personas, you need to edit the configuration file that the Rusty Buddy uses to control its
+behavior, and specify both the interaction style and the file types to be included in the context:
 
-1. **Locate the Configuration File:** This file is called `config.toml` and is located in the `.rusty` directory, typically within your home directory or project root.
-   
-2. **Edit the Configuration File:** Add your custom personas in the `personas` array section of the file, defining each persona's `name`, `chat_prompt`, and `file_types`.
-   
+1. **Locate the Configuration File:** This file is called `config.toml` and is located in the `.rusty` directory,
+   typically within your home directory or project root.
+
+2. **Edit the Configuration File:** Add your custom personas in the `personas` array section of the file, defining each
+   persona's `name`, `chat_prompt`, and `file_types`.
+
    Example:
    ```toml
    [[personas]]
@@ -95,51 +126,65 @@ To create and manage your own personas, you need to edit the configuration file 
    ```
 
 3. **Set the Default Persona:** Specify the persona you want to use by default in the `default_persona` field.
-   
+
    Example:
    ```toml
    default_persona = "python"
    ```
 
-4. **Save and Restart:** After editing, save the `config.toml` file. Restart the Rusty CLI to apply the new configurations.
+4. **Save and Restart:** After editing, save the `config.toml` file. Restart the Rusty CLI to apply the new
+   configurations.
 
 ### Using Personas
 
-The persona specified in `default_persona` will be used automatically when you start a new chat session. You do not need to pass any additional flags or arguments for personas when you run the CLI commands.
+The persona specified in `default_persona` will be used automatically when you start a new chat session. You do not need
+to pass any additional flags or arguments for personas when you run the CLI commands.
 
-This approach to persona management allows you to customize how the CLI interacts with you, making it a flexible tool that adapts to multiple programming environments and personal preferences.
+This approach to persona management allows you to customize how the CLI interacts with you, making it a flexible tool
+that adapts to multiple programming environments and personal preferences.
 
 ### Shell Completion
 
-Rusty Buddy CLI supports auto-completion for various shells, allowing you to complete commands, options, and arguments easily. This can enhance your productivity and reduce errors when using the CLI.
+Rusty Buddy CLI supports auto-completion for various shells, allowing you to complete commands, options, and arguments
+easily. This can enhance your productivity and reduce errors when using the CLI.
 
 #### Enabling Shell Completion
 
 To enable shell completion, use the `--completion` flag with the shell you need:
 
-For Bash: 
+For Bash:
+
 ```bash
 rusty-buddy --completion=bash >> ~/.bashrc
 ```
+
 For Zsh:
+
 ```zsh
 rusty-buddy --completion=zsh >> ~/.zshrc
 ```
+
 For Fish:
+
 ```shell
 rusty-buddy --completion=fish > ~/.config/fish/completions/rusty-buddy.fish
 ```
+
 For PowerShell:
+
 ```shell
 rusty-buddy --completion=powershell >> $PROFILE
 ```
+
 Reload your shell configuration after adding the completion script to activate it.
 
-This feature provides tab-completion for commands and options, making it easier to use Rusty Buddy in your daily workflow.
+This feature provides tab-completion for commands and options, making it easier to use Rusty Buddy in your daily
+workflow.
 
 ## Contributing
 
-Contributions are welcome! Please fork this repository and make a pull request if you have any features, bug fixes, or improvements you want to contribute.
+Contributions are welcome! Please fork this repository and make a pull request if you have any features, bug fixes, or
+improvements you want to contribute.
 
 ## License
 
