@@ -30,9 +30,12 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
         
+      - name: Setup target
+        run: rustup target add ${{ matrix.config.target }}
+
       - name: Build
         run: cargo build --release --target ${{ matrix.config.target }}
-        
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
