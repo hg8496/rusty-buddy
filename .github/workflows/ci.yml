@@ -28,12 +28,12 @@ jobs:
         run: |
           case ${{ matrix.target }} in
             aarch64-unknown-linux-gnu)
-              sudo dpkg --add-architecture aarch64
+              sudo dpkg --add-architecture arm64
               sudo apt-get update && sudo apt-get install --assume-yes libssl-dev:aarch64
               ;;
             armv7-unknown-linux-gnueabihf)
               sudo dpkg --add-architecture armv7
-              sudo apt-get update && sudo apt-get install --assume-yes libssl-dev:armv7
+              sudo apt-get update && sudo apt-get install --assume-yes libssl-dev:armvhf
           esac
         shell: bash
         
