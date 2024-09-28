@@ -3,7 +3,7 @@ use crate::chat::interface::ChatStorage;
 use crate::chat::service::ChatService;
 use crate::cli::spinner::{start_spinner, stop_spinner};
 use crate::cli::style::configure_mad_skin;
-use crate::cli::utils::{get_user_input, load_files_into_context};
+use crate::cli::utils::{get_multiline_input, get_user_input, load_files_into_context};
 use crate::config;
 use crate::config::get_chat_sessions_dir;
 use crate::openai_api::openai_interface::OpenAIInterface;
@@ -69,7 +69,7 @@ pub async fn run_chat(
     let skin = configure_mad_skin();
 
     loop {
-        let user_input = get_user_input("User (use Ctrl+D to submit): ")?;
+        let user_input = get_multiline_input("User (use Ctrl+D to submit): ")?;
         let trimmed_input = user_input.trim();
 
         if trimmed_input == "exit" || trimmed_input.is_empty() {
@@ -92,7 +92,7 @@ pub async fn run_chat(
         stop_spinner(spinner);
 
         // Use the skin to print the AI's response with styling
-        skin.print_text("-----\nAI:");
+        skin.print_text("---\n# AI:");
         skin.print_text(&response);
         chat_service.print_statistics();
     }

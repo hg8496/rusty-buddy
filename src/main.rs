@@ -5,10 +5,10 @@ mod config;
 mod openai_api;
 mod persona;
 
-use clap::{Command, Parser, CommandFactory};
+use clap::{Command, CommandFactory, Parser};
 use clap_complete::{generate, Generator};
-use std::io;
 use dotenvy::dotenv;
+use std::io;
 
 #[tokio::main]
 async fn main() {

@@ -1,6 +1,6 @@
 use crate::chat::file_storage::NilChatStorage;
 use crate::chat::service::ChatService;
-use crate::cli::utils::{add_to_context, get_user_input, load_files_into_context};
+use crate::cli::utils::{add_to_context, get_multiline_input, load_files_into_context};
 use crate::openai_api::openai_interface::OpenAIInterface;
 use std::error::Error;
 use std::path::PathBuf;
@@ -52,7 +52,7 @@ pub async fn run_wish(directory: &str, use_tools: bool) -> Result<(), Box<dyn Er
     chat_service.add_system_message(&full_context);
 
     // Get user input for their wish
-    let user_input = get_user_input("What do you wish? ")
+    let user_input = get_multiline_input("What do you wish? ")
         .map_err(|e| format!("Failed to read user input: {}", e))?;
     let wish = format!("Users wish: {}", user_input);
 

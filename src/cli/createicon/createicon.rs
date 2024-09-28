@@ -1,5 +1,5 @@
 use crate::cli::spinner::{start_spinner, stop_spinner};
-use crate::cli::utils::get_user_input;
+use crate::cli::utils::get_multiline_input;
 use async_openai::config::OpenAIConfig;
 use async_openai::types::{CreateImageRequestArgs, Image, ImageResponseFormat, ImageSize};
 use async_openai::Client;
@@ -17,7 +17,7 @@ pub async fn run_createicon(output_dir: &str, sizes: Vec<u32>) -> Result<(), Box
 
     // Get user's description
     let prompt_message = "Please describe the icon you wish to create. Type 'Ctrl+D' on a new line when you're finished:";
-    let description = get_user_input(prompt_message)?;
+    let description = get_multiline_input(prompt_message)?;
 
     if description.trim().is_empty() {
         println!("No description provided. Exiting.");
