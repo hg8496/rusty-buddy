@@ -18,7 +18,7 @@ pub fn get_user_input(prompt: &str) -> Result<String, Box<dyn Error>> {
     // Create a MadSkin for styling the prompt
     let skin = configure_mad_skin();
     // Use termimad to print a horizontal line and a colored prompt
-    skin.print_text("-------------------------------");
+    skin.print_text("-------------------------------\n");
     skin.print_text(&format!("**{}**", prompt)); // Make the prompt bold and colored
 
     loop {
