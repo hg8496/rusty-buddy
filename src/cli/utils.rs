@@ -1,11 +1,7 @@
-use std::error::Error;
-use std::fs;
-use std::path::Path;
-use walkdir::WalkDir;
-
 use rustyline::error::ReadlineError;
 use rustyline::EditMode::Emacs;
 use rustyline::{Config, DefaultEditor};
+use std::error::Error;
 
 use crate::cli::style::configure_mad_skin;
 
@@ -24,6 +20,11 @@ pub fn get_multiline_input(prompt: &str) -> Result<String, Box<dyn Error>> {
     loop {
         match rl.readline("") {
             Ok(line) => {
+                if line.trim_start().starts_with('/') {
+                    // Exit the loop if a slash command is entered
+                    buffer.push_str(&line); // Keep the command in the buffer if needed
+                    break;
+                }
                 buffer.push_str(&line);
                 buffer.push('\n');
             }
@@ -35,7 +36,6 @@ pub fn get_multiline_input(prompt: &str) -> Result<String, Box<dyn Error>> {
     }
     Ok(buffer)
 }
-
 pub fn get_user_input(prompt: &str) -> Result<String, Box<dyn std::error::Error>> {
     let config = Config::builder().edit_mode(Emacs).build();
     let mut rl = DefaultEditor::with_config(config)?;
@@ -59,45 +59,4 @@ pub fn get_user_input(prompt: &str) -> Result<String, Box<dyn std::error::Error>
         }
         Err(err) => Err(Box::new(err)),
     }
-}
-
-pub fn load_files_into_context(
-    directory: &Path,
-    file_types: &[String], // Use a slice of strings
-    context: &mut String,
-) -> Result<(), Box<dyn Error>> {
-    for entry in WalkDir::new(directory) {
-        let entry = entry?;
-        let file_path = entry.path();
-
-        if file_path.is_file() {
-            if let Some(extension) = file_path.extension() {
-                if let Some(ext_str) = extension.to_str() {
-                    if file_types.contains(&ext_str.to_string()) {
-                        add_to_context(context, &file_path)?;
-                    }
-                }
-            }
-        }
-    }
-    Ok(())
-}
-
-pub fn add_to_context(context: &mut String, file_path: &Path) -> Result<(), Box<dyn Error>> {
-    let current_dir = std::env::current_dir()
-        .map_err(|e| format!("Failed to get current directory for context: {}", e))?;
-
-    let content = fs::read_to_string(&file_path)
-        .map_err(|e| format!("Failed to read file '{}': {}", file_path.display(), e))?;
-
-    let relative_path = file_path
-        .strip_prefix(&current_dir)
-        .unwrap_or(file_path)
-        .to_string_lossy();
-
-    context.push_str(&format!(
-        "Filename: {}\nContent:\n{}\n",
-        relative_path, content
-    ));
-    Ok(())
 }

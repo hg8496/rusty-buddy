@@ -1,7 +1,8 @@
 use crate::chat::file_storage::NilChatStorage;
 use crate::chat::service::ChatService;
-use crate::openai_api::openai_interface::OpenAIInterface;
 use crate::config;
+use crate::openai_api::openai_interface::OpenAIInterface;
+use crate::persona::get_personas;
 use std::process::Command;
 
 pub async fn run_commitmessage() -> Result<(), Box<dyn std::error::Error>> {
@@ -10,7 +11,8 @@ pub async fn run_commitmessage() -> Result<(), Box<dyn std::error::Error>> {
     drop(config);
     let openai = OpenAIInterface::new(String::from(model));
     let storage = NilChatStorage {};
-    let mut chat_service = ChatService::new(openai, storage);
+
+    let mut chat_service = ChatService::new(openai, storage, get_personas()[0].clone(), None);
 
     chat_service.add_system_message("
         Begin your message with a short summary of your changes (up to 50 characters as a guideline).

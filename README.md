@@ -81,6 +81,36 @@ Rusty Buddy is a command line tool that provides various utilities to assist in 
 
   By default, if no session command is provided, a new chat is initiated.
 
+### Slash Commands
+
+Within a chat session, you can use slash commands to execute specific tasks. These commands begin with a `/` character. The following slash commands are currently supported:
+
+- **Renew Context**: Refresh the context of the chat session.
+  ```
+  /renew 
+  ```
+  This will clear existing context, reload files if a directory context is specified, and reapply persona prompts.
+
+To execute a slash command, type it within the chat interface. For example, to renew the context, you would enter:
+
+```
+/renew
+```
+
+When you're done with the chat session, typing `exit` will allow you to exit, optionally saving the chat session under a specified name.
+
+### Examples of Chat Interactions
+
+Here's how you might interact with the chat interface:
+
+1. Start a new session or continue a previous session.
+2. Engage in dialogue using natural language.
+3. Use slash commands to adjust the session context or perform other operations.
+4. Save the session if needed for future reference.
+
+These features make the chat component of `rusty-buddy` highly customizable and user-friendly, providing tool and AI support directly from your project contexts.
+
+
 - **Wish**
 
   Use the CLI to fulfill development wishes in a specified directory:

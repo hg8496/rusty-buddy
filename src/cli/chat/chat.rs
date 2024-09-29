@@ -1,15 +1,16 @@
+use crate::chat::command_registry::CommandRegistry;
+use crate::chat::commands::initialize_commands;
 use crate::chat::file_storage::DirectoryChatStorage;
 use crate::chat::interface::ChatStorage;
 use crate::chat::service::ChatService;
 use crate::cli::spinner::{start_spinner, stop_spinner};
 use crate::cli::style::configure_mad_skin;
-use crate::cli::utils::{get_multiline_input, get_user_input, load_files_into_context};
+use crate::cli::utils::{get_multiline_input, get_user_input};
 use crate::config;
 use crate::config::get_chat_sessions_dir;
 use crate::openai_api::openai_interface::OpenAIInterface;
 use crate::persona::get_persona;
 use std::error::Error;
-use std::path::Path;
 
 pub async fn run_chat(
     start_new: bool,
@@ -24,6 +25,10 @@ pub async fn run_chat(
     drop(config);
     let openai = OpenAIInterface::new(String::from(model));
     let storage = DirectoryChatStorage::new(config::get_chat_sessions_dir());
+    let mut command_registry = CommandRegistry::new();
+
+    // Have all commands register themselves
+    initialize_commands(&mut command_registry);
 
     // Use specified persona or default if none provided
     let persona = match persona_name {
@@ -36,8 +41,7 @@ pub async fn run_chat(
         },
         None => get_persona(default_persona.as_str()).unwrap(),
     };
-    let mut chat_service = ChatService::new(openai, storage);
-    chat_service.add_system_message(persona.chat_prompt.as_str());
+    let mut chat_service = ChatService::new(openai, storage, persona.clone(), directory);
     let mut start_session = start_new;
     if continue_last {
         if let Some(last_session) = get_last_session_name()? {
@@ -56,14 +60,7 @@ pub async fn run_chat(
     }
 
     if start_session {
-        eprintln!("Starting new Chat.");
-        if let Some(dir) = directory {
-            let path = Path::new(&dir);
-            let mut context = String::from("Use the following Context to assist the user.\n");
-            load_files_into_context(path, persona.file_types.as_slice(), &mut context)?;
-            chat_service.add_system_message(&context.as_str());
-            eprintln!("Loaded {} bytes of context.", context.len());
-        }
+        chat_service.setup_context();
     }
 
     // Create a MadSkin to style the terminal output
@@ -73,6 +70,13 @@ pub async fn run_chat(
         let user_input = get_multiline_input("User (use Ctrl+D to submit): ")?;
         let trimmed_input = user_input.trim();
 
+        if trimmed_input.starts_with('/') {
+            let mut parts = trimmed_input.split_whitespace();
+            let command_name = parts.next().unwrap_or("");
+            let args: Vec<&str> = parts.collect();
+            command_registry.execute_command(command_name, &args, &mut chat_service)?;
+            continue;
+        }
         if trimmed_input == "exit" || trimmed_input.is_empty() {
             let save_name = get_user_input(
                 "Enter a name to save this session (or press Enter to skip saving): ",

@@ -14,6 +14,7 @@ pub enum MessageRole {
     System,
     User,
     Assistant,
+    Context,
 }
 
 pub trait ChatBackend {

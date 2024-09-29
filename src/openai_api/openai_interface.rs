@@ -96,6 +96,11 @@ impl OpenAIInterface {
                     .build()
                     .unwrap()
                     .into(),
+                MessageRole::Context => ChatCompletionRequestSystemMessageArgs::default()
+                    .content(msg.content.as_str())
+                    .build()
+                    .unwrap()
+                    .into(),
                 MessageRole::User => ChatCompletionRequestUserMessageArgs::default()
                     .content(msg.content.as_str())
                     .build()
