@@ -4,6 +4,7 @@ use crate::cli::utils::{add_to_context, get_multiline_input, load_files_into_con
 use crate::openai_api::openai_interface::OpenAIInterface;
 use std::error::Error;
 use std::path::PathBuf;
+use crate::config;
 
 pub async fn run_wish(directory: &str, use_tools: bool) -> Result<(), Box<dyn Error>> {
     // Check if the directory is valid
@@ -17,7 +18,10 @@ pub async fn run_wish(directory: &str, use_tools: bool) -> Result<(), Box<dyn Er
     }
 
     // Initialize the chat service with an OpenAI backend and NilStorage
-    let openai = OpenAIInterface::new();
+    let config = config::CONFIG.lock().unwrap();
+    let model = &config.ai.wish_model.clone();
+    drop(config);
+    let openai = OpenAIInterface::new(String::from(model));
     let storage = NilChatStorage {};
     let mut chat_service = ChatService::new(openai, storage);
 

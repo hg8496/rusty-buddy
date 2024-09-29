@@ -17,6 +17,7 @@ use std::env;
 use std::error::Error;
 
 pub struct OpenAIInterface {
+    model: String,
     last_call_completion_token: u32,
     last_call_prompt_token: u32,
     overall_completion_token: u32,
@@ -26,6 +27,7 @@ pub struct OpenAIInterface {
 impl Default for OpenAIInterface {
     fn default() -> Self {
         OpenAIInterface {
+            model: "gpt-4o-2024-08-06".to_string(),
             last_call_completion_token: 0,
             last_call_prompt_token: 0,
             overall_completion_token: 0,
@@ -75,8 +77,9 @@ impl ChatBackend for OpenAIInterface {
 }
 
 impl OpenAIInterface {
-    pub fn new() -> Self {
+    pub fn new(model: String) -> Self {
         OpenAIInterface {
+            model,
             ..Default::default()
         }
     }
@@ -128,7 +131,7 @@ impl OpenAIInterface {
     ) -> Result<CreateChatCompletionRequest, Box<dyn Error>> {
         let mut builder = &mut CreateChatCompletionRequestArgs::default();
         builder = builder
-            .model("gpt-4o-2024-08-06")
+            .model(self.model.as_str())
             .max_tokens(15000u32)
             .messages(messages.clone());
         if use_tools {

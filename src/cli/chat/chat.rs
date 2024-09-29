@@ -18,13 +18,14 @@ pub async fn run_chat(
     directory: Option<String>,
     persona_name: Option<String>,
 ) -> Result<(), Box<dyn Error>> {
-    let openai = OpenAIInterface::new();
+    let config = config::CONFIG.lock().unwrap();
+    let model = &config.ai.chat_model.clone();
+    let default_persona = config.default_persona.clone();
+    drop(config);
+    let openai = OpenAIInterface::new(String::from(model));
     let storage = DirectoryChatStorage::new(config::get_chat_sessions_dir());
 
     // Use specified persona or default if none provided
-    let config = config::CONFIG.lock().unwrap();
-    let default_persona = config.default_persona.clone();
-    drop(config);
     let persona = match persona_name {
         Some(name) => match get_persona(&name) {
             Some(p) => p,
@@ -92,7 +93,7 @@ pub async fn run_chat(
         stop_spinner(spinner);
 
         // Use the skin to print the AI's response with styling
-        skin.print_text("---\n# AI:");
+        skin.print_text(format!("---\n# AI Persona:{} Model: {}:", persona.name, model).as_str());
         skin.print_text(&response);
         chat_service.print_statistics();
     }

@@ -44,7 +44,7 @@ more.
   Generate a summary for staged changes in your git repository:
   ```bash  
   git add .                                                                                                                                                                                                          
-  rusty-buddy commitmessage                                                                                                                                                                                            
+  rusty-buddy commit-message                                                                                                                                                                                            
   ```                                                                                                                                                                                                                
 
 - **Chat**
@@ -85,6 +85,49 @@ more.
   ```bash                                                                                                                                                                                                            
   rusty-buddy wish ./src --tools                                                                                                                                                                            
   ```                                                                                                                                                                                                                
+
+## Configuration
+
+The Rusty Buddy CLI supports personalized configurations through a `config.toml` file. This file allows you to customize personas, models, and other aspects of Rusty Buddy.
+
+### Configuration File Structure
+
+The `config.toml` file follows this basic structure:
+
+```toml
+# Default persona to use if none is specified
+default_persona = "rust"
+
+# Model configurations for different functionalities
+[ai]
+chat_model = "gpt-4o-2024-08-06"
+commit_model = "gpt-4o-2024-08-06"
+wish_model = "gpt-4o-2024-08-06"
+
+# Define various personas
+[[personas]]
+name = "rust"
+chat_prompt = "You are an experienced Rust developer assisting a colleague with feature development and answering questions related to Rust programming."
+file_types = ["rs", "md", "toml", "yml"]
+
+[[personas]]
+name = "java"
+chat_prompt = "You are an experienced Java developer assisting a colleague with feature development and answering questions related to Java programming."
+file_types = ["java"]
+
+[[personas]]
+name = "typescript"
+chat_prompt = "You are an experienced Typescript developer assisting a colleague with feature development and answering questions related to Typescript programming."
+file_types = ["ts"]
+```
+
+### Setting Up the Configuration File
+
+1. **Locate the Configuration File:** The configuration file, `config.toml`, is typically located in the `.rusty` directory within your project root or home directory.
+
+2. **Edit the Configuration File:** Customize the configuration by modifying or adding personas, changing default models, or specifying other options.
+
+3. **Applying Configurations:** After saving your changes in `config.toml`, restart the Rusty Buddy CLI to apply the configurations.
 
 ## Persona Feature
 
