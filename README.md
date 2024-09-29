@@ -1,17 +1,20 @@
 # Rusty Buddy
 
-Rusty Buddy is a command line tool that provides various utilities to assist in development, including chat support with
-a backend powered by OpenAI, a tool to generate commit messages from git diffs, and      
-more.
+Rusty Buddy is a command line tool that provides various utilities to assist in development, including AI-powered interactions and file management.
 
 ## Features
 
-- **Chat Interface**: Engage in a conversation with an AI assistant, with the content of your project. Load or save chat
-  sessions.
-- **Commit Message Generator**: Automatically generate commit messages from `git diff` summaries.
-- **Wish Fulfillment**: Collects files from a specified directory and creates a context for interactions with AI.
-- **Tool Integration**: Use custom tools (like showing diffs, creating files and directories) to enhance the AI's
-  capabilities.
+- **Chat Interface**: Engage in a conversation with an AI assistant. Load or save chat sessions, and specify a directory to include in the chat context for more relevant interactions.
+
+- **Commit Message Generator**: Automatically generate commit messages from `git diff` summaries, ensuring clear and consistent commit history.
+
+- **Wish Fulfillment**: Collects files from a specified directory and creates a development context, helping integrate AI into software development workflows. Utilize tools for file and directory creation and modification.
+
+- **Icon Generation**: Generate icons based on user descriptions using OpenAI's DALL·E. Specify output sizes for tailored icon usage.
+
+- **Tool Integration**: Use custom tools (like showing diffs, creating files, and directories) to enhance the AI's capabilities and assist users in making swift development changes.
+
+- **Shell Completion**: Supports shell completion for convenient command-line interaction across different shells including Bash, Zsh, Fish, and PowerShell.
 
 ## Installation
 
@@ -48,47 +51,53 @@ more.
   ```                                                                                                                                                                                                                
 
 - **Chat**
-  
+
   Start a chat session with various options:
-  
+
     - **Start a New Chat Session**
       ```bash
       rusty-buddy chat --new
       ```
-      
+
     - **Continue the Last Chat Session**
       ```bash
       rusty-buddy chat --continue
       ```
-      
+
     - **Load a Specific Chat Session by Name**
       ```bash
       rusty-buddy chat --load session_name
       ```
-      
+
     - **Specify a Directory to Add to the Chat Context**
       ```bash
       rusty-buddy chat --directory ./src
       ```
-      
+
     - **Use a Specific Persona for the Chat Session**
       ```bash
       rusty-buddy chat --persona rust
       ```                                      
 
-  By default, if no session command is provided, a new chat is initiated. You can also set up and select different
-  personas for tailored interactions.
+  By default, if no session command is provided, a new chat is initiated.
 
 - **Wish**
 
   Use the CLI to fulfill development wishes in a specified directory:
   ```bash                                                                                                                                                                                                            
   rusty-buddy wish ./src --tools                                                                                                                                                                            
-  ```                                                                                                                                                                                                                
+  ```
+
+- **Create Icon**
+
+  Generate an icon using a description provided by the user, specifying output sizes:
+  ```bash
+  rusty-buddy create-icon --output ./icons --sizes 16,32,64,128,256,512
+  ```
 
 ## Configuration
 
-The Rusty Buddy CLI supports personalized configurations through a `config.toml` file. This file allows you to customize personas, models, and other aspects of Rusty Buddy.
+The Rusty Buddy CLI supports personalized configurations through a `config.toml` file. This file allows you to customize personas, models, and other aspects.
 
 ### Configuration File Structure
 
@@ -161,11 +170,6 @@ behavior, and specify both the interaction style and the file types to be includ
    name = "python"
    chat_prompt = "You are an experienced Python developer assisting a colleague with feature development and answering questions related to Python programming."
    file_types = ["py", "md"]
-
-   [[personas]]
-   name = "go"
-   chat_prompt = "You are an experienced Go developer assisting a colleague with feature development and answering questions related to Go programming."
-   file_types = ["go"]
    ```
 
 3. **Set the Default Persona:** Specify the persona you want to use by default in the `default_persona` field.
@@ -175,21 +179,17 @@ behavior, and specify both the interaction style and the file types to be includ
    default_persona = "python"
    ```
 
-4. **Save and Restart:** After editing, save the `config.toml` file. Restart the Rusty CLI to apply the new
-   configurations.
+4. **Save and Restart:** After editing, save the `config.toml` file. Restart the Rusty CLI to apply the new configurations.
 
 ### Using Personas
 
-The persona specified in `default_persona` will be used automatically when you start a new chat session. You do not need
-to pass any additional flags or arguments for personas when you run the CLI commands.
+The persona specified in `default_persona` will be used automatically when you start a new chat session. You do not need to pass any additional flags or arguments for personas when you run the CLI commands.
 
-This approach to persona management allows you to customize how the CLI interacts with you, making it a flexible tool
-that adapts to multiple programming environments and personal preferences.
+This approach to persona management allows you to customize how the CLI interacts with you, making it a flexible tool that adapts to multiple programming environments and personal preferences.
 
 ### Shell Completion
 
-Rusty Buddy CLI supports auto-completion for various shells, allowing you to complete commands, options, and arguments
-easily. This can enhance your productivity and reduce errors when using the CLI.
+Rusty Buddy CLI supports auto-completion for various shells, allowing you to complete commands, options, and arguments easily. This can enhance your productivity and reduce errors when using the CLI.
 
 #### Enabling Shell Completion
 
@@ -209,25 +209,23 @@ rusty-buddy --completion=zsh >> ~/.zshrc
 
 For Fish:
 
-```shell
+```fish
 rusty-buddy --completion=fish > ~/.config/fish/completions/rusty-buddy.fish
 ```
 
 For PowerShell:
 
-```shell
+```powershell
 rusty-buddy --completion=powershell >> $PROFILE
 ```
 
 Reload your shell configuration after adding the completion script to activate it.
 
-This feature provides tab-completion for commands and options, making it easier to use Rusty Buddy in your daily
-workflow.
+This feature provides tab-completion for commands and options, making it easier to use Rusty Buddy in your daily workflow.
 
 ## Contributing
 
-Contributions are welcome! Please fork this repository and make a pull request if you have any features, bug fixes, or
-improvements you want to contribute.
+Contributions are welcome! Please fork this repository and make a pull request if you have any features, bug fixes, or improvements you want to contribute.
 
 ## License
 
@@ -235,4 +233,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Contact
 
-For inquiries or support, please contact hg8496(mailto:hg8496@cstolz.de).                                                                                                                                      
+For inquiries or support, please contact hg8496(mailto:hg8496@cstolz.de).
