@@ -102,9 +102,12 @@ impl<B: ChatBackend, S: ChatStorage> ChatService<B, S> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::chat::file_storage::NilChatStorage;
+    use crate::chat::interface::{ChatBackend, Message};
+    use crate::chat::service::ChatService;
     use crate::persona::Persona;
+    use std::error::Error;
+    use std::path::{Path, PathBuf};
 
     #[tokio::test]
     async fn test_setup_context() {
@@ -112,17 +115,23 @@ mod tests {
         let persona = Persona {
             name: "test".to_string(),
             chat_prompt: "Test persona prompt".to_string(),
-            file_types: vec!["rs".to_string()], // Assuming you want to load `.rs` files
+            file_types: vec!["rs".to_string()],
         };
+
+        // Construct the path using PathBuf
+        let path = PathBuf::from("tests").join("mocks");
 
         // Create an instance of ChatService
         let mut chat_service = ChatService::new(
             MockChatBackend::new(),
             NilChatStorage {},
             persona.clone(),
-            Some("tests/mocks".to_string()), // Specify the path to mock files
+            Some(path.to_string_lossy().into_owned()), // Convert to String
         );
+
+        // Set up the context
         chat_service.setup_context();
+
         // Verify that context messages are correctly set
         assert!(chat_service
             .messages
@@ -130,31 +139,43 @@ mod tests {
             .unwrap()
             .content
             .contains("Test persona prompt"));
+
+        // Construct the expected mock file path
+        let expected_filepath = Path::new("tests").join("mocks").join("mock_file.rs");
+        let expected_filename = format!("Filename: {}", expected_filepath.to_string_lossy());
+
         assert!(chat_service
             .messages
             .last()
             .unwrap()
             .content
-            .contains("Filename: tests/mocks/mock_file.rs"));
+            .contains(&expected_filename));
     }
+
     #[tokio::test]
     async fn test_multiple_setup_context() {
         // Configure a mock persona
         let persona = Persona {
             name: "test".to_string(),
             chat_prompt: "Test persona prompt".to_string(),
-            file_types: vec!["rs".to_string()], // Assuming you want to load `.rs` files
+            file_types: vec!["rs".to_string()],
         };
+
+        // Construct the path using PathBuf
+        let path = PathBuf::from("tests").join("mocks");
 
         // Create an instance of ChatService
         let mut chat_service = ChatService::new(
             MockChatBackend::new(),
             NilChatStorage {},
             persona.clone(),
-            Some("tests/mocks".to_string()), // Specify the path to mock files
+            Some(path.to_string_lossy().into_owned()), // Convert to String
         );
+
+        // Set up the context multiple times
         chat_service.setup_context();
         chat_service.setup_context();
+
         // Verify that context messages are correctly set
         assert!(chat_service
             .messages
@@ -162,12 +183,17 @@ mod tests {
             .unwrap()
             .content
             .contains("Test persona prompt"));
+
+        // Construct the expected mock file path
+        let expected_filepath = Path::new("tests").join("mocks").join("mock_file.rs");
+        let expected_filename = format!("Filename: {}", expected_filepath.to_string_lossy());
+
         assert!(chat_service
             .messages
             .last()
             .unwrap()
             .content
-            .contains("Filename: tests/mocks/mock_file.rs"));
+            .contains(&expected_filename));
         assert_eq!(chat_service.messages.len(), 2);
     }
 

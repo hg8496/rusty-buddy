@@ -82,9 +82,9 @@ impl ChatStorage for DirectoryChatStorage {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::chat::interface::MessageRole;
     use std::fs;
     use std::path::PathBuf;
-    use crate::chat::interface::MessageRole;
 
     fn setup_test_storage_dir(nr: u16) -> PathBuf {
         let dir = PathBuf::from(format!(".test_storage{}", nr));
@@ -117,10 +117,14 @@ mod tests {
         ];
 
         // Save the session
-        storage.save_session(session_name, &messages).expect("Failed to save session.");
+        storage
+            .save_session(session_name, &messages)
+            .expect("Failed to save session.");
 
         // Load the session
-        let loaded_messages = storage.load_session(session_name).expect("Failed to load session.");
+        let loaded_messages = storage
+            .load_session(session_name)
+            .expect("Failed to load session.");
 
         assert_eq!(messages, loaded_messages);
 
@@ -142,8 +146,12 @@ mod tests {
         }];
 
         // Save two sessions
-        storage.save_session(session_name_1, &messages).expect("Failed to save session one.");
-        storage.save_session(session_name_2, &messages).expect("Failed to save session two.");
+        storage
+            .save_session(session_name_1, &messages)
+            .expect("Failed to save session one.");
+        storage
+            .save_session(session_name_2, &messages)
+            .expect("Failed to save session two.");
 
         // List sessions
         let session_list = storage.list_sessions().expect("Failed to list sessions.");
