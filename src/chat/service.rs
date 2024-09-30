@@ -46,10 +46,13 @@ impl<B: ChatBackend, S: ChatStorage> ChatService<B, S> {
 
     // Adds a message from the system perspective to the chat messages.
     pub fn add_context_message(&mut self, system_message: &str) {
-        self.messages.insert(0, Message {
-            role: MessageRole::Context,
-            content: system_message.to_string(),
-        })
+        self.messages.insert(
+            0,
+            Message {
+                role: MessageRole::Context,
+                content: system_message.to_string(),
+            },
+        )
     }
 
     // Adds a message from the system perspective to the chat messages.
@@ -94,5 +97,98 @@ impl<B: ChatBackend, S: ChatStorage> ChatService<B, S> {
     // Prints statistics related to the chat session, using the backend's statistics function.
     pub fn print_statistics(&self) {
         self.backend.print_statistics();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::chat::file_storage::NilChatStorage;
+    use crate::persona::Persona;
+
+    #[tokio::test]
+    async fn test_setup_context() {
+        // Configure a mock persona
+        let persona = Persona {
+            name: "test".to_string(),
+            chat_prompt: "Test persona prompt".to_string(),
+            file_types: vec!["rs".to_string()], // Assuming you want to load `.rs` files
+        };
+
+        // Create an instance of ChatService
+        let mut chat_service = ChatService::new(
+            MockChatBackend::new(),
+            NilChatStorage {},
+            persona.clone(),
+            Some("tests/mocks".to_string()), // Specify the path to mock files
+        );
+        chat_service.setup_context();
+        // Verify that context messages are correctly set
+        assert!(chat_service
+            .messages
+            .first()
+            .unwrap()
+            .content
+            .contains("Test persona prompt"));
+        assert!(chat_service
+            .messages
+            .last()
+            .unwrap()
+            .content
+            .contains("Filename: tests/mocks/mock_file.rs"));
+    }
+    #[tokio::test]
+    async fn test_multiple_setup_context() {
+        // Configure a mock persona
+        let persona = Persona {
+            name: "test".to_string(),
+            chat_prompt: "Test persona prompt".to_string(),
+            file_types: vec!["rs".to_string()], // Assuming you want to load `.rs` files
+        };
+
+        // Create an instance of ChatService
+        let mut chat_service = ChatService::new(
+            MockChatBackend::new(),
+            NilChatStorage {},
+            persona.clone(),
+            Some("tests/mocks".to_string()), // Specify the path to mock files
+        );
+        chat_service.setup_context();
+        chat_service.setup_context();
+        // Verify that context messages are correctly set
+        assert!(chat_service
+            .messages
+            .first()
+            .unwrap()
+            .content
+            .contains("Test persona prompt"));
+        assert!(chat_service
+            .messages
+            .last()
+            .unwrap()
+            .content
+            .contains("Filename: tests/mocks/mock_file.rs"));
+        assert_eq!(chat_service.messages.len(), 2);
+    }
+
+    // Implement a simple ChatBackend mock
+    struct MockChatBackend;
+
+    impl MockChatBackend {
+        fn new() -> Self {
+            MockChatBackend
+        }
+    }
+
+    impl ChatBackend for MockChatBackend {
+        async fn send_request(
+            &mut self,
+            _messages: &Vec<Message>,
+            _use_tools: bool,
+        ) -> Result<String, Box<dyn Error>> {
+            Ok("".to_string())
+        }
+
+        fn print_statistics(&self) {}
     }
 }

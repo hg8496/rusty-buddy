@@ -97,7 +97,7 @@ pub async fn run_chat(
         stop_spinner(spinner);
 
         // Use the skin to print the AI's response with styling
-        skin.print_text(format!("---\n# AI Persona:{} Model: {}:", persona.name, model).as_str());
+        skin.print_text(format!("---\n# AI Persona:{} Model: {}\n", persona.name, model).as_str());
         skin.print_text(&response);
         chat_service.print_statistics();
     }

@@ -25,13 +25,16 @@ jobs:
             args: ''
           - os: windows-latest
             target: aarch64-pc-windows-msvc
-            
+    
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
-        
+
       - name: Setup target
         run: rustup target add ${{ matrix.config.target }}
+
+      - name: Run tests
+        run: cargo test
 
       - name: Build
         run: cargo build --release --target ${{ matrix.config.target }}
