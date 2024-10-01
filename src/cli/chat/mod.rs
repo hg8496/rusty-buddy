@@ -10,6 +10,8 @@ pub async fn run(args: ChatArgs) -> Result<(), Box<dyn std::error::Error>> {
         args.load,
         args.directory,
         args.persona,
+        args.one_shot,
+        args.message,
     )
     .await
 }

@@ -21,4 +21,12 @@ pub struct ChatArgs {
     /// Specify a persona for the chat session
     #[arg(short, long)]
     pub persona: Option<String>,
+
+    /// Send one message and quit
+    #[arg(short = 'o', long = "one-shot")]
+    pub one_shot: bool,
+
+    /// Use this message as user input
+    #[arg(short = 'm', long = "message")]
+    pub message: Option<String>,
 }

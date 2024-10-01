@@ -1,7 +1,7 @@
 use crate::cli::chat::ChatArgs;
 use crate::cli::commitmessage::CommitMessageArgs;
-use crate::cli::createicon::CreateIconArgs;
 use crate::cli::createbackground::BackgroundArgs;
+use crate::cli::createicon::CreateIconArgs;
 use crate::cli::wish::WishArgs;
 use clap::{Parser, Subcommand};
 use clap_complete::aot::Shell;

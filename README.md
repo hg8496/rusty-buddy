@@ -48,15 +48,15 @@ Rusty Buddy is a command-line tool that provides various utilities to assist in 
 
   Generate a background image using a description provided by the user, specifying orientation:
 
-  - **Landscape Orientation**
-    ```bash
-    rusty-buddy create-background --orientation landscape --output ./backgrounds
-    ```
+    - **Landscape Orientation**
+      ```bash
+      rusty-buddy create-background --orientation landscape --output ./backgrounds
+      ```
 
-  - **Portrait Orientation**
-    ```bash
-    rusty-buddy create-background --orientation portrait --output ./backgrounds
-    ```
+    - **Portrait Orientation**
+      ```bash
+      rusty-buddy create-background --orientation portrait --output ./backgrounds
+      ```
 
 - **Create Icon**
 
@@ -102,6 +102,20 @@ Rusty Buddy is a command-line tool that provides various utilities to assist in 
       rusty-buddy chat --persona rust
       ```
 
+    - **One-shot Chat**
+
+      Send a single message and print the assistant's response:
+
+        - From a specified message:
+          ```bash
+          rusty-buddy chat --one-shot --message "Hello, assistant!"
+          ```
+
+        - From piped input:
+          ```bash
+          echo "What does the program do?" | rusty-buddy chat --one-shot -d .
+          ```
+
   By default, if no session command is provided, a new chat is initiated.
 
 - **Wish**
@@ -126,9 +140,8 @@ Within a chat session, you can use slash commands to execute specific tasks. The
   /save-files
   ```
   This command allows you to interactively extract code snippets from AI responses and save them. Options include:
-  - **a**: Add code block to the current memory for later saving.
-  - **s**: Save accumulated code blocks to a file.
-  - **q**: Quit without saving.
+    - **y**: Save this block.
+    - **n**: Skip this block.
 
   For a quick save of all available code between first and last triple backticks, use:
   ```
@@ -150,7 +163,6 @@ When you're done with the chat session, typing `exit` will allow you to exit, op
 4. Save the session if needed for future reference.
 
 These features make the chat component of `rusty-buddy` highly customizable and user-friendly, providing tool and AI support directly from your project contexts.
-
 ## Configuration
 
 The Rusty Buddy CLI supports personalized configurations through a `config.toml` file. This file allows you to customize personas, models, and other aspects.

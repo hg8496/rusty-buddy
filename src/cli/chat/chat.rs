@@ -11,6 +11,8 @@ use crate::config::get_chat_sessions_dir;
 use crate::openai_api::openai_interface::OpenAIInterface;
 use crate::persona::get_persona;
 use std::error::Error;
+use std::io::{self, Read};
+use atty::Stream;
 
 pub async fn run_chat(
     start_new: bool,
@@ -18,6 +20,8 @@ pub async fn run_chat(
     load_name: Option<String>,
     directory: Option<String>,
     persona_name: Option<String>,
+    one_shot: bool,
+    input_message: Option<String>,
 ) -> Result<(), Box<dyn Error>> {
     let config = config::CONFIG.lock().unwrap();
     let model = &config.ai.chat_model.clone();
@@ -27,10 +31,10 @@ pub async fn run_chat(
     let storage = DirectoryChatStorage::new(config::get_chat_sessions_dir());
     let mut command_registry = CommandRegistry::new();
 
-    // Have all commands register themselves
+    // Register commands
     initialize_commands(&mut command_registry);
 
-    // Use specified persona or default if none provided
+    // Determine the persona to use
     let persona = match persona_name {
         Some(name) => match get_persona(&name) {
             Some(p) => p,
@@ -42,6 +46,7 @@ pub async fn run_chat(
         None => get_persona(default_persona.as_str()).unwrap(),
     };
     let mut chat_service = ChatService::new(openai, storage, persona.clone(), directory);
+
     let mut start_session = start_new;
     if continue_last {
         if let Some(last_session) = get_last_session_name()? {
@@ -62,10 +67,39 @@ pub async fn run_chat(
     if start_session {
         chat_service.setup_context();
     }
-
-    // Create a MadSkin to style the terminal output
     let skin = configure_mad_skin();
 
+    if one_shot {
+        // Initialize a buffer to read data from stdin
+        let mut buffer = String::new();
+
+        // Check if there's a message passed via command line options
+        let user_input = if let Some(message) = input_message {
+            message
+        } else if !atty::is(Stream::Stdin) {
+            // Read from stdin if it's not a terminal (i.e., piped input)
+            io::stdin().read_to_string(&mut buffer)?;
+            buffer.trim().to_string()  // Trim whitespace
+        } else {
+            get_multiline_input("Your message (end with Ctrl+D): ")?
+        };
+
+        // Send the message to OpenAI using ChatService
+        if !user_input.trim().is_empty() {
+            let spinner = start_spinner();
+
+            let response = chat_service.send_message(user_input.trim(), false).await?;
+            stop_spinner(spinner);
+
+            skin.print_text(format!("---\n# AI Persona:{} Model: {}\n", persona.name, model).as_str());
+            skin.print_text(&response);
+            chat_service.print_statistics();
+        } else {
+            println!("No input provided.");
+        }
+        return Ok(());
+    }
+    // Interactive chat loop
     loop {
         let user_input = get_multiline_input("User (use Ctrl+D to submit): ")?;
         let trimmed_input = user_input.trim();
@@ -87,16 +121,12 @@ pub async fn run_chat(
             break;
         }
 
-        // Start the spinner
         let spinner = start_spinner();
 
-        // Send the message to OpenAI using ChatService
         let response = chat_service.send_message(trimmed_input, false).await?;
 
-        // Stop the spinner
         stop_spinner(spinner);
 
-        // Use the skin to print the AI's response with styling
         skin.print_text(format!("---\n# AI Persona:{} Model: {}\n", persona.name, model).as_str());
         skin.print_text(&response);
         chat_service.print_statistics();

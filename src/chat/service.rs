@@ -8,10 +8,10 @@ use std::path::Path;
 // It is responsible for managing session messages, interfacing with storage,
 // and communicating user messages to a backend service.
 pub struct ChatService<B: ChatBackend, S: ChatStorage> {
-    backend: B,                // Handles message processing and interactions with OpenAI or others
-    storage: S,                // Manages storing and loading previous chat sessions
-    messages: Vec<Message>,    // Stores messages exchanged during the current chat session
-    persona: Persona,          // Represents the context and behavior in the chat session
+    backend: B, // Handles message processing and interactions with OpenAI or others
+    storage: S, // Manages storing and loading previous chat sessions
+    messages: Vec<Message>, // Stores messages exchanged during the current chat session
+    persona: Persona, // Represents the context and behavior in the chat session
     directory: Option<String>, // Directory path for file context loading
 }
 

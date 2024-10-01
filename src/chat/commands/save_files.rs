@@ -54,7 +54,10 @@ impl ChatCommand for SaveFilesCommand {
                 let content = &cap[1].trim();
                 println!("Found code block #{}:\n{}", index + 1, content);
 
-                if get_user_input("Do you want to save this code block? (y/n): ")?.trim().eq_ignore_ascii_case("y") {
+                if get_user_input("Do you want to save this code block? (y/n): ")?
+                    .trim()
+                    .eq_ignore_ascii_case("y")
+                {
                     save_content(content)?;
                 } else {
                     println!("Skipped code block #{}.", index + 1);

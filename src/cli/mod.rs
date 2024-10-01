@@ -1,7 +1,7 @@
 pub mod chat;
 pub mod commitmessage;
-pub mod createicon;
 pub mod createbackground;
+pub mod createicon;
 mod spinner;
 mod style;
 pub mod utils;

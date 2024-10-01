@@ -1,15 +1,17 @@
+use crate::cli::createbackground::Orientation;
 use crate::cli::spinner::{start_spinner, stop_spinner};
 use crate::cli::utils::get_multiline_input;
 use async_openai::config::OpenAIConfig;
-use async_openai::types::{CreateImageRequestArgs, Image, ImageModel, ImageQuality, ImageResponseFormat, ImageSize};
+use async_openai::types::{
+    CreateImageRequestArgs, Image, ImageModel, ImageQuality, ImageResponseFormat, ImageSize,
+};
 use async_openai::Client;
+use base64::prelude::BASE64_STANDARD;
+use base64::Engine;
 use dotenvy::dotenv;
 use std::error::Error;
 use std::fs;
 use std::sync::Arc;
-use base64::Engine;
-use base64::prelude::BASE64_STANDARD;
-use crate::cli::createbackground::Orientation;
 
 pub async fn run_create_background(
     output_file: &str,
