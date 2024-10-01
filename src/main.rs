@@ -31,6 +31,9 @@ async fn main() {
             args::Commands::CreateIcon(args) => {
                 cli::createicon::run(args).await.unwrap();
             }
+            args::Commands::CreateBackground(args) => {
+                cli::createbackground::run(args).await.unwrap();
+            }
             args::Commands::Wish(args) => {
                 cli::wish::run(args).await.unwrap();
             }

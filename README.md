@@ -12,6 +12,8 @@ Rusty Buddy is a command-line tool that provides various utilities to assist in 
 
 - **Icon Generation**: Generate icons based on user descriptions using OpenAI's DALL·E. Specify output sizes for tailored icon usage.
 
+- **Background Image Creation**: Generate background images in landscape or portrait orientation based on user descriptions. Use predefined sizes for optimal results.
+
 - **Tool Integration**: Use custom tools (like showing diffs, creating files, and directories) to enhance the AI's capabilities and assist users in making swift development changes.
 
 - **Shell Completion**: Supports shell completion for convenient command-line interaction across different shells including Bash, Zsh, Fish, and PowerShell.
@@ -41,6 +43,27 @@ Rusty Buddy is a command-line tool that provides various utilities to assist in 
 ## Usage
 
 ### CLI Commands
+
+- **Create Background**
+
+  Generate a background image using a description provided by the user, specifying orientation:
+
+  - **Landscape Orientation**
+    ```bash
+    rusty-buddy create-background --orientation landscape --output ./backgrounds
+    ```
+
+  - **Portrait Orientation**
+    ```bash
+    rusty-buddy create-background --orientation portrait --output ./backgrounds
+    ```
+
+- **Create Icon**
+
+  Generate an icon using a description provided by the user, specifying output sizes:
+  ```bash
+  rusty-buddy create-icon --output ./icons --sizes 16,32,64,128,256,512
+  ```
 
 - **Commit Message**
 
@@ -84,15 +107,8 @@ Rusty Buddy is a command-line tool that provides various utilities to assist in 
 - **Wish**
 
   Use the CLI to fulfill development wishes in a specified directory:
-  ```bash
-  rusty-buddy wish ./src --tools
-  ```
-
-- **Create Icon**
-
-  Generate an icon using a user-provided description, specifying output sizes:
-  ```bash
-  rusty-buddy create-icon --output ./icons --sizes 16,32,64,128,256,512
+  ```bash                                                                                                                                                                                                            
+  rusty-buddy wish ./src --tools                                                                                                                                                                            
   ```
 
 ### Slash Commands
@@ -180,7 +196,7 @@ file_types = ["ts"]
 
 ## Persona Feature
 
-Rusty CLI supports customizable personas, allowing you to tailor chatbot interactions to your specific needs. Personas provide context and a specific tone or style of interaction, simulating an experienced developer in your desired programming language or environment.
+The Rusty CLI supports customizable personas, allowing you to tailor chatbot interactions to your specific needs. Personas provide context and a specific tone or style of interaction, simulating an experienced developer in your desired programming language or environment.
 
 ### Built-in Personas
 
@@ -193,11 +209,11 @@ By default, Rusty-Buddy comes with several built-in personas:
 
 ### Setting Up Custom Personas
 
-To create and manage your own personas, edit the configuration file that controls Rusty Buddy's behavior, specifying both the interaction style and the file types for context:
+To create and manage your own personas, you need to edit the configuration file that the Rusty Buddy uses to control its behavior, and specify both the interaction style and the file types to be included in the context:
 
-1. **Locate the Configuration File** in the `.rusty` directory.
+1. **Locate the Configuration File:** This file is called `config.toml` and is located in the `.rusty` directory, typically within your home directory or project root.
 
-2. **Edit the Configuration File** to include your custom personas in the `personas` array, defining each persona's `name`, `chat_prompt`, and `file_types`.
+2. **Edit the Configuration File:** Add your custom personas in the `personas` array section of the file, defining each persona's `name`, `chat_prompt`, and `file_types`.
 
    Example:
    ```toml
