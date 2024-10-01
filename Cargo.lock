@@ -2010,7 +2010,7 @@ dependencies = [
 
 [[package]]
 name = "rusty-buddy"
-version = "0.3.1"
+version = "0.4.1"
 dependencies = [
  "async-openai",
  "base64",
