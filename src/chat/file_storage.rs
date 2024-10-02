@@ -1,6 +1,6 @@
 use crate::chat::interface::{ChatStorage, Message};
 use std::fs;
-use std::io::{self, Read, Write};
+use std::io;
 use std::path::PathBuf;
 
 pub struct NilChatStorage {}
@@ -42,13 +42,11 @@ impl ChatStorage for DirectoryChatStorage {
     fn load_session(&mut self, session_name: &str) -> io::Result<Vec<Message>> {
         self.ensure_storage_dir_exists()?;
         let file_path = self.get_file_path(session_name);
-        let mut file = fs::File::open(file_path)?;
-        let mut content = String::new();
-        file.read_to_string(&mut content)?;
+        let content = fs::read_to_string(file_path)?;
 
         // Deserialize the JSON content into a Vec<Message>
         let messages: Vec<Message> = serde_json::from_str(&content)
-            .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e.to_string()))?;
+            .or_else(|err| Err(io::Error::new(io::ErrorKind::InvalidData, err.to_string())))?;
 
         Ok(messages)
     }
@@ -56,29 +54,43 @@ impl ChatStorage for DirectoryChatStorage {
     fn save_session(&self, session_name: &str, messages: &[Message]) -> io::Result<()> {
         self.ensure_storage_dir_exists()?;
         let file_path = self.get_file_path(session_name);
-        let mut file = fs::File::create(file_path)?;
-
-        // Serialize the messages to JSON and write to the file
         let json_content = serde_json::to_string(messages)
-            .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e.to_string()))?;
+            .or_else(|err| Err(io::Error::new(io::ErrorKind::InvalidData, err.to_string())))?;
 
-        file.write_all(json_content.as_bytes())?;
+        fs::write(&file_path, json_content.as_bytes())?;
         Ok(())
     }
 
     fn list_sessions(&self) -> io::Result<Vec<String>> {
         self.ensure_storage_dir_exists()?;
-        Ok(fs::read_dir(&self.storage_dir)?
+        let mut sessions = fs::read_dir(&self.storage_dir)?
             .filter_map(|entry| {
                 entry.ok().and_then(|e| {
-                    e.file_name()
-                        .to_str()
-                        .map(|s| s.trim_end_matches(".json").to_owned())
+                    let path = e.path();
+                    if path.extension().and_then(|ext| ext.to_str()) == Some("json") {
+                        let metadata = fs::metadata(&path).ok()?;
+                        Some((path, metadata.modified().ok()?))
+                    } else {
+                        None
+                    }
                 })
+            })
+            .collect::<Vec<_>>();
+
+        // Sort by modification time, oldest first
+        sessions.sort_by_key(|&(_, modified_time)| modified_time);
+
+        // Extract session names, trimming the `.json` extension
+        Ok(sessions
+            .iter()
+            .filter_map(|(path, _)| {
+                path.file_stem()
+                    .and_then(|stem| stem.to_str().map(|s| s.to_owned()))
             })
             .collect())
     }
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;

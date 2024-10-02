@@ -118,12 +118,12 @@ impl<B: ChatBackend, S: ChatStorage> ChatService<B, S> {
 // Unit tests for ChatService
 #[cfg(test)]
 mod tests {
-    use crate::chat::file_storage::NilChatStorage;
     use crate::chat::interface::{ChatBackend, Message};
     use crate::chat::service::ChatService;
     use crate::persona::Persona;
     use std::error::Error;
     use std::path::{Path, PathBuf};
+    use crate::chat::file_storage::NilChatStorage;
 
     // Test function for the setup_context method
     #[tokio::test]
