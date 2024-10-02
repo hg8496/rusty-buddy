@@ -85,6 +85,8 @@ fn handle_session_loading(
     } else if let Some(session_name) = load_name {
         eprintln!("Loading session: {}", session_name);
         chat_service.load_history(session_name)?;
+    } else {
+        chat_service.setup_context();
     }
     Ok(())
 }
