@@ -29,4 +29,8 @@ pub struct ChatArgs {
     /// Use this message as user input
     #[arg(short = 'm', long = "message")]
     pub message: Option<String>,
+
+    /// Silence the output of old messages
+    #[arg(short = 's', long = "silence")]
+    pub silence: bool,
 }
