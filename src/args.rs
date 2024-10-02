@@ -39,4 +39,7 @@ pub enum Commands {
 
     /// Collect files from a specified directory and create a context for chat.
     Wish(WishArgs),
+
+    /// Initialize configuration and environment.
+    Init,
 }

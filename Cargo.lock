@@ -2090,7 +2090,7 @@ dependencies = [
 
 [[package]]
 name = "rusty-buddy"
-version = "0.5.2"
+version = "0.6.0"
 dependencies = [
  "async-openai",
  "atty",

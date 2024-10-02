@@ -53,6 +53,58 @@ This script will download and install the Rusty Buddy binaries onto your system.
    ```plaintext
    OPENAI_KEY=your_openai_api_key
    ```
+## Setup
+
+The `init` command is a setup utility designed to streamline the initial configuration process for the Rusty Buddy CLI. It ensures that your environment is correctly set up with the necessary credentials and configurations before using the tool. This command is particularly useful for first-time users or when setting up on a new system.
+
+### Features
+
+- **API Key Management**: Prompts for the OpenAI API key if it isn't already set in the environment or in a `.env` file. Automatically stores the key in a `.env` file for future use.
+- **Automatic Persona Selection**: Analyzes the current project's directory structure and uses OpenAI's API to determine the most suitable persona based on the given directory's content.
+- **Configuration Initialization**: Generates a default `config.toml` file in the `.rusty` directory, setting the stage for a personalized project setup with the selected persona.
+
+### Usage
+
+To run the `init` command, open your terminal and navigate to the directory where you've installed Rusty Buddy. Execute the following command:
+
+```bash
+rusty-buddy init
+```
+
+### Execution Flow
+
+1. **OpenAI API Key Prompt**:
+    - If no valid OpenAI API key is found, the command will prompt you to enter your OpenAI API key.
+    - The key is stored in a `.env` file in the current directory for future reference.
+
+2. **Persona Recommendation**:
+    - The command performs a recursive directory listing, aggregating the types of files and project structure.
+    - Communicates with OpenAI using the internal chat API to recommend a suitable persona based on the project's characteristics.
+
+3. **Configuration File Creation**:
+    - Generates a `config.toml` file in the `.rusty` directory with the recommended persona and assigns default AI models for chat and commit message generation.
+
+### Example Output
+
+After executing the `init` command, you will see:
+
+```
+OpenAI key not found in the environment.
+Please enter your OpenAI API key: [User enters key]
+Configuration successfully initialized with persona: [Recommended Persona]
+```
+
+### Prerequisites
+
+- Ensure you have an OpenAI API key handy to enter when prompted.
+- The command requires network access to communicate with the OpenAI servers for persona recommendation.
+
+### Notes
+
+- Running the `init` command is a one-time setup operation per project directory. If you switch projects or directories, you may need to rerun `rusty-buddy init`.
+- The `.env` file and `.rusty/config.toml` are crucial for the CLI's correct operation, storing sensitive and configuration data safely.
+
+By following these simple steps, you can quickly configure your development environment with Rusty Buddy for a seamless start.
 
 ## Usage
 

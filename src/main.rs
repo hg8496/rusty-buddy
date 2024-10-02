@@ -5,6 +5,7 @@ mod config;
 mod openai_api;
 mod persona;
 
+use crate::cli::init::run_init_command;
 use crate::config::get_config_file;
 use clap::{Command, CommandFactory, Parser};
 use clap_complete::{generate, Generator};
@@ -13,6 +14,10 @@ use std::io;
 
 #[tokio::main]
 async fn main() {
+    let cli = args::Cli::parse();
+    if let Some(args::Commands::Init) = cli.command {
+        run_init_command().await.unwrap();
+    }
     dotenv()
         .map_err(|e| eprintln!("Failed to load .env file: {}", e))
         .unwrap();
@@ -20,7 +25,6 @@ async fn main() {
         eprintln!("No configuration file found.");
         std::process::exit(1);
     }
-    let cli = args::Cli::parse(); // Parse command line arguments with the new CLI struct
 
     if let Some(completion) = cli.completion {
         print_completions(completion, &mut args::Cli::command());
@@ -40,6 +44,9 @@ async fn main() {
             }
             args::Commands::Wish(args) => {
                 cli::wish::run(args).await.unwrap();
+            }
+            args::Commands::Init => {
+                run_init_command().await.unwrap();
             }
         }
     } else {
