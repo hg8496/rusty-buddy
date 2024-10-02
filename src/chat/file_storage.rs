@@ -10,7 +10,7 @@ impl ChatStorage for NilChatStorage {
         Ok(Vec::new())
     }
 
-    fn save_session(&self, _session_name: &str, _messages: &Vec<Message>) -> io::Result<()> {
+    fn save_session(&self, _session_name: &str, _messages: &[Message]) -> io::Result<()> {
         Ok(())
     }
 
@@ -53,7 +53,7 @@ impl ChatStorage for DirectoryChatStorage {
         Ok(messages)
     }
 
-    fn save_session(&self, session_name: &str, messages: &Vec<Message>) -> io::Result<()> {
+    fn save_session(&self, session_name: &str, messages: &[Message]) -> io::Result<()> {
         self.ensure_storage_dir_exists()?;
         let file_path = self.get_file_path(session_name);
         let mut file = fs::File::create(file_path)?;

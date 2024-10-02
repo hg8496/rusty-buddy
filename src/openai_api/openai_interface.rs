@@ -39,7 +39,7 @@ impl Default for OpenAIInterface {
 impl ChatBackend for OpenAIInterface {
     async fn send_request(
         &mut self,
-        messages: &Vec<Message>,
+        messages: &[Message],
         use_tools: bool,
     ) -> Result<String, Box<dyn Error>> {
         let oai_messages = self.convert_to_chat_completion_messages(messages);
@@ -86,7 +86,7 @@ impl OpenAIInterface {
 
     fn convert_to_chat_completion_messages(
         &self,
-        messages: &Vec<Message>,
+        messages: &[Message],
     ) -> Vec<ChatCompletionRequestMessage> {
         messages
             .iter()
@@ -131,14 +131,14 @@ impl OpenAIInterface {
 
     fn create_openai_request(
         &self,
-        messages: &Vec<ChatCompletionRequestMessage>,
+        messages: &[ChatCompletionRequestMessage],
         use_tools: bool,
     ) -> Result<CreateChatCompletionRequest, Box<dyn Error>> {
         let mut builder = &mut CreateChatCompletionRequestArgs::default();
         builder = builder
             .model(self.model.as_str())
             .max_tokens(15000u32)
-            .messages(messages.clone());
+            .messages(messages);
         if use_tools {
             builder = builder
                 .tools(vec![

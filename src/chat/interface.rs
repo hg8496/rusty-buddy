@@ -20,7 +20,7 @@ pub enum MessageRole {
 pub trait ChatBackend {
     async fn send_request(
         &mut self,
-        messages: &Vec<Message>,
+        messages: &[Message],
         use_tools: bool,
     ) -> Result<String, Box<dyn Error>>;
     fn print_statistics(&self);
@@ -28,6 +28,6 @@ pub trait ChatBackend {
 
 pub trait ChatStorage {
     fn load_session(&mut self, session_name: &str) -> io::Result<Vec<Message>>;
-    fn save_session(&self, session_name: &str, messages: &Vec<Message>) -> io::Result<()>;
+    fn save_session(&self, session_name: &str, messages: &[Message]) -> io::Result<()>;
     fn list_sessions(&self) -> io::Result<Vec<String>>;
 }

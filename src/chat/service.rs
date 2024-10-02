@@ -33,10 +33,8 @@ impl<B: ChatBackend, S: ChatStorage> ChatService<B, S> {
     // Sets up the initial context for the chat session, including loading files.
     pub fn setup_context(&mut self) {
         // Remove existing context messages
-        self.messages.retain(|msg| match msg.role {
-            MessageRole::Context => false,
-            _ => true,
-        });
+        self.messages
+            .retain(|msg| !matches!(msg.role, MessageRole::Context));
         // Load files into context from a specified directory
         if let Some(directory) = &self.directory {
             let mut context = String::from("Use the following context to assist the user.\n");
@@ -229,7 +227,7 @@ mod tests {
     impl ChatBackend for MockChatBackend {
         async fn send_request(
             &mut self,
-            _messages: &Vec<Message>,
+            _messages: &[Message],
             _use_tools: bool,
         ) -> Result<String, Box<dyn Error>> {
             Ok("".to_string())

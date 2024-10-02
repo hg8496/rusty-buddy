@@ -1,7 +1,12 @@
-pub mod persona;
-
 use crate::config;
-pub use persona::Persona;
+use serde::Deserialize;
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct Persona {
+    pub name: String,
+    pub chat_prompt: String,
+    pub file_types: Vec<String>,
+}
 
 fn get_internal_persona_configs() -> Vec<Persona> {
     vec![

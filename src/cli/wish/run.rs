@@ -19,11 +19,8 @@ pub async fn run_wish(directory: &str, use_tools: bool) -> Result<(), Box<dyn Er
     }
 
     // Initialize the chat service with an OpenAI backend and NilStorage
-    let config = config::CONFIG.lock().unwrap();
-    let model = &config.ai.wish_model.clone();
-    let default_persona = &config.default_persona.clone();
-    drop(config);
-    let openai = OpenAIInterface::new(String::from(model));
+    let (model, default_persona) = get_config();
+    let openai = OpenAIInterface::new(model);
     let storage = NilChatStorage {};
     let persona = get_persona(default_persona.as_str()).unwrap();
 
@@ -46,4 +43,11 @@ pub async fn run_wish(directory: &str, use_tools: bool) -> Result<(), Box<dyn Er
     println!("AI Context Response: {}", response);
 
     Ok(())
+}
+
+fn get_config() -> (String, String) {
+    let config = config::CONFIG.lock().unwrap();
+    let model = config.ai.wish_model.clone();
+    let default_persona = config.default_persona.clone();
+    (model, default_persona)
 }

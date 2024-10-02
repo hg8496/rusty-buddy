@@ -6,10 +6,11 @@ use crate::persona::get_personas;
 use std::process::Command;
 
 pub async fn run_commitmessage() -> Result<(), Box<dyn std::error::Error>> {
-    let config = config::CONFIG.lock().unwrap();
-    let model = &config.ai.commit_model.clone();
-    drop(config);
-    let openai = OpenAIInterface::new(String::from(model));
+    let model = {
+        let config = config::CONFIG.lock().unwrap();
+        config.ai.commit_model.clone()
+    };
+    let openai = OpenAIInterface::new(String::from(&model));
     let storage = NilChatStorage {};
 
     let mut chat_service = ChatService::new(openai, storage, get_personas()[0].clone(), None);
@@ -28,7 +29,7 @@ pub async fn run_commitmessage() -> Result<(), Box<dyn std::error::Error>> {
     let diff = generate_git_diff_summary().await?;
     let summary = chat_service.send_message(&diff, false).await?;
 
-    println!("Summary of git diff (model: {}):\n{}", model, summary);
+    println!("Summary of git diff (model: {}):\n{}", &model, summary);
 
     Ok(())
 }

@@ -10,9 +10,9 @@ use crate::config;
 use crate::config::get_chat_sessions_dir;
 use crate::openai_api::openai_interface::OpenAIInterface;
 use crate::persona::get_persona;
+use atty::Stream;
 use std::error::Error;
 use std::io::{self, Read};
-use atty::Stream;
 
 pub async fn run_chat(
     start_new: bool,
@@ -23,11 +23,8 @@ pub async fn run_chat(
     one_shot: bool,
     input_message: Option<String>,
 ) -> Result<(), Box<dyn Error>> {
-    let config = config::CONFIG.lock().unwrap();
-    let model = &config.ai.chat_model.clone();
-    let default_persona = config.default_persona.clone();
-    drop(config);
-    let openai = OpenAIInterface::new(String::from(model));
+    let (model, default_persona) = get_config();
+    let openai = OpenAIInterface::new(String::from(&model));
     let storage = DirectoryChatStorage::new(config::get_chat_sessions_dir());
     let mut command_registry = CommandRegistry::new();
 
@@ -79,7 +76,7 @@ pub async fn run_chat(
         } else if !atty::is(Stream::Stdin) {
             // Read from stdin if it's not a terminal (i.e., piped input)
             io::stdin().read_to_string(&mut buffer)?;
-            buffer.trim().to_string()  // Trim whitespace
+            buffer.trim().to_string() // Trim whitespace
         } else {
             get_multiline_input("Your message (end with Ctrl+D): ")?
         };
@@ -91,7 +88,9 @@ pub async fn run_chat(
             let response = chat_service.send_message(user_input.trim(), false).await?;
             stop_spinner(spinner);
 
-            skin.print_text(format!("---\n# AI Persona:{} Model: {}\n", persona.name, model).as_str());
+            skin.print_text(
+                format!("---\n# AI Persona:{} Model: {}\n", persona.name, model).as_str(),
+            );
             skin.print_text(&response);
             chat_service.print_statistics();
         } else {
@@ -108,7 +107,10 @@ pub async fn run_chat(
             let mut parts = trimmed_input.split_whitespace();
             let command_name = parts.next().unwrap_or("");
             let args: Vec<&str> = parts.collect();
-            command_registry.execute_command(command_name, &args, &mut chat_service)?;
+            if let Err(e) = command_registry.execute_command(command_name, &args, &mut chat_service)
+            {
+                eprintln!("Unknown command '{}', error: {}", command_name, e);
+            }
             continue;
         }
         if trimmed_input == "exit" || trimmed_input.is_empty() {
@@ -116,7 +118,7 @@ pub async fn run_chat(
                 "Enter a name to save this session (or press Enter to skip saving): ",
             )?;
             if !save_name.trim().is_empty() {
-                chat_service.save_history(&save_name.trim())?;
+                chat_service.save_history(save_name.trim())?;
             }
             break;
         }
@@ -134,6 +136,13 @@ pub async fn run_chat(
 
     println!("You have exited the chat.");
     Ok(())
+}
+
+fn get_config() -> (String, String) {
+    let config = config::CONFIG.lock().unwrap();
+    let model = config.ai.chat_model.clone();
+    let default_persona = config.default_persona.clone();
+    (model, default_persona)
 }
 
 // Helper function to get the name of the last session

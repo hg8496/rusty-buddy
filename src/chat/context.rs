@@ -16,7 +16,7 @@ pub fn load_files_into_context(
             if let Some(extension) = file_path.extension() {
                 if let Some(ext_str) = extension.to_str() {
                     if file_types.contains(&ext_str.to_string()) {
-                        add_to_context(context, &file_path)?;
+                        add_to_context(context, file_path)?;
                     }
                 }
             }
@@ -29,7 +29,7 @@ fn add_to_context(context: &mut String, file_path: &Path) -> Result<(), Box<dyn 
     let current_dir = std::env::current_dir()
         .map_err(|e| format!("Failed to get current directory for context: {}", e))?;
 
-    let content = fs::read_to_string(&file_path)
+    let content = fs::read_to_string(file_path)
         .map_err(|e| format!("Failed to read file '{}': {}", file_path.display(), e))?;
 
     let relative_path = file_path

@@ -1,8 +1,8 @@
+mod config_file;
+
 use std::path::PathBuf;
 
-pub mod config;
-
-pub use config::CONFIG;
+pub use config_file::CONFIG;
 
 pub static BASE_DIR: &str = ".rusty";
 

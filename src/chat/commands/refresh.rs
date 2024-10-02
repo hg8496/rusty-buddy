@@ -20,7 +20,7 @@ impl ChatCommand for RenewCommand {
         chat_service: &mut ChatService<OpenAIInterface, DirectoryChatStorage>,
     ) -> Result<(), Box<dyn Error>> {
         println!("Renewing the context...");
-        if let Some(param) = args.get(0) {
+        if let Some(param) = args.first() {
             println!("Received parameter for renewing: {}", param);
         }
 
@@ -29,7 +29,7 @@ impl ChatCommand for RenewCommand {
     }
 }
 
-impl<'a> RegisterableCommand for RenewCommand {
+impl RegisterableCommand for RenewCommand {
     fn register_with_registry(registry: &mut CommandRegistry) {
         let command = RenewCommand::new();
         registry.register_command("/renew", Box::new(command));
