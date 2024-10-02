@@ -141,7 +141,7 @@ mod tests {
         assert_eq!(messages, loaded_messages);
 
         // Clean up test directories
-        cleanup_test_storage_dir(1);
+        //cleanup_test_storage_dir(1);
     }
 
     #[test]
@@ -167,7 +167,6 @@ mod tests {
 
         // List sessions
         let session_list = storage.list_sessions().expect("Failed to list sessions.");
-
         assert!(session_list.contains(&session_name_1.to_string()));
         assert!(session_list.contains(&session_name_2.to_string()));
         assert_eq!(session_list.len(), 2);

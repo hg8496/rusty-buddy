@@ -25,7 +25,7 @@ pub async fn run_chat(
 ) -> Result<(), Box<dyn Error>> {
     let (model, default_persona) = get_config();
     let openai = OpenAIInterface::new(model.clone());
-    let storage = DirectoryChatStorage::new(get_chat_sessions_dir());
+    let storage = DirectoryChatStorage::new(get_chat_sessions_dir()?);
     let command_registry = initialize_command_registry();
 
     let persona = resolve_persona(&persona_name, &default_persona)?;
@@ -195,6 +195,6 @@ fn get_config() -> (String, String) {
 }
 
 fn get_last_session_name() -> Result<Option<String>, Box<dyn Error>> {
-    let sessions = DirectoryChatStorage::new(get_chat_sessions_dir()).list_sessions()?;
+    let sessions = DirectoryChatStorage::new(get_chat_sessions_dir()?).list_sessions()?;
     Ok(sessions.last().cloned())
 }

@@ -5,6 +5,7 @@ mod config;
 mod openai_api;
 mod persona;
 
+use crate::config::get_config_file;
 use clap::{Command, CommandFactory, Parser};
 use clap_complete::{generate, Generator};
 use dotenvy::dotenv;
@@ -15,7 +16,10 @@ async fn main() {
     dotenv()
         .map_err(|e| eprintln!("Failed to load .env file: {}", e))
         .unwrap();
-
+    if !check_environment() {
+        eprintln!("No configuration file found.");
+        std::process::exit(1);
+    }
     let cli = args::Cli::parse(); // Parse command line arguments with the new CLI struct
 
     if let Some(completion) = cli.completion {
@@ -41,6 +45,10 @@ async fn main() {
     } else {
         println!("No valid command given. Use `rusty-buddy help` for more information.");
     }
+}
+
+fn check_environment() -> bool {
+    get_config_file().is_ok()
 }
 
 fn print_completions<G: Generator>(gen: G, cmd: &mut Command) {

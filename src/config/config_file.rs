@@ -1,22 +1,18 @@
 use crate::persona::Persona;
-use serde::Deserialize;
-
-use crate::config::get_config_file;
 use lazy_static::lazy_static;
+use serde::Deserialize;
 use std::fs;
 use std::sync::Mutex;
 
+// Configuration struct definitions
 #[derive(Debug, Deserialize)]
 pub struct Config {
-    //    openai_api_key: String,
     #[serde(default = "default_persona")]
     pub default_persona: String,
-
     #[serde(default = "default_ai")]
     pub ai: AI,
-
-    #[serde(default = "personas")]
-    pub personas: Vec<Persona>, // Array of Product structs
+    #[serde(default = "default_personas")]
+    pub personas: Vec<Persona>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -48,7 +44,7 @@ fn chat_model() -> String {
 }
 
 fn commit_model() -> String {
-    default_model()
+    "gpt-4o-mini".to_string()
 }
 
 fn wish_model() -> String {
@@ -59,20 +55,27 @@ fn default_persona() -> String {
     "rust".to_string()
 }
 
-fn personas() -> Vec<Persona> {
+fn default_personas() -> Vec<Persona> {
     vec![]
 }
 
+// Lazy loading of global config to avoid uninitialized states
 lazy_static! {
     pub static ref CONFIG: Mutex<Config> = Mutex::new(load_config().unwrap());
 }
 
+// Load configuration from file
 fn load_config() -> Result<Config, Box<dyn std::error::Error>> {
-    match fs::read_to_string(get_config_file()) {
+    let config_path = crate::config::get_config_file()?;
+    match fs::read_to_string(config_path) {
         Ok(config_contents) => {
-            let config: Config = toml::de::from_str(&config_contents)?;
+            let config: Config = toml::from_str(&config_contents)?;
             Ok(config)
         }
-        Err(_e) => Ok(toml::de::from_str("")?),
+        Err(_) => Ok(Config {
+            default_persona: default_persona(),
+            ai: default_ai(),
+            personas: default_personas(),
+        }),
     }
 }
