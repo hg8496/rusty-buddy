@@ -20,6 +20,20 @@ Rusty Buddy is a command-line tool that provides various utilities to assist in 
 
 ## Installation
 
+You can install Rusty Buddy by using the provided installation script, or by cloning the repository and building the project.
+
+### Method 2: Install Using Script
+
+For a quick installation using a script, run the following command:
+
+```bash
+curl -sSL https://get.rusty-buddy.org | bash
+```
+`
+This script will download and install the Rusty Buddy binaries onto your system. Make sure you have the necessary permissions to run the installation script.
+
+### Method 2: Clone and Build
+
 1. Clone this repository:
    ```bash
    git clone https://github.com/hg8496/rusty-buddy.git
