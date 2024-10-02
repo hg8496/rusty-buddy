@@ -192,7 +192,7 @@ default_persona = "rust"
 # Model configurations for different functionalities
 [ai]
 chat_model = "gpt-4o-2024-08-06"
-commit_model = "gpt-4o-2024-08-06"
+commit_model = "gpt-4o-mini"
 wish_model = "gpt-4o-2024-08-06"
 
 # Define various personas
@@ -228,10 +228,46 @@ The Rusty CLI supports customizable personas, allowing you to tailor chatbot int
 
 By default, Rusty-Buddy comes with several built-in personas:
 
-- **Rust Developer**
-- **Swift Developer**
-- **Java Developer**
-- **TypeScript Developer**
+| Persona Type                        | ID                            |
+|-------------------------------------|-------------------------------|
+| Rust Developer                      | rust                          |
+| Swift Developer                     | swift                         |
+| Java Developer                      | java                          |
+| TypeScript Developer                | typescript                    |
+|  Embedded C Specialist              | embedded_c_specialist         |
+| Yocto C++ Linux Embedded Specialist | yocto_cpp_embedded_specialist |
+| Python Developer                    | python                        |
+| JavaScript Developer                | javascript                    |
+| C++ Developer                       | cplusplus                     |
+| C# Developer                        | csharp                        |
+| PHP Developer                       | php                           |
+| Ruby Developer                      | ruby                          |
+| Go Developer                        | golang                        |
+| Kotlin Developer                    | kotlin                        |
+| R Developer                         | r                             |
+| Scala Developer                     | scala                         |
+| Shell Scripting Developer           | shell                         |
+| Perl Developer                      | perl                          |
+| Dart Developer                      | dart                          |
+| Objective-C Developer               | objective-c                   |
+| Ansible Expert                      | ansible_expert                |
+| DevOps Engineer                     | devops_engineer               |
+| LaTeX Book Setter                   | latex_book_setter             |
+| Technical Writer                    | technical_writer              |
+| Poet                                | poet                          |
+| Novelist                            | novelist                      |
+| Screenwriter                        | screenwriter                  |
+| Journalist                          | journalist                    |
+| Content Writer                      | content_writer                |
+| UX/UI Designer                      | ux_ui_designer                |
+| Data Scientist                      | data_scientist                |
+| Cybersecurity Analyst               | cybersecurity_analyst         |
+| SEO Specialist                      | seo_specialist                |
+| Social Media Manager                | social_media_manager          |
+| Project Manager                     | project_manager               |
+| Game Developer                      | game_developer                |
+| AI/ML Engineer                      | ai_ml_engineer                |
+| Digital Marketing Strategist        | digital_marketing_strategist  |
 
 ### Setting Up Custom Personas
 

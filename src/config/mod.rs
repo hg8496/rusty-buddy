@@ -15,7 +15,9 @@ pub fn get_chat_sessions_dir() -> Result<PathBuf, String> {
 }
 
 pub fn get_config_file() -> Result<PathBuf, String> {
-    get_config_file_from_dir(env::current_dir().map_err(|e| format!("Failed to get the current directory: {}", e))?)
+    get_config_file_from_dir(
+        env::current_dir().map_err(|e| format!("Failed to get the current directory: {}", e))?,
+    )
 }
 
 pub fn get_config_file_from_dir(mut current_dir: PathBuf) -> Result<PathBuf, String> {
@@ -54,7 +56,8 @@ mod tests {
         //env::set_current_dir(&temp_dir).expect("Failed to set current directory");
 
         // Run the function you're testing
-        let result = get_config_file_from_dir(temp_dir.into_path()).unwrap_or(PathBuf::from("/wrong_path"));
+        let result =
+            get_config_file_from_dir(temp_dir.into_path()).unwrap_or(PathBuf::from("/wrong_path"));
 
         // Assert the expected outcome
         assert!(result.ends_with(config_path));
@@ -63,7 +66,8 @@ mod tests {
     #[test]
     fn test_get_config_file_not_found() {
         // Set up a temporary directory without a config file
-        let temp_dir = TempDir::new("test_get_config_file_not_found").expect("Failed to create temp dir");
+        let temp_dir =
+            TempDir::new("test_get_config_file_not_found").expect("Failed to create temp dir");
 
         // Confirm that the path does not exist
         let config_file = temp_dir.path().join(".rusty").join("config.toml");
