@@ -25,7 +25,7 @@ jobs:
             args: ''
           - os: windows-latest
             target: aarch64-pc-windows-msvc
-    
+
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -37,7 +37,7 @@ jobs:
         run: cargo test
 
       - name: Build
-        run: cargo build --release --target ${{ matrix.config.target }}
+        run: cargo build --release --locked --target ${{ matrix.config.target }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

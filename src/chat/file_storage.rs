@@ -46,7 +46,7 @@ impl ChatStorage for DirectoryChatStorage {
 
         // Deserialize the JSON content into a Vec<Message>
         let messages: Vec<Message> = serde_json::from_str(&content)
-            .or_else(|err| Err(io::Error::new(io::ErrorKind::InvalidData, err.to_string())))?;
+            .map_err(|err| io::Error::new(io::ErrorKind::InvalidData, err.to_string()))?;
 
         Ok(messages)
     }
@@ -55,7 +55,7 @@ impl ChatStorage for DirectoryChatStorage {
         self.ensure_storage_dir_exists()?;
         let file_path = self.get_file_path(session_name);
         let json_content = serde_json::to_string(messages)
-            .or_else(|err| Err(io::Error::new(io::ErrorKind::InvalidData, err.to_string())))?;
+            .map_err(|err| io::Error::new(io::ErrorKind::InvalidData, err.to_string()))?;
 
         fs::write(&file_path, json_content.as_bytes())?;
         Ok(())

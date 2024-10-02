@@ -1,9 +1,9 @@
+use crate::chat::file_storage::NilChatStorage;
 use crate::chat::service::ChatService;
 use crate::config;
 use crate::openai_api::openai_interface::OpenAIInterface;
 use crate::persona::get_personas;
 use std::process::Command;
-use crate::chat::file_storage::NilChatStorage;
 
 pub async fn run_commitmessage() -> Result<(), Box<dyn std::error::Error>> {
     let model = {

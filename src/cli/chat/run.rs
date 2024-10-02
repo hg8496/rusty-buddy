@@ -48,11 +48,12 @@ fn initialize_command_registry() -> CommandRegistry<'static> {
 
 fn resolve_persona(
     persona_name: &Option<String>,
-    default_persona: &String,
+    default_persona: &str,
 ) -> Result<Persona, Box<dyn Error>> {
     match persona_name {
-        Some(name) => get_persona(name)
-            .ok_or_else(|| format!("Specified persona not found. Using default.").into()),
+        Some(name) => {
+            get_persona(name).ok_or_else(|| "Specified persona not found. Using default.".into())
+        }
         None => Ok(get_persona(default_persona).unwrap()),
     }
 }
@@ -111,7 +112,7 @@ async fn start_interactive_chat(
         let trimmed_input = user_input.trim();
 
         if trimmed_input.starts_with('/') {
-            handle_command(&mut command_registry, &trimmed_input, &mut chat_service);
+            handle_command(&mut command_registry, trimmed_input, &mut chat_service);
             continue;
         }
 
