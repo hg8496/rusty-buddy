@@ -22,7 +22,7 @@ Rusty Buddy is a command-line tool that provides various utilities to assist in 
 
 You can install Rusty Buddy by using the provided installation script, or by cloning the repository and building the project.
 
-### Method 2: Install Using Script
+### Method 1: Install Using Script
 
 For a quick installation using a script, run the following command:
 
