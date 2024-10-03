@@ -11,6 +11,7 @@
   --text-color: var(--base-color);
   --placeholder-color: var(--base-color);
   --link-color: var(--base-color);
+  --code-bg-color: #2d2d2d;
   --code-color-1: #aaaaaa;
   --code-color-2: #ffffcc;
   --code-color-3: #F00000;
@@ -29,4 +30,16 @@
   --code-color-16: #1e90ff;
   --code-color-17: #800000;
   --code-color-18: #bbbbbb;
+}
+
+pre {
+  background-color: var(--code-bg-color); // Update the background to use your theme variable
+  border: none;
+  padding: 0 0 0 15px;
+  margin: 0;
+  overflow: auto;
+  font-size: $base-font-size;
+  color: var(--text-color);
+  line-height: 1.7 !important;
+  font-family: $base-font-family !important;
 }
