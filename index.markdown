@@ -6,7 +6,7 @@ short_title: Welcome
 
 # Welcome to Rusty Buddy CLI
 
-![Rusty Buddy CLI Logo](/assets/images/rusty-buddy-logo-128.png | relative_url)
+![Rusty Buddy CLI Logo]({{ '/assets/images/rusty-buddy-logo-128.png' | relative_url }})
 
 Are you ready to supercharge your command-line experience? 🌟 Introducing **Rusty Buddy CLI** - your new trusty AI sidekick for development tasks!
 
@@ -41,7 +41,7 @@ Are you ready to supercharge your command-line experience? 🌟 Introducing **Ru
 
 ---
 
-![Get Started](/assets/images/getting_started4-25.png| relative_url) <!-- Add a compelling image or graphic -->
+![Get Started]({{ '/assets/images/getting_started4-25.png' | relative_url }}) <!-- Add a compelling image or graphic -->
 
 > "Rusty Buddy CLI transformed my workflow!" - Satisfied User
 

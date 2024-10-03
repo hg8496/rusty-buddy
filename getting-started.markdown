@@ -93,10 +93,9 @@ Once installed, you can start using Rusty Buddy CLI to enhance your development 
 ## Explore More
 
 - **Documentation**: Delve into [comprehensive documentation](https://github.com/hg8496/rusty-buddy) for more features and advanced usage.
-- **Community**: Join our [community forum](link-to-community) to ask questions and share insights.
 - **Subscribe**: Stay updated on our latest features and improvements by subscribing to our newsletter.
 
-![Get Started Banner](/assets/images/getting_started4-25.png| relative_url) <!-- Add a compelling image or graphic if available -->
+[Get Started Banner]({{ '/assets/images/getting_started4-25.png' | relative_url }}) <!-- Add a compelling image or graphic if available -->
 
 ---
 

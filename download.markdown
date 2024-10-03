@@ -70,4 +70,4 @@ Thank you for choosing Rusty Buddy CLI. We hope it enhances your productivity an
 
 ---
 
-![Happy Coding Banner](/assets/images/getting_started5-25.png| relative_url) <!-- Add a motivational or thank-you image -->
+![Happy Coding Banner]({{ '/assets/images/getting_started5-25.png' | relative_url }}) <!-- Add a motivational or thank-you image -->
