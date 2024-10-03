@@ -1,6 +1,6 @@
 [package]
 name = "rusty-buddy"
-version = "0.6.0"
+version = "0.7.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -25,3 +25,4 @@ base64 = "0.22"
 regex = "1.11"
 atty = "0.2"
 tempdir = "0.3.7"
+ignore = "0.4"

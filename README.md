@@ -4,15 +4,15 @@ Rusty Buddy is a command-line tool that provides various utilities to assist in 
 
 ## Features
 
+- **Context-Aware Interaction**: Rusty Buddy can now build context from a project directory while respecting `.gitignore` rules, ensuring that ignored files and directories are skipped. It also supports including specific files like `Gemfile` and `Dockerfile` along with files by their extensions.
+
 - **Chat Interface**: Engage in a conversation with an AI assistant. Load or save chat sessions, and specify a directory to include in the chat context for more relevant interactions.
 
 - **Commit Message Generator**: Automatically generate commit messages from `git diff` summaries, ensuring clear and consistent commit histories.
 
-- **Wish Fulfillment**: Collects files from a specified directory and creates a development context, helping integrate AI into software development workflows. Utilize tools for file and directory creation and modification.
+- **Wish Fulfillment**: Collects files from a specified directory while adhering to `.gitignore`, creating a development context to help integrate AI into software development workflows. Utilize tools for file and directory creation and modification.
 
-- **Icon Generation**: Generate icons based on user descriptions using OpenAI's DALL·E. Specify output sizes for tailored icon usage.
-
-- **Background Image Creation**: Generate background images in landscape or portrait orientation based on user descriptions. Use predefined sizes for optimal results.
+- **Icon and Background Image Generation**: Generate icons and backgrounds based on user descriptions using OpenAI's DALL·E. Specify output sizes and orientations for tailored usage.
 
 - **Tool Integration**: Use custom tools (like showing diffs, creating files, and directories) to enhance the AI's capabilities and assist users in making swift development changes.
 
