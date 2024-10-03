@@ -3,7 +3,7 @@ title: Rusty Buddy CLI
 email: hg8496@cstolz.de
 description: >
   Rusty Buddy CLI is a versatile AI powerd command-line tool designed to streamline your development tasks. Explore its powerful features and simplify your workflow.
-baseurl: "" # The subpath of your site, e.g., /blog
+baseurl: "/rusty-buddy" # The subpath of your site, e.g., /blog
 url: "https://www.rusty-buddy.org" # The base URL for your site, e.g., http://example.com
 github_username: hg8496
 
