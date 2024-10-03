@@ -1,7 +1,9 @@
 use crate::cli::spinner::{start_spinner, stop_spinner};
 use crate::cli::utils::get_multiline_input;
 use async_openai::config::OpenAIConfig;
-use async_openai::types::{CreateImageRequestArgs, Image, ImageResponseFormat, ImageSize};
+use async_openai::types::{
+    CreateImageRequestArgs, Image, ImageModel, ImageQuality, ImageResponseFormat, ImageSize,
+};
 use async_openai::Client;
 use base64::prelude::*;
 use dotenvy::dotenv;
@@ -32,7 +34,9 @@ pub async fn run_createicon(output_dir: &str, sizes: Vec<u32>) -> Result<(), Box
         .prompt(description.clone())
         .n(1) // Number of images to generate
         .size(ImageSize::S1024x1024) // Largest size, we'll downscale as needed
+        .model(ImageModel::DallE3)
         .response_format(ImageResponseFormat::B64Json)
+        .quality(ImageQuality::HD)
         .build()?;
 
     println!("Generating image...");
