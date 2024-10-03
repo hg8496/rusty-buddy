@@ -1,0 +1,50 @@
+# Site settings
+title: Rusty Buddy CLI
+email: hg8496@cstolz.de
+description: >
+  Rusty Buddy CLI is a versatile AI powerd command-line tool designed to streamline your development tasks. Explore its powerful features and simplify your workflow.
+baseurl: "" # The subpath of your site, e.g., /blog
+url: "https://www.rusty-buddy.org" # The base URL for your site, e.g., http://example.com
+github_username: hg8496
+
+# Build settings
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+style: dark # Options: dark (default), light, or hacker
+listen_for_clients_preferred_style: true
+header_pages:
+  - index.markdown
+  - getting-started.markdown
+  - download.markdown
+
+# Excluded files and directories
+exclude:
+  - README.md
+
+# Miscellaneous
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  syntax_highlighter_opts:
+    inline_theme: base16
+    line_numbers: true
+
+# Google Analytics (optional)
+# google_analytics: UA-XXXXXXXX-X
+
+# Social media links (optional)
+social_links:
+  github: https://github.com/hg8496/rusty-buddy-cli
+
+# SEO settings (optional)
+meta_tags:
+  author: Christian Stolz
+  keywords: command-line, development, Rust, CLI, tool, efficient
+
+# Deployment settings (optional)
+# If deploying to GitHub Pages, set the following:
+# branch: gh-pages
