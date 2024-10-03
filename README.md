@@ -12,7 +12,9 @@ Rusty Buddy is a command-line tool that provides various utilities to assist in 
 
 - **Wish Fulfillment**: Collects files from a specified directory while adhering to `.gitignore`, creating a development context to help integrate AI into software development workflows. Utilize tools for file and directory creation and modification.
 
-- **Icon and Background Image Generation**: Generate icons and backgrounds based on user descriptions using OpenAI's DALL·E. Specify output sizes and orientations for tailored usage.
+- **Icon and Background Image Generation**: Generate icons and backgrounds based on user descriptions using OpenAI's DALL·E. The commands now support piped input to streamline usage in scripts and other non-interactive environments. Specify output sizes and orientations for tailored usage:
+
+    - **Piped Input Support**: You can provide descriptions directly via standard input (stdin), enabling seamless integration with other command-line tools.
 
 - **Tool Integration**: Use custom tools (like showing diffs, creating files, and directories) to enhance the AI's capabilities and assist users in making swift development changes.
 
@@ -112,23 +114,46 @@ By following these simple steps, you can quickly configure your development envi
 
 - **Create Background**
 
-  Generate a background image using a description provided by the user, specifying orientation:
+  Generate a background image using a description provided by the user. You can provide the description directly through the terminal or pipe it in:
 
-    - **Landscape Orientation**
+    - **Landscape Orientation**:
+
       ```bash
       rusty-buddy create-background --orientation landscape --output ./backgrounds
       ```
 
-    - **Portrait Orientation**
+      With piped input:
+
+      ```bash
+      echo "Create a sunset-themed background" | rusty-buddy create-background --orientation landscape --output ./backgrounds
+      ```
+
+    - **Portrait Orientation**:
+
       ```bash
       rusty-buddy create-background --orientation portrait --output ./backgrounds
       ```
 
+      With piped input:
+
+      ```bash
+      echo "Create a cityscape background" | rusty-buddy create-background --orientation portrait --output ./backgrounds
+      ```
+
 - **Create Icon**
 
-  Generate an icon using a description provided by the user, specifying output sizes:
+  Generate an icon using a description provided by the user. You can specify output sizes as well:
+
+  Run interactively:
+
   ```bash
   rusty-buddy create-icon --output ./icons --sizes 16,32,64,128,256,512
+  ```
+
+  With piped input:
+
+  ```bash
+  echo "Design a circular blue logo" | rusty-buddy create-icon --output ./icons --sizes 64,128,256
   ```
 
 - **Commit Message**

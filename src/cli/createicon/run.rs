@@ -5,21 +5,30 @@ use async_openai::types::{
     CreateImageRequestArgs, Image, ImageModel, ImageQuality, ImageResponseFormat, ImageSize,
 };
 use async_openai::Client;
+use atty::Stream;
 use base64::prelude::*;
 use dotenvy::dotenv;
 use std::error::Error;
-use std::fs;
+use std::io::Read;
 use std::path::Path;
 use std::sync::Arc;
+use std::{fs, io};
 
 pub async fn run_createicon(output_dir: &str, sizes: Vec<u32>) -> Result<(), Box<dyn Error>> {
     dotenv().ok(); // Load environment variables from .env file
     let openai_key = std::env::var("OPENAI_KEY")
         .expect("OPENAI_KEY must be set in .env file or environment variables");
 
-    // Get user's description
-    let prompt_message = "Please describe the icon you wish to create. Type 'Ctrl+D' on a new line when you're finished:";
-    let description = get_multiline_input(prompt_message)?;
+    let description = if !atty::is(Stream::Stdin) {
+        // Read from standard input if it's not a terminal (piped data)
+        let mut buffer = String::new();
+        io::stdin().read_to_string(&mut buffer)?;
+        buffer.trim().to_string() // Use the piped content as the description
+    } else {
+        // Get user's description
+        let prompt_message = "Please describe the icon you wish to create. Type 'Ctrl+D' on a new line when you're finished:";
+        get_multiline_input(prompt_message)?
+    };
 
     if description.trim().is_empty() {
         println!("No description provided. Exiting.");
