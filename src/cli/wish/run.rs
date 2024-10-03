@@ -32,7 +32,7 @@ pub async fn run_wish(directory: &str, use_tools: bool) -> Result<(), Box<dyn Er
     );
 
     // Get user input for their wish
-    let user_input = get_multiline_input("What do you wish? ")
+    let user_input = get_multiline_input("What do you wish? ", vec![])
         .map_err(|e| format!("Failed to read user input: {}", e))?;
     let wish = format!("Users wish: {}", user_input);
 

@@ -37,7 +37,7 @@ pub async fn run_chat(args: ChatArgs) -> Result<(), Box<dyn Error>> {
     start_interactive_chat(chat_service, command_registry, model, persona).await
 }
 
-fn initialize_command_registry() -> CommandRegistry<'static> {
+fn initialize_command_registry() -> CommandRegistry {
     let mut command_registry = CommandRegistry::new();
     initialize_commands(&mut command_registry);
     command_registry
@@ -118,12 +118,15 @@ async fn handle_one_shot_mode(
 
 async fn start_interactive_chat(
     mut chat_service: ChatService<OpenAIInterface, DirectoryChatStorage>,
-    mut command_registry: CommandRegistry<'_>,
+    mut command_registry: CommandRegistry,
     model: String,
     persona: Persona,
 ) -> Result<(), Box<dyn Error>> {
     loop {
-        let user_input = get_multiline_input("User (use Ctrl+D to submit): ")?;
+        let user_input = get_multiline_input(
+            "User (use Ctrl+D to submit): ",
+            command_registry.get_completions(),
+        )?;
         let trimmed_input = user_input.trim();
 
         if trimmed_input.starts_with('/') {
@@ -200,7 +203,7 @@ fn get_user_input_from_option_or_stdin(
         io::stdin().read_to_string(&mut buffer)?;
         Ok(buffer.trim().to_string())
     } else {
-        get_multiline_input("Your message (end with Ctrl+D): ")
+        get_multiline_input("Your message (end with Ctrl+D): ", vec![])
     }
 }
 

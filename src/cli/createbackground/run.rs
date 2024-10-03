@@ -31,7 +31,7 @@ pub async fn run_create_background(
     } else {
         // Get user's description
         let prompt_message = "Please describe the background you wish to create. Type 'Ctrl+D' on a new line when you're finished:";
-        get_multiline_input(prompt_message)?
+        get_multiline_input(prompt_message, vec![])?
     };
 
     if description.trim().is_empty() {

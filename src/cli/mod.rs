@@ -3,6 +3,7 @@ pub mod commitmessage;
 pub mod createbackground;
 pub mod createicon;
 pub mod init;
+mod slash_completer;
 mod spinner;
 mod style;
 pub mod utils;

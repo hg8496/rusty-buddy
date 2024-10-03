@@ -32,6 +32,6 @@ impl ChatCommand for RenewCommand {
 impl RegisterableCommand for RenewCommand {
     fn register_with_registry(registry: &mut CommandRegistry) {
         let command = RenewCommand::new();
-        registry.register_command("/renew", Box::new(command));
+        registry.register_command("/renew", Box::new(command), vec!["renew".to_string()]);
     }
 }

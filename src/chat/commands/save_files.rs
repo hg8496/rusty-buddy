@@ -106,6 +106,10 @@ fn save_content(content: &str) -> Result<(), Box<dyn Error>> {
 impl RegisterableCommand for SaveFilesCommand {
     fn register_with_registry(registry: &mut CommandRegistry) {
         let command = SaveFilesCommand::new();
-        registry.register_command("/save-files", Box::new(command));
+        registry.register_command(
+            "/save-files",
+            Box::new(command),
+            vec!["save-files".to_string(), "save-files greedy".to_string()],
+        );
     }
 }

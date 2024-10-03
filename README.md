@@ -8,6 +8,8 @@ Rusty Buddy is a command-line tool that provides various utilities to assist in 
 
 - **Chat Interface**: Engage in a conversation with an AI assistant. Load or save chat sessions, and specify a directory to include in the chat context for more relevant interactions.
 
+- **Slash Command Auto-Completion**: Enjoy interactive auto-completion for slash commands within chat sessions. Type a `/` at the beginning of a line to see available commands, cycle through suggestions using arrow keys, and quickly complete commands with the Tab key.
+
 - **Commit Message Generator**: Automatically generate commit messages from `git diff` summaries, ensuring clear and consistent commit histories.
 
 - **Wish Fulfillment**: Collects files from a specified directory while adhering to `.gitignore`, creating a development context to help integrate AI into software development workflows. Utilize tools for file and directory creation and modification.
@@ -31,7 +33,7 @@ For a quick installation using a script, run the following command:
 ```bash
 curl -sSL https://get.rusty-buddy.org | bash
 ```
-`
+
 This script will download and install the Rusty Buddy binaries onto your system. Make sure you have the necessary permissions to run the installation script.
 
 ### Method 2: Clone and Build
@@ -218,7 +220,9 @@ By following these simple steps, you can quickly configure your development envi
 
 ### Slash Commands
 
-Within a chat session, you can use slash commands to execute specific tasks. These commands begin with a `/` character. The following slash commands are currently supported:
+Within a chat session, you can use slash commands to execute specific tasks. These commands begin with a `/` character. 
+After entering a `/` you can use `Tab` to cycle through possible slash commands.
+The following slash commands are currently supported:
 
 - **Renew Context**: Refresh the context of the chat session.
   ```
@@ -254,6 +258,7 @@ When you're done with the chat session, typing `exit` will allow you to exit, op
 4. Save the session if needed for future reference.
 
 These features make the chat component of `rusty-buddy` highly customizable and user-friendly, providing tool and AI support directly from your project contexts.
+
 ## Configuration
 
 The Rusty Buddy CLI supports personalized configurations through a `config.toml` file. This file allows you to customize personas, models, and other aspects.

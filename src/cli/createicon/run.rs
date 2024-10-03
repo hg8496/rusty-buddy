@@ -27,7 +27,7 @@ pub async fn run_createicon(output_dir: &str, sizes: Vec<u32>) -> Result<(), Box
     } else {
         // Get user's description
         let prompt_message = "Please describe the icon you wish to create. Type 'Ctrl+D' on a new line when you're finished:";
-        get_multiline_input(prompt_message)?
+        get_multiline_input(prompt_message, vec![])?
     };
 
     if description.trim().is_empty() {
