@@ -12,15 +12,16 @@ Get started with Rusty Buddy CLI today! Choose your platform below to download a
 ## Available Downloads
 
 ### Windows 🖥️
-- [Download Rusty Buddy CLI for Windows (64-bit)](link-to-windows-download)
-- [Download Rusty Buddy CLI for Windows (32-bit)](link-to-windows-download-32bit)
+- [Download Rusty Buddy CLI for Windows (64-bit)](lhttps://github.com/hg8496/rusty-buddy/releases)
+- [Download Rusty Buddy CLI for Windows (ARM)](https://github.com/hg8496/rusty-buddy/releases)
 
 ### macOS 🍏
-- [Download Rusty Buddy CLI for macOS](link-to-mac-download)
+- [Download Rusty Buddy CLI for macOS (Intel)](https://github.com/hg8496/rusty-buddy/releases)
+- [Download Rusty Buddy CLI for macOS (ARM)](https://github.com/hg8496/rusty-buddy/releases)
 
 ### Linux 🐧
-- [Download Rusty Buddy CLI for Linux (x86_64)](link-to-linux-download)
-- [Download Rusty Buddy CLI for Linux (ARM)](link-to-linux-arm-download)
+- [Download Rusty Buddy CLI for Linux (x86_64)](https://github.com/hg8496/rusty-buddy/releases)
+- [Download Rusty Buddy CLI for Linux (ARM)](https://github.com/hg8496/rusty-buddy/releases)
 
 Ensure to download the version that matches your system architecture.
 
@@ -69,4 +70,4 @@ Thank you for choosing Rusty Buddy CLI. We hope it enhances your productivity an
 
 ---
 
-![Happy Coding Banner](/assets/images/getting_started5-25.png) <!-- Add a motivational or thank-you image -->
+![Happy Coding Banner](/assets/images/getting_started5-25.png| relative_url) <!-- Add a motivational or thank-you image -->
