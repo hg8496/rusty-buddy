@@ -33,6 +33,6 @@ jobs:
 
     - name: Deploy to server
       run: |
-        rsync -e "ssh -o StrictHostKeyChecking=no" -avz --delete docs/site/ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:rusty-buddy-docs/
+        rsync -e "ssh -o StrictHostKeyChecking=no" -avz --delete docs/site/ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/srv/rusty-buddy-doc/
       env:
         SSH_KNOWN_HOSTS: ${{ secrets.SSH_HOST }}
