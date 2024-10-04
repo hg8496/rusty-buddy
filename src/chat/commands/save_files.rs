@@ -1,10 +1,8 @@
 use crate::chat::command::{ChatCommand, RegisterableCommand};
 use crate::chat::command_registry::CommandRegistry;
 use crate::chat::file_storage::DirectoryChatStorage;
-use crate::chat::{
-    interface::{ChatBackend, ChatStorage, MessageRole},
-    service::ChatService,
-};
+use crate::chat::message_helpers::find_last_assistant_message;
+use crate::chat::service::ChatService;
 use crate::cli::editor::{get_filename_input, get_user_input};
 use crate::openai_api::openai_interface::OpenAIInterface;
 use regex::Regex;
@@ -25,60 +23,60 @@ impl ChatCommand for SaveFilesCommand {
         args: &[&str],
         chat_service: &mut ChatService<OpenAIInterface, DirectoryChatStorage>,
     ) -> Result<(), Box<dyn Error>> {
-        let assistant_answer = match find_last_assistant_message(chat_service) {
-            Some(message) => message,
-            None => {
-                eprintln!("No message found.");
-                return Ok(());
-            }
-        };
+        let assistant_answer =
+            find_last_assistant_message(chat_service).ok_or("No assistant message found.")?;
 
         let greedy_mode = args.contains(&"greedy");
 
-        if greedy_mode {
-            // Extract everything from the first to the last triple backtick
-            if let Some(start) = assistant_answer.find("```") {
-                if let Some(end) = assistant_answer.rfind("```") {
-                    if start < end {
-                        let content = &assistant_answer[start + 3..end].trim();
-                        if save_content(content).is_ok() {
-                            println!("All code blocks saved in greedy mode.");
-                        }
-                    }
-                }
-            }
-        } else {
-            // Regex pattern to find content within triple backticks
-            let re = Regex::new(r"```(?s)(.*?)```")?;
-            for (index, cap) in re.captures_iter(&assistant_answer).enumerate() {
-                let content = &cap[1].trim();
-                println!("Found code block #{}:\n{}", index + 1, content);
-
-                if get_user_input("Do you want to save this code block? (y/n): ")?
-                    .trim()
-                    .eq_ignore_ascii_case("y")
-                {
-                    save_content(content)?;
-                } else {
-                    println!("Skipped code block #{}.", index + 1);
-                }
-            }
-        }
+        process_code_blocks(&assistant_answer, greedy_mode)?;
 
         Ok(())
     }
 }
 
-fn find_last_assistant_message<B: ChatBackend, S: ChatStorage>(
-    chat_service: &ChatService<B, S>,
-) -> Option<String> {
-    let mut last_assistant_message = None;
-    chat_service.process_messages(|msg| {
-        if msg.role == MessageRole::Assistant {
-            last_assistant_message = Some(msg.content.clone());
+fn process_code_blocks(content: &str, greedy: bool) -> Result<(), Box<dyn Error>> {
+    let re = Regex::new(r"```(?s)(.*?)```")?;
+
+    if greedy {
+        if let Some(start) = content.find("```") {
+            if let Some(end) = content.rfind("```") {
+                if start < end {
+                    let block_content = &content[start + 3..end].trim();
+                    save_block(block_content)?;
+                }
+            }
         }
-    });
-    last_assistant_message
+    } else {
+        for (index, cap) in re.captures_iter(content).enumerate() {
+            let block_content = &cap[1];
+            prompt_and_save_block(index, block_content)?;
+        }
+    }
+
+    Ok(())
+}
+
+fn save_block(block_content: &str) -> Result<(), Box<dyn Error>> {
+    let content_without_first_line = block_content.lines().skip(1).collect::<Vec<_>>().join("\n");
+    if !content_without_first_line.is_empty() {
+        save_content(&content_without_first_line)?;
+    }
+    Ok(())
+}
+
+fn prompt_and_save_block(index: usize, block_content: &str) -> Result<(), Box<dyn Error>> {
+    println!("Found code block #{}:", index + 1);
+    println!("{}", block_content);
+
+    if get_user_input("Do you want to save this code block? (y/n): ")?
+        .trim()
+        .eq_ignore_ascii_case("y")
+    {
+        save_block(block_content)?;
+    } else {
+        println!("Skipped code block #{}.", index + 1);
+    }
+    Ok(())
 }
 
 fn save_content(content: &str) -> Result<(), Box<dyn Error>> {

@@ -141,7 +141,7 @@ mod tests {
         assert_eq!(messages, loaded_messages);
 
         // Clean up test directories
-        //cleanup_test_storage_dir(1);
+        cleanup_test_storage_dir(1);
     }
 
     #[test]

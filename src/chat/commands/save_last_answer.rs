@@ -1,7 +1,7 @@
 use crate::chat::command::{ChatCommand, RegisterableCommand};
 use crate::chat::command_registry::CommandRegistry;
 use crate::chat::file_storage::DirectoryChatStorage;
-use crate::chat::interface::{ChatBackend, ChatStorage, MessageRole};
+use crate::chat::message_helpers::find_last_assistant_message;
 use crate::chat::service::ChatService;
 use crate::cli::editor::get_filename_input;
 use crate::openai_api::openai_interface::OpenAIInterface;
@@ -14,18 +14,6 @@ impl SaveLastAnswerCommand {
     pub fn new() -> Self {
         SaveLastAnswerCommand {}
     }
-
-    fn find_last_assistant_message<B: ChatBackend, S: ChatStorage>(
-        chat_service: &ChatService<B, S>,
-    ) -> Option<String> {
-        let mut last_assistant_message = None;
-        chat_service.process_messages(|msg| {
-            if msg.role == MessageRole::Assistant {
-                last_assistant_message = Some(msg.content.clone());
-            }
-        });
-        last_assistant_message
-    }
 }
 
 impl ChatCommand for SaveLastAnswerCommand {
@@ -34,7 +22,7 @@ impl ChatCommand for SaveLastAnswerCommand {
         _args: &[&str],
         chat_service: &mut ChatService<OpenAIInterface, DirectoryChatStorage>,
     ) -> Result<(), Box<dyn Error>> {
-        if let Some(last_message) = Self::find_last_assistant_message(chat_service) {
+        if let Some(last_message) = find_last_assistant_message(chat_service) {
             let default_file_name = "last_answer.txt";
             let user_file_path = get_filename_input(&format!(
                 "Enter file path to save the last answer (default: {}). Use <Tab> for filename autocompletion: ",
