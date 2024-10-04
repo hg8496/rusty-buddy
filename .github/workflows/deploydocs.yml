@@ -1,0 +1,38 @@
+name: Deploy MkDocs Site
+
+on:
+  push:
+    branches:
+      - main  # Change 'main' to your default branch if different
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python environment
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.x  # Use the appropriate version for your setup
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install mkdocs -f docs/mkdocs.yml
+
+    - name: Build MkDocs site
+      run: mkdocs build --clean
+
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.NS1_SSH_DEPLOY_KEY }}
+
+    - name: Deploy to server
+      run: |
+        rsync -avz --delete docs/site/ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:rusty-buddy-docs/
+      env:
+        SSH_KNOWN_HOSTS: ${{ secrets.SSH_HOST }}

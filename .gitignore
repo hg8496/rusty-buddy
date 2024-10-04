@@ -1,4 +1,7 @@
 commit.txt
+docs_env/
+venv_docs/
+docs/site/
 release.txt
 release.md
 .rusty/

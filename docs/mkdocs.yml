@@ -1,0 +1,51 @@
+site_name: Rusty Buddy Documentation
+site_url: https://docs.rusty-buddy.org
+site_description: A comprehensive guide to Rusty Buddy, an AI-powered command-line tool for developers.
+
+# Define the theme for the documentation
+theme:
+  name: readthedocs
+
+# Enable plugins, if needed
+plugins:
+  - search  # Enables full-text search within the documentation
+  # Add more plugins if required
+
+# Navigation structure for the documentation
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Getting Started: getting_started.md
+  - Commands:
+      - Overview: commands.md
+  - Personas: personas.md
+  - Usecases:
+      - Case study Rust development: usecases/case_study_rest.md
+      - Assisted Debugging: usecases/assisted_debugging.md
+      - Code Refactoring: usecases/code_refactoring.md
+      - Dynamic Configuration Automation: usecases/dynamic_config_automation.md
+      - Security Audit: usecases/security_audit.md
+      - Test Case Development: usecases/test_cases.md
+      - Writing Documentation: usecases/writing_documentation.md
+  # Add more categories or files as your documentation expands
+  # For example:
+  # - Advanced Usage: advanced_usage.md
+  # - FAQ: faq.md
+  # - Contributing: contributing.md
+
+# Additional configuration settings
+markdown_extensions:
+  - toc:
+      permalink: true  # Adds a permalink to each heading in the table of contents
+  - tables
+  - fenced_code
+
+# Include any additional files or settings required for deployment or functionality
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/hg8496/rusty-buddy
+  # etc...
+
+# Provide options for deploying the site if using features like GitHub Pages
+# use_directory_urls: false  # Set to false if linking pages with file extensions
