@@ -9,7 +9,6 @@ use clap_complete::aot::Shell;
 #[derive(Parser)]
 #[command(
     name = "rusty-buddy",
-    version = "0.2.0",
     author = "Christian Stolz <hg8496@cstolz.de>",
     about = "A command line interface for various tasks",
     version
@@ -18,6 +17,10 @@ pub struct Cli {
     /// Activate shell completion generation
     #[arg(long, value_enum)]
     pub completion: Option<Shell>,
+
+    /// List all available personas                      
+    #[arg(long)]
+    pub list_personas: bool,
 
     #[command(subcommand)]
     pub command: Option<Commands>,

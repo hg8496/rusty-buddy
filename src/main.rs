@@ -25,7 +25,10 @@ async fn main() {
         eprintln!("No configuration file found.");
         std::process::exit(1);
     }
-
+    if cli.list_personas {
+        persona::print_all_personas();
+        return;
+    }
     if let Some(completion) = cli.completion {
         print_completions(completion, &mut args::Cli::command());
     } else if let Some(command) = cli.command {

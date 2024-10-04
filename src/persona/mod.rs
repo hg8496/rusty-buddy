@@ -224,6 +224,15 @@ processing.".to_string(),
         },
     ]
 }
+
+pub fn print_all_personas() {
+    let personas = get_personas();
+    println!("Available Personas:");
+    for persona in personas {
+        println!("{}", persona.name);
+    }
+}
+
 pub fn get_personas() -> Vec<Persona> {
     let config = config::CONFIG.lock().unwrap();
     [get_internal_persona_configs(), config.personas.clone()].concat()
