@@ -1,6 +1,6 @@
 use crate::chat::file_storage::NilChatStorage;
 use crate::chat::service::ChatService;
-use crate::cli::utils::get_multiline_input;
+use crate::cli::editor::get_multiline_input;
 use crate::config;
 use crate::openai_api::openai_interface::OpenAIInterface;
 use crate::persona::get_persona;

@@ -5,7 +5,7 @@ use crate::chat::{
     interface::{ChatBackend, ChatStorage, MessageRole},
     service::ChatService,
 };
-use crate::cli::utils::get_user_input;
+use crate::cli::editor::get_user_input;
 use crate::openai_api::openai_interface::OpenAIInterface;
 use regex::Regex;
 use std::error::Error;

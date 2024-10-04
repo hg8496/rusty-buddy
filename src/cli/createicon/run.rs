@@ -1,5 +1,5 @@
+use crate::cli::editor::get_multiline_input;
 use crate::cli::spinner::{start_spinner, stop_spinner};
-use crate::cli::utils::get_multiline_input;
 use async_openai::config::OpenAIConfig;
 use async_openai::types::{
     CreateImageRequestArgs, Image, ImageModel, ImageQuality, ImageResponseFormat, ImageSize,
