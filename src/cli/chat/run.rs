@@ -93,10 +93,16 @@ fn handle_session_loading(
 
 // Function to print loaded messages
 fn print_loaded_messages(chat_service: &ChatService<OpenAIInterface, DirectoryChatStorage>) {
-    let skin = configure_mad_skin();
+    let is_terminal = is_output_to_terminal();
+
     chat_service.process_messages(|msg| match msg.role {
-        MessageRole::User => skin.print_text(&format!("# User\n{}\n---\n", msg.content)),
-        MessageRole::Assistant => skin.print_text(&format!("# Assistant\n{}\n---\n", msg.content)),
+        MessageRole::User => {
+            print_with_optional_formatting(&format!("# User\n{}\n---\n", msg.content), is_terminal)
+        }
+        MessageRole::Assistant => print_with_optional_formatting(
+            &format!("# Assistant\n{}\n---\n", msg.content),
+            is_terminal,
+        ),
         _ => {}
     });
 }
@@ -171,28 +177,49 @@ fn save_session_if_requested(
     Ok(())
 }
 
+fn print_with_optional_formatting(text: &str, use_formatting: bool) {
+    if use_formatting {
+        let skin = configure_mad_skin(); // Assuming you have a function for configuring MadSkin
+        skin.print_text(text);
+    } else {
+        println!("{}", text);
+    }
+}
+
+fn is_output_to_terminal() -> bool {
+    atty::is(Stream::Stdout)
+}
+
 async fn send_and_display_response(
     chat_service: &mut ChatService<OpenAIInterface, DirectoryChatStorage>,
     user_input: &str,
     model: &str,
     persona: &Persona,
 ) -> Result<(), Box<dyn Error>> {
-    let spinner = start_spinner();
-
+    let is_terminal = is_output_to_terminal();
+    let spinner = if is_terminal {
+        Some(start_spinner())
+    } else {
+        None
+    };
     let response = chat_service.send_message(user_input.trim(), false).await?;
-    stop_spinner(spinner);
 
-    let skin = configure_mad_skin();
-    skin.print_text(&format!(
-        "---\n# AI Persona:{} Model: {}\n",
-        persona.name, model
-    ));
-    skin.print_text(&response);
+    if let Some(spin) = spinner {
+        stop_spinner(spin);
+    }
+
+    print_with_optional_formatting(
+        &format!(
+            "---\n# AI Persona:{} Model: {}\n{}",
+            persona.name, model, response
+        ),
+        is_terminal,
+    );
+
     chat_service.print_statistics();
 
     Ok(())
 }
-
 fn get_user_input_from_option_or_stdin(
     input_message: Option<String>,
 ) -> Result<String, Box<dyn Error>> {
