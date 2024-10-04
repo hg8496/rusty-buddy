@@ -4,7 +4,7 @@ title: Download Rusty Buddy
 short_title: Download
 permalink: /download/
 ---
-
+![Download Header]({{ '/assets/images/download_header-50.png' | relative_url }}){: width="100%" }
 # Download Rusty Buddy CLI
 
 Get started with Rusty Buddy CLI today! Choose your platform below to download and follow the simple installation instructions.
@@ -70,4 +70,4 @@ Thank you for choosing Rusty Buddy CLI. We hope it enhances your productivity an
 
 ---
 
-![Happy Coding Banner]({{ '/assets/images/getting_started5-25.png' | relative_url }}) <!-- Add a motivational or thank-you image -->
+![Happy Coding Banner]({{ '/assets/images/getting_started5-25.png' | relative_url }}){: width="100%" } <!-- Add a motivational or thank-you image -->

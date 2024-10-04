@@ -1,3 +1,7 @@
 <footer>
-  {{ site.footer }}
+  <a href="https://github.com/{{ site.github_username }}" style="display: inline-flex; align-items: center; text-decoration: none;">
+    <img src="{{ '/assets/images/github_logo.png' | relative_url }}" alt="GitHub Logo" class="social-logo">
+    <span style="vertical-align: middle; color: inherit;">Visit our GitHub</span>
+  </a>
+  <div>{{ site.footer }}</div>
 </footer>

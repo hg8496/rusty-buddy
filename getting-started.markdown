@@ -4,6 +4,7 @@ title: Getting Started with Rusty Buddy CLI
 short_title: Getting Started
 permalink: /getting-started/
 ---
+![Download Header]({{ '/assets/images/getting_started_header-50.png' | relative_url }}){: width="100%" }
 
 # Getting Started with Rusty Buddy CLI
 
@@ -93,9 +94,9 @@ Once installed, you can start using Rusty Buddy CLI to enhance your development 
 ## Explore More
 
 - **Documentation**: Delve into [comprehensive documentation](https://github.com/hg8496/rusty-buddy) for more features and advanced usage.
-- **Subscribe**: Stay updated on our latest features and improvements by subscribing to our newsletter.
+- **Subscribe**: Stay updated on our latest features and improvements by subscribing to our github project.
 
-![Get Started Banner]({{ '/assets/images/getting_started4-25.png' | relative_url }}) <!-- Add a compelling image or graphic if available -->
+![Get Started Banner]({{ '/assets/images/getting_started4-25.png' | relative_url }}){: width="100%" } <!-- Add a compelling image or graphic if available -->
 
 ---
 

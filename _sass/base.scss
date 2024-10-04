@@ -67,6 +67,12 @@ input[type=submit]:hover { color: var(--background-color); background-color: var
 *:focus { outline: none; }
 textarea { vertical-align: top; }
 
+.social-logo {
+   width: 24px;
+   height: 24px;
+   margin-right: 8px;
+   vertical-align: middle; /* This aligns the image vertically with text */
+}
 /**
  * Code and syntax highlighting
  */

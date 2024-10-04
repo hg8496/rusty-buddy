@@ -41,7 +41,7 @@ Are you ready to supercharge your command-line experience? 🌟 Introducing **Ru
 
 ---
 
-![Get Started]({{ '/assets/images/getting_started4-25.png' | relative_url }}) <!-- Add a compelling image or graphic -->
+![Get Started]({{ '/assets/images/getting_started4-25.png' | relative_url }}){: width="100%" } <!-- Add a compelling image or graphic -->
 
 > "Rusty Buddy CLI transformed my workflow!" - Satisfied User
 
