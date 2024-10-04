@@ -5,7 +5,7 @@ use crate::chat::{
     interface::{ChatBackend, ChatStorage, MessageRole},
     service::ChatService,
 };
-use crate::cli::editor::get_user_input;
+use crate::cli::editor::{get_filename_input, get_user_input};
 use crate::openai_api::openai_interface::OpenAIInterface;
 use regex::Regex;
 use std::error::Error;
@@ -88,8 +88,8 @@ fn save_content(content: &str) -> Result<(), Box<dyn Error>> {
     }
 
     let default_file_name = "extracted_content.txt";
-    let user_file_path = get_user_input(&format!(
-        "Enter file path to save the content (default: {}): ",
+    let user_file_path = get_filename_input(&format!(
+        "Enter file path to save the content (default: {}). Use <Tab> file for autocompletion: ",
         default_file_name
     ))?;
     let file_path = if user_file_path.trim().is_empty() {
