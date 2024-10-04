@@ -57,6 +57,7 @@ This script will download and install the Rusty Buddy binaries onto your system.
    ```plaintext
    OPENAI_KEY=your_openai_api_key
    ```
+
 ## Setup
 
 The `init` command is a setup utility designed to streamline the initial configuration process for the Rusty Buddy CLI. It ensures that your environment is correctly set up with the necessary credentials and configurations before using the tool. This command is particularly useful for first-time users or when setting up on a new system.
@@ -234,18 +235,20 @@ The following slash commands are currently supported:
   ```
   /save-files
   ```
-  This command allows you to interactively extract code snippets from AI responses and save them. Options include:
-    - **y**: Save this block.
-    - **n**: Skip this block.
-
-  For a quick save of all available code between first and last triple backticks, use:
+  Options include **y** to save block or **n** to skip. For a quick save of all available code between first and last triple backticks, use:
   ```
   /save-files greedy
   ```
 
-To execute a slash command, type it within the chat interface. For example, to save files, you would enter:
+- **Save Last Answer**: Save the complete last response from the assistant to a file.
+  ```
+  /save-last-answer
+  ```
+  This command will store the last assistant's message into a file named `last_answer.txt`.
+
+To execute a slash command, type it within the chat interface. For example, to save the last answer, you would enter:
 ```
-/save-files
+/save-last-answer
 ```
 
 When you're done with the chat session, typing `exit` will allow you to exit, optionally saving the chat session under a specified name.
