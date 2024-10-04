@@ -3,14 +3,16 @@
     <ul>
       {%- assign page_paths = site.header_pages | default: default_paths -%}
       {%- for path in page_paths -%}
-        {%- assign my_page = site.pages | where: "path", path | first -%}
-        {%- if my_page.short_title -%}
-          <li>
-            <a href="{{ my_page.url | relative_url }}">{{ my_page.short_title | escape }}</a>
-            {%- unless forloop.last -%}&nbsp;|{%- endunless -%}
-          </li>
-        {%- endif -%}
+      {%- assign my_page = site.pages | where: "path", path | first -%}
+      {%- if my_page.short_title -%}
+      <li>
+        <a href="{{ my_page.url | relative_url }}">{{ my_page.short_title | escape }}</a>
+      </li> |
+      {%- endif -%}
       {%- endfor -%}
+      <li>
+        <a href="https://docs.rusty-buddy.org">Docs</a>
+      </li>
     </ul>
   </div>
 </header>

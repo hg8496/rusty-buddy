@@ -30,7 +30,7 @@ Are you ready to supercharge your command-line experience? 🌟 Introducing **Ru
 
 🙌 **Step 1**: [Download Rusty Buddy CLI](download) <!-- Link to your download page -->
 🤝 **Step 2**: [Get started](getting-started)
-👉 **Step 3**: [Read the Documentation](https://github.com/hg8496/rusty-buddy) <!-- Link to your documentation -->
+👉 **Step 3**: [Read the Documentation](https://docs.rusty-buddy.org) <!-- Link to your documentation -->
 
 ---
 
