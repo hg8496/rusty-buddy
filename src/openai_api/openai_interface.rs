@@ -12,9 +12,12 @@ use async_openai::types::{
 };
 use async_openai::Client;
 use dotenvy::dotenv;
+use log::{debug, error, info};
 use serde_json::Value;
 use std::env;
 use std::error::Error;
+use std::time::Duration;
+use tokio::time::timeout;
 
 pub struct OpenAIInterface {
     model: String,
@@ -43,25 +46,44 @@ impl ChatBackend for OpenAIInterface {
         use_tools: bool,
     ) -> Result<String, Box<dyn Error>> {
         let oai_messages = self.convert_to_chat_completion_messages(messages);
-        dotenv().ok(); // Load environment variables from a .env file (optional)
+
+        dotenv().ok();
+
         let client = self.create_openai_client()?;
         let request = self.create_openai_request(&oai_messages, use_tools)?;
 
-        let chat_completion = client.chat().create(request).await?;
+        info!("Sending request to OpenAI with timeout.");
+        let result = timeout(Duration::from_secs(30), client.chat().create(request)).await;
+
+        let chat_completion = match result {
+            Ok(Ok(chat_completion)) => chat_completion,
+            Ok(Err(e)) => {
+                error!("Failed to get chat completion from OpenAI: {}", e);
+                return Err(e.into());
+            }
+            Err(_) => {
+                error!("Request to OpenAI timed out.");
+                return Ok("Request timed out".into());
+            }
+        };
+
         let usage = chat_completion.usage.clone().unwrap();
         self.update_statistics(usage);
+
+        debug!("Extracting returned message from chat completion.");
         let returned_message = self.extract_returned_message(&chat_completion)?;
 
         if use_tools {
             if let Some(tool_calls) = returned_message.tool_calls {
                 for tool_call in tool_calls {
+                    debug!("Handling tool call: {:?}", tool_call.function.name);
                     self.handle_tool_call(tool_call).await?;
                 }
             }
         }
 
         let content = returned_message.content.unwrap_or_default();
-
+        info!("Request processing completed successfully.");
         Ok(content)
     }
 

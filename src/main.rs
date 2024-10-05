@@ -10,10 +10,16 @@ use crate::config::get_config_file;
 use clap::{Command, CommandFactory, Parser};
 use clap_complete::{generate, Generator};
 use dotenvy::dotenv;
+use log::info;
 use std::io;
 
 #[tokio::main]
 async fn main() {
+    // Initialize the logger
+    env_logger::init();
+
+    // Example info log
+    info!("Application started");
     let cli = args::Cli::parse();
     if let Some(args::Commands::Init) = cli.command {
         run_init_command().await.unwrap();
