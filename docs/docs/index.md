@@ -11,3 +11,7 @@ Welcome to the official documentation for Rusty Buddy, a command-line tool desig
 - Icon and Background Image Generation
 - Tool Integration
 - Shell Completion Support
+
+## Example usage
+
+![CLI](quickstart.gif)

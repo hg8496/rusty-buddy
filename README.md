@@ -12,6 +12,7 @@ Rusty Buddy is more than just a command-line tool; it’s a suite of utilities t
 
 [Get Started Now](https://docs.rusty-buddy.org/getting_started) and transform your coding experience with Rusty Buddy.
 
+![quickstart](docs/docs/quickstart.gif)
 ## Security
 
 At Rusty Buddy, your security and privacy are our top priorities:

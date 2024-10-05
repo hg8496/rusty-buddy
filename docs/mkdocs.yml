@@ -26,7 +26,7 @@ nav:
       - Dynamic Configuration Automation: usecases/dynamic_config_automation.md
       - Security Audit: usecases/security_audit.md
       - Test Case Development: usecases/test_cases.md
-      - Writing Documentation: usecases/writing_documentation.md
+      - Writing Documentation: usecases/write_documentation.md
   # Add more categories or files as your documentation expands
   # For example:
   # - Advanced Usage: advanced_usage.md
