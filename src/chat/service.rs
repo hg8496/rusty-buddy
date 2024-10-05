@@ -40,6 +40,7 @@ impl<B: ChatBackend, S: ChatStorage> ChatService<B, S> {
             let mut context = String::from("Use the following context to assist the user.\n");
             load_files_into_context(Path::new(directory), &self.persona.file_types, &mut context)
                 .unwrap();
+            println!("Context size: {}", context.len());
             self.add_context_message(context.as_str());
         }
         // Add persona's chat prompt to the context
