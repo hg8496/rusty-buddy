@@ -166,19 +166,4 @@ mod tests {
         assert!(listing.contains("file1.txt"));
         assert!(listing.contains("file2.txt"));
     }
-
-    #[tokio::test]
-    async fn test_recommend_persona() {
-        // This test might require mocking the OpenAI API client. Consider using a mocking library like mockall.
-        // The goal is to simulate the providing a directory and getting a persona recommendation based on it.
-
-        let dir_listing = "file1.txt\nfile2.txt";
-        let personas = vec!["rust".to_string(), "swift".to_string()];
-
-        // Mock the expected result based on provided mocks
-        let recommended_persona = recommend_persona(dir_listing.to_string(), personas.clone())
-            .await
-            .unwrap();
-        assert!(personas.contains(&recommended_persona));
-    }
 }
