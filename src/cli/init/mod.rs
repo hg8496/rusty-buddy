@@ -1,12 +1,13 @@
 use crate::chat::file_storage::NilChatStorage;
 use crate::chat::service::ChatService;
+use crate::cli::editor::get_password_input;
 use crate::openai_api::openai_interface::OpenAIInterface;
 use crate::persona::{get_internal_persona_configs, Persona};
 use dotenvy::dotenv;
 use std::env;
 use std::error::Error;
 use std::fs;
-use std::io::{self, Write};
+use std::io::Write;
 use std::path::Path;
 use walkdir::WalkDir;
 
@@ -18,14 +19,15 @@ pub async fn run_init_command() -> Result<(), Box<dyn Error>> {
     let openai_key = env::var("OPENAI_KEY").unwrap_or_else(|_| {
         // Prompt user for OpenAI key if not present
         println!("OpenAI key not found in the environment.");
-        print!("Please enter your OpenAI API key: ");
-        io::stdout().flush().unwrap();
 
-        let mut key = String::new();
-        io::stdin().read_line(&mut key).unwrap();
-        key.trim().to_string()
+        match get_password_input("Please enter your OpenAI API key: ") {
+            Ok(key) => key.trim().to_string(),
+            Err(e) => {
+                eprintln!("Failed to read the OpenAI API key: {}", e);
+                std::process::exit(1);
+            }
+        }
     });
-
     // Ensure OPENAI_KEY is set and write to .env file if necessary
     ensure_openai_key_in_env(&openai_key)?;
 

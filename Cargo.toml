@@ -18,6 +18,7 @@ walkdir = "2.5.0"
 tempfile = "3.13.0"
 termimad = "0.30"
 rustyline = { version = "14.0", features = ["derive"] }
+unicode-width = "0.2"
 toml = "0.8"
 lazy_static = "1.5"
 image = "0.25"
