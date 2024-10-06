@@ -37,9 +37,20 @@ default_persona = "rust"
 
 # Model configurations for different functionalities
 [ai]
-chat_model = "gpt-4o-2024-08-06"
-commit_model = "gpt-4o-mini"
-wish_model = "gpt-4o-2024-08-06"
+hat_model = "openai_complex"
+commit_model = "openai_fast"
+wish_model = "openai_complex"
+
+#Define various models
+[[models]]
+name = "openai_fast"
+api_name = "gpt-4o-mini"
+backend = "OpenAI"
+
+[[models]]
+name = "openai_complex"
+api_name = "gpt-4o-2024-08-06"
+backend = "OpenAI"
 
 # Define various personas
 [[personas]]

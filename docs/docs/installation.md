@@ -42,16 +42,6 @@ If you prefer to have more control over the installation or need to modify the s
    cargo build --release
    ```
 
-4. **Set Up the Environment:**
-
-   You need to provide an OpenAI API key to interact with the AI components of Rusty Buddy. Create a `.env` file and add your API key like so:
-
-   ```plaintext
-   OPENAI_KEY=your_openai_api_key
-   ```
-
-   Replace `your_openai_api_key` with your actual API key from OpenAI.
-
 **Prerequisites:**
 - Ensure that Rust and Cargo are installed on your system. You can install them via [rustup](https://rustup.rs/).
 - Network access may be required for both installation methods, particularly for downloading dependencies or connecting with the OpenAI API.
