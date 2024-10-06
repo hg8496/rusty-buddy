@@ -27,13 +27,18 @@ impl ChatService {
         persona: Persona,
         directory: Option<String>,
     ) -> Self {
-        ChatService {
+        let mut cs = ChatService {
             backend,
             storage,
             directory,
             persona,
             messages: vec![],
-        }
+        };
+        // Add persona's chat prompt to the context
+        let prompt = cs.persona.chat_prompt.clone();
+        cs.add_system_message(prompt.as_str());
+
+        cs
     }
 
     pub fn builder() -> ChatServiceBuilder {
@@ -52,15 +57,13 @@ impl ChatService {
             println!("Context size: {}", context.len());
             self.add_context_message(context.as_str());
         }
-        // Add persona's chat prompt to the context
-        let prompt = self.persona.chat_prompt.clone();
-        self.add_system_message(prompt.as_str());
     }
 
     // Inserts a new context message into the session
     pub fn add_context_message(&mut self, system_message: &str) {
+        let pos = if self.messages.is_empty() { 0 } else { 1 };
         self.messages.insert(
-            0,
+            pos,
             Message {
                 role: MessageRole::Context,
                 content: system_message.to_string(),
@@ -161,12 +164,10 @@ mod tests {
         chat_service.setup_context();
 
         // Verify that context messages are correctly set
-        assert!(chat_service
-            .messages
-            .first()
-            .unwrap()
-            .content
-            .contains("Test persona prompt"));
+        assert_eq!(
+            "Test persona prompt",
+            chat_service.messages.first().unwrap().content
+        );
 
         // Construct the expected mock file path
         let expected_filepath = Path::new("tests").join("mocks").join("mock_file.rs");
