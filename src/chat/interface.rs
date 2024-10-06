@@ -1,7 +1,7 @@
+use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::io;
-
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Message {
@@ -17,6 +17,7 @@ pub enum MessageRole {
     Context,
 }
 
+#[async_trait]
 pub trait ChatBackend {
     async fn send_request(
         &mut self,

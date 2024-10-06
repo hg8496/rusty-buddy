@@ -1,8 +1,6 @@
 use crate::chat::command::{ChatCommand, RegisterableCommand};
 use crate::chat::command_registry::CommandRegistry;
-use crate::chat::file_storage::DirectoryChatStorage;
 use crate::chat::service::ChatService;
-use crate::openai_api::openai_interface::OpenAIInterface;
 use std::error::Error;
 
 pub struct RenewCommand {}
@@ -14,11 +12,7 @@ impl RenewCommand {
 }
 
 impl ChatCommand for RenewCommand {
-    fn execute(
-        &self,
-        args: &[&str],
-        chat_service: &mut ChatService<OpenAIInterface, DirectoryChatStorage>,
-    ) -> Result<(), Box<dyn Error>> {
+    fn execute(&self, args: &[&str], chat_service: &mut ChatService) -> Result<(), Box<dyn Error>> {
         println!("Renewing the context...");
         if let Some(param) = args.first() {
             println!("Received parameter for renewing: {}", param);

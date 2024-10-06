@@ -2161,6 +2161,7 @@ name = "rusty-buddy"
 version = "0.9.1"
 dependencies = [
  "async-openai",
+ "async-trait",
  "atty",
  "base64",
  "clap",

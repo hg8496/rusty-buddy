@@ -1,9 +1,7 @@
-use crate::chat::interface::{ChatBackend, ChatStorage, MessageRole};
+use crate::chat::interface::MessageRole;
 use crate::chat::service::ChatService;
 
-pub fn find_last_assistant_message<B: ChatBackend, S: ChatStorage>(
-    chat_service: &ChatService<B, S>,
-) -> Option<String> {
+pub fn find_last_assistant_message(chat_service: &ChatService) -> Option<String> {
     let mut last_assistant_message = None;
     chat_service.process_messages(|msg| {
         if msg.role == MessageRole::Assistant {
@@ -16,8 +14,9 @@ pub fn find_last_assistant_message<B: ChatBackend, S: ChatStorage>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::chat::interface::{Message, MessageRole};
+    use crate::chat::interface::{ChatBackend, ChatStorage, Message, MessageRole};
     use crate::persona::Persona;
+    use async_trait::async_trait;
     use std::error::Error;
     use std::io;
 
@@ -50,6 +49,7 @@ mod tests {
         }
     }
 
+    #[async_trait]
     impl ChatBackend for MockChatBackend {
         async fn send_request(
             &mut self,
@@ -93,7 +93,12 @@ mod tests {
 
         let backend = MockChatBackend;
         let storage = MockStorageService::new(messages);
-        let mut chat_service = ChatService::new(backend, storage, create_mock_persona(), None);
+        let mut chat_service = ChatService::new(
+            Box::new(backend),
+            Box::new(storage),
+            create_mock_persona(),
+            None,
+        );
         chat_service.load_history("history1").unwrap();
         let result = find_last_assistant_message(&chat_service);
         assert_eq!(
@@ -117,7 +122,12 @@ mod tests {
 
         let backend = MockChatBackend;
         let storage = MockStorageService::new(messages);
-        let mut chat_service = ChatService::new(backend, storage, create_mock_persona(), None);
+        let mut chat_service = ChatService::new(
+            Box::new(backend),
+            Box::new(storage),
+            create_mock_persona(),
+            None,
+        );
         chat_service.load_history("history1").unwrap();
 
         let result = find_last_assistant_message(&chat_service);
@@ -130,7 +140,12 @@ mod tests {
 
         let backend = MockChatBackend;
         let storage = MockStorageService::new(messages);
-        let mut chat_service = ChatService::new(backend, storage, create_mock_persona(), None);
+        let mut chat_service = ChatService::new(
+            Box::new(backend),
+            Box::new(storage),
+            create_mock_persona(),
+            None,
+        );
         chat_service.load_history("history1").unwrap();
 
         let result = find_last_assistant_message(&chat_service);

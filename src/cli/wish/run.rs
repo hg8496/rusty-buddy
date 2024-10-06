@@ -2,8 +2,8 @@ use crate::chat::file_storage::NilChatStorage;
 use crate::chat::service::ChatService;
 use crate::cli::editor::get_multiline_input;
 use crate::config;
-use crate::openai_api::openai_interface::OpenAIInterface;
 use crate::persona::get_persona;
+use crate::provider::openai::openai_interface::OpenAIInterface;
 use std::error::Error;
 use std::path::PathBuf;
 
@@ -25,8 +25,8 @@ pub async fn run_wish(directory: &str, use_tools: bool) -> Result<(), Box<dyn Er
     let persona = get_persona(default_persona.as_str()).unwrap();
 
     let mut chat_service = ChatService::new(
-        openai,
-        storage,
+        Box::new(openai),
+        Box::new(storage),
         persona.clone(),
         Some(directory.to_string()),
     );

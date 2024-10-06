@@ -1,8 +1,8 @@
 use crate::chat::file_storage::NilChatStorage;
 use crate::chat::service::ChatService;
 use crate::cli::editor::get_password_input;
-use crate::openai_api::openai_interface::OpenAIInterface;
 use crate::persona::{get_internal_persona_configs, Persona};
+use crate::provider::openai::openai_interface::OpenAIInterface;
 use dotenvy::dotenv;
 use std::env;
 use std::error::Error;
@@ -94,7 +94,8 @@ async fn recommend_persona(
         file_types: vec![],
     };
 
-    let mut chat_service = ChatService::new(client, storage, persona.clone(), None);
+    let mut chat_service =
+        ChatService::new(Box::new(client), Box::new(storage), persona.clone(), None);
 
     let prompt = format!(
         "Analyze the following directory structure:\n{}\n\nChoose the most suitable persona from this list: {:?}. Just answer with one value from that list. No explanation needed.",

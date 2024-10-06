@@ -1,6 +1,6 @@
 use crate::chat::interface::{ChatBackend, Message, MessageRole};
-use crate::openai_api::file_diff;
-use crate::openai_api::file_diff::{create_directory, create_file};
+use crate::provider::openai::file_diff;
+use crate::provider::openai::file_diff::{create_directory, create_file};
 use async_openai::config::OpenAIConfig;
 use async_openai::types::{
     ChatCompletionMessageToolCall, ChatCompletionRequestAssistantMessageArgs,
@@ -11,6 +11,7 @@ use async_openai::types::{
     CreateChatCompletionResponse, FunctionObjectArgs,
 };
 use async_openai::Client;
+use async_trait::async_trait;
 use dotenvy::dotenv;
 use log::{debug, error, info};
 use serde_json::Value;
@@ -39,6 +40,7 @@ impl Default for OpenAIInterface {
     }
 }
 
+#[async_trait]
 impl ChatBackend for OpenAIInterface {
     async fn send_request(
         &mut self,

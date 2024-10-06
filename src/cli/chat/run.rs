@@ -9,8 +9,8 @@ use crate::cli::spinner::{start_spinner, stop_spinner};
 use crate::cli::style::configure_mad_skin;
 use crate::config;
 use crate::config::get_chat_sessions_dir;
-use crate::openai_api::openai_interface::OpenAIInterface;
 use crate::persona::{get_persona, Persona};
+use crate::provider::openai::openai_interface::OpenAIInterface;
 use atty::Stream;
 use std::error::Error;
 use std::io::{self, Read};
@@ -22,7 +22,12 @@ pub async fn run_chat(args: ChatArgs) -> Result<(), Box<dyn Error>> {
     let command_registry = initialize_command_registry();
 
     let persona = resolve_persona(&args.persona, &default_persona)?;
-    let mut chat_service = ChatService::new(openai, storage, persona.clone(), args.directory);
+    let mut chat_service = ChatService::new(
+        Box::new(openai),
+        Box::new(storage),
+        persona.clone(),
+        args.directory,
+    );
 
     handle_session(&mut chat_service, args.new, args.continue_last, &args.load)?;
 
@@ -56,7 +61,7 @@ fn resolve_persona(
 }
 
 fn handle_session(
-    chat_service: &mut ChatService<OpenAIInterface, DirectoryChatStorage>,
+    chat_service: &mut ChatService,
     start_new: bool,
     continue_last: bool,
     load_name: &Option<String>,
@@ -70,7 +75,7 @@ fn handle_session(
 }
 
 fn handle_session_loading(
-    chat_service: &mut ChatService<OpenAIInterface, DirectoryChatStorage>,
+    chat_service: &mut ChatService,
     continue_last: bool,
     load_name: &Option<String>,
 ) -> Result<(), Box<dyn Error>> {
@@ -92,7 +97,7 @@ fn handle_session_loading(
 }
 
 // Function to print loaded messages
-fn print_loaded_messages(chat_service: &ChatService<OpenAIInterface, DirectoryChatStorage>) {
+fn print_loaded_messages(chat_service: &ChatService) {
     let is_terminal = is_output_to_terminal();
 
     chat_service.process_messages(|msg| match msg.role {
@@ -108,7 +113,7 @@ fn print_loaded_messages(chat_service: &ChatService<OpenAIInterface, DirectoryCh
 }
 
 async fn handle_one_shot_mode(
-    mut chat_service: ChatService<OpenAIInterface, DirectoryChatStorage>,
+    mut chat_service: ChatService,
     input_message: Option<String>,
     model: String,
     persona: Persona,
@@ -123,7 +128,7 @@ async fn handle_one_shot_mode(
 }
 
 async fn start_interactive_chat(
-    mut chat_service: ChatService<OpenAIInterface, DirectoryChatStorage>,
+    mut chat_service: ChatService,
     mut command_registry: CommandRegistry,
     model: String,
     persona: Persona,
@@ -155,7 +160,7 @@ async fn start_interactive_chat(
 fn handle_command(
     command_registry: &mut CommandRegistry,
     trimmed_input: &str,
-    chat_service: &mut ChatService<OpenAIInterface, DirectoryChatStorage>,
+    chat_service: &mut ChatService,
 ) {
     let mut parts = trimmed_input.split_whitespace();
     let command_name = parts.next().unwrap_or("");
@@ -166,9 +171,7 @@ fn handle_command(
     }
 }
 
-fn save_session_if_requested(
-    chat_service: &mut ChatService<OpenAIInterface, DirectoryChatStorage>,
-) -> Result<(), Box<dyn Error>> {
+fn save_session_if_requested(chat_service: &mut ChatService) -> Result<(), Box<dyn Error>> {
     let save_name =
         get_user_input("Enter a name to save this session (or press Enter to skip saving): ")?;
     if !save_name.trim().is_empty() {
@@ -191,7 +194,7 @@ fn is_output_to_terminal() -> bool {
 }
 
 async fn send_and_display_response(
-    chat_service: &mut ChatService<OpenAIInterface, DirectoryChatStorage>,
+    chat_service: &mut ChatService,
     user_input: &str,
     model: &str,
     persona: &Persona,

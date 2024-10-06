@@ -1,7 +1,5 @@
 use crate::chat::command::ChatCommand;
-use crate::chat::file_storage::DirectoryChatStorage;
 use crate::chat::service::ChatService;
-use crate::openai_api::openai_interface::OpenAIInterface;
 use std::collections::HashMap;
 use std::error::Error;
 
@@ -48,7 +46,7 @@ impl CommandRegistry {
         &self,
         name: &str,
         args: &[&str],
-        chat_service: &mut ChatService<OpenAIInterface, DirectoryChatStorage>,
+        chat_service: &mut ChatService,
     ) -> Result<(), Box<dyn Error>> {
         if let Some(command) = self.commands.get(name) {
             command.command.execute(args, chat_service)

@@ -2,8 +2,8 @@ mod args;
 mod chat;
 mod cli;
 mod config;
-mod openai_api;
 mod persona;
+mod provider;
 
 use crate::cli::init::run_init_command;
 use crate::config::get_config_file;

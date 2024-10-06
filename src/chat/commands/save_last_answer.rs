@@ -1,10 +1,8 @@
 use crate::chat::command::{ChatCommand, RegisterableCommand};
 use crate::chat::command_registry::CommandRegistry;
-use crate::chat::file_storage::DirectoryChatStorage;
 use crate::chat::message_helpers::find_last_assistant_message;
 use crate::chat::service::ChatService;
 use crate::cli::editor::get_filename_input;
-use crate::openai_api::openai_interface::OpenAIInterface;
 use std::error::Error;
 use std::fs;
 
@@ -20,7 +18,7 @@ impl ChatCommand for SaveLastAnswerCommand {
     fn execute(
         &self,
         _args: &[&str],
-        chat_service: &mut ChatService<OpenAIInterface, DirectoryChatStorage>,
+        chat_service: &mut ChatService,
     ) -> Result<(), Box<dyn Error>> {
         if let Some(last_message) = find_last_assistant_message(chat_service) {
             let default_file_name = "last_answer.txt";

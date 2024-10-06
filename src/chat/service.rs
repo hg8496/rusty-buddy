@@ -7,20 +7,25 @@ use std::path::Path;
 // The ChatService struct acts as a mediator between user interactions and backend processing.
 // It is responsible for managing session messages, interfacing with storage,
 // and communicating user messages to a backend service.
-pub struct ChatService<B: ChatBackend, S: ChatStorage> {
-    backend: B, // Handles message processing and interactions with OpenAI or others
-    storage: S, // Manages storing and loading previous chat sessions
-    messages: Vec<Message>, // Stores messages exchanged during the current chat session
-    persona: Persona, // Represents the context and behavior in the chat session
-    directory: Option<String>, // Directory path for file context loading
+pub struct ChatService {
+    backend: Box<dyn ChatBackend>, // Handles message processing and interactions with OpenAI or others
+    storage: Box<dyn ChatStorage>, // Manages storing and loading previous chat sessions
+    messages: Vec<Message>,        // Stores messages exchanged during the current chat session
+    persona: Persona,              // Represents the context and behavior in the chat session
+    directory: Option<String>,     // Directory path for file context loading
 }
 
 use crate::persona::Persona;
 
 // Implementation of ChatService struct
-impl<B: ChatBackend, S: ChatStorage> ChatService<B, S> {
+impl ChatService {
     // Constructor to initialize a new ChatService with a backend and storage system.
-    pub fn new(backend: B, storage: S, persona: Persona, directory: Option<String>) -> Self {
+    pub fn new(
+        backend: Box<dyn ChatBackend>,
+        storage: Box<dyn ChatStorage>,
+        persona: Persona,
+        directory: Option<String>,
+    ) -> Self {
         ChatService {
             backend,
             storage,
@@ -123,6 +128,7 @@ mod tests {
     use crate::chat::interface::{ChatBackend, Message};
     use crate::chat::service::ChatService;
     use crate::persona::Persona;
+    use async_trait::async_trait;
     use std::error::Error;
     use std::path::{Path, PathBuf};
 
@@ -141,8 +147,8 @@ mod tests {
 
         // Create an instance of ChatService
         let mut chat_service = ChatService::new(
-            MockChatBackend::new(),
-            NilChatStorage {},
+            Box::new(MockChatBackend::new()),
+            Box::new(NilChatStorage {}),
             persona.clone(),
             Some(path.to_string_lossy().into_owned()), // Convert to String
         );
@@ -185,8 +191,8 @@ mod tests {
 
         // Create an instance of ChatService
         let mut chat_service = ChatService::new(
-            MockChatBackend::new(),
-            NilChatStorage {},
+            Box::new(MockChatBackend::new()),
+            Box::new(NilChatStorage {}),
             persona.clone(),
             Some(path.to_string_lossy().into_owned()), // Convert to String
         );
@@ -225,6 +231,7 @@ mod tests {
         }
     }
 
+    #[async_trait]
     impl ChatBackend for MockChatBackend {
         async fn send_request(
             &mut self,

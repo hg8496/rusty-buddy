@@ -1,10 +1,8 @@
 use crate::chat::command::{ChatCommand, RegisterableCommand};
 use crate::chat::command_registry::CommandRegistry;
-use crate::chat::file_storage::DirectoryChatStorage;
 use crate::chat::message_helpers::find_last_assistant_message;
 use crate::chat::service::ChatService;
 use crate::cli::editor::{get_filename_input, get_user_input};
-use crate::openai_api::openai_interface::OpenAIInterface;
 use regex::Regex;
 use std::error::Error;
 use std::fs;
@@ -18,11 +16,7 @@ impl SaveFilesCommand {
 }
 
 impl ChatCommand for SaveFilesCommand {
-    fn execute(
-        &self,
-        args: &[&str],
-        chat_service: &mut ChatService<OpenAIInterface, DirectoryChatStorage>,
-    ) -> Result<(), Box<dyn Error>> {
+    fn execute(&self, args: &[&str], chat_service: &mut ChatService) -> Result<(), Box<dyn Error>> {
         let assistant_answer =
             find_last_assistant_message(chat_service).ok_or("No assistant message found.")?;
 
