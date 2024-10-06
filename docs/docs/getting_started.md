@@ -38,6 +38,27 @@ Recommended persona: [Recommended Persona]
    - A default `config.toml` file is generated in the `.rusty` directory.
    - This file includes the recommended persona and sets default models for chat and commit message generation.
 
+## Choosing Your AI Provider
+
+After configuring your environment, you can select between different AI backends, including OpenAI and Ollama, depending on your needs or preferences.
+
+### Using the Ollama Backend
+
+To utilize Ollama, ensure your configuration in the `config.toml` specifies Ollama in the desired models:
+```toml
+[ai]
+chat_model = "ollama_32"
+commit_model = "ollama_32"
+wish_model = "ollama_32"
+
+[[models]]
+name = "ollama_32"
+api_name = "llama3.2"
+backend = "Ollama"
+url = "http://localhost:11434"
+
+```
+
 ## Example Usage
 
 Once your setup is complete, you can start using Rusty Buddy right away. Here are a few common scenarios:

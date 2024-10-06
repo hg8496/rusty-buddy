@@ -126,6 +126,12 @@ backend = "OpenAI"
 name = "openai_complex"
 api_name = "gpt-4o-2024-08-06"
 backend = "OpenAI"
+
+[[models]]
+name = "ollama_complex"
+api_name = "llama3.2"
+backend = "Ollama"
+url = "http://localhost:11434"
 "#,
         recommended_persona
     );

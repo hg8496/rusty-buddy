@@ -33,10 +33,7 @@ pub struct AI {
 pub struct Model {
     pub name: String,
     pub api_name: String,
-    #[allow(dead_code)]
     pub url: Option<String>,
-    #[allow(dead_code)]
-    pub port: Option<u16>,
     pub backend: AIBackend,
 }
 

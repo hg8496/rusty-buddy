@@ -47,3 +47,15 @@ If you prefer to have more control over the installation or need to modify the s
 - Network access may be required for both installation methods, particularly for downloading dependencies or connecting with the OpenAI API.
 
 By following these instructions, you will be able to set up Rusty Buddy and harness its capability for your development workflows. Choose the installation method that aligns with your needs and system configuration.
+
+## Additional Requirements for Ollama
+
+To use the Ollama feature in Rusty Buddy, you need to install and configure the Ollama service. This section explains any additional dependencies or steps required for Ollama.
+
+### Step 1: Install Ollama
+
+Ensure that the Ollama service is installed and running on your machine. You can follow the installation guide on the [official Ollama documentation](https://ollama.com).
+
+### Step 2: Configure Firewall and Ports
+
+Make sure your network allows communication through the port that Ollama uses (default is 11434).

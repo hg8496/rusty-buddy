@@ -2,6 +2,7 @@ use crate::chat::interface::{ChatBackend, ChatStorage};
 use crate::chat::service::ChatService;
 use crate::config::{AIBackend, CONFIG};
 use crate::persona::Persona;
+use crate::provider::ollama::ollama_interface::OllamaInterface;
 use crate::provider::openai::openai_interface::OpenAIInterface;
 use log::debug;
 use std::error::Error;
@@ -55,7 +56,10 @@ impl ChatServiceBuilder {
         // Check which provider to use based on the model
         let backend: Box<dyn ChatBackend> = match &model.backend {
             AIBackend::OpenAI => Box::new(OpenAIInterface::new(model.api_name.clone())), // Additional backends can be added here
-            _ => return Err(format!("Unknown backend for model: {:?}", model.backend).into()),
+            AIBackend::Ollama => Box::new(OllamaInterface::new(
+                model.api_name.clone(),
+                model.url.clone(),
+            )), // New line added
         };
 
         Ok(ChatService::new(backend, storage, persona, self.directory))
