@@ -2,6 +2,10 @@ Welcome to Rusty Buddy, your AI-powered development companion designed to stream
 
 ![Rusty Buddy Logo](https://www.rusty-buddy.org/assets/images/rusty-buddy-logo-128.png)
 
+## News
+
+- For maximum privacy now with Ollama support! (See [Getting Started](https://docs.rusty-buddy.org/getting_started/))
+
 ## Unleash Your Development Potential
 
 Rusty Buddy is more than just a command-line tool; it’s a suite of utilities tailored to modern developers:
@@ -15,7 +19,7 @@ Rusty Buddy is more than just a command-line tool; it’s a suite of utilities t
 ![quickstart](docs/docs/quickstart.gif)
 ## Security
 
-At Rusty Buddy, your security and privacy are our top priorities:
+For Rusty Buddy, your security and privacy are our top priorities:
 
 - **Built on Rust**: Rusty Buddy is developed using Rust, known for its focus on memory safety and concurrent development practices. This reduces the risk of vulnerabilities, ensuring a robust and secure toolset.
   
@@ -116,4 +120,4 @@ For further queries or support, feel free to reach out at [hg8496@cstolz.de](mai
 
 Embrace the future of development with Rusty Buddy—your AI-powered assistant!
 
-[^1]: Your data will be sent to OpenAI API to use AI features.
+[^1]: If you are using a local Ollama installation for AI workloads.

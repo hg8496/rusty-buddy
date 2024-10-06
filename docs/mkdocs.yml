@@ -39,6 +39,7 @@ markdown_extensions:
       permalink: true  # Adds a permalink to each heading in the table of contents
   - tables
   - fenced_code
+  - footnotes
 
 # Include any additional files or settings required for deployment or functionality
 extra:
