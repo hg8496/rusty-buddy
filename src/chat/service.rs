@@ -136,8 +136,9 @@ mod tests {
     use crate::chat::service::ChatService;
     use crate::persona::Persona;
     use async_trait::async_trait;
+    use std::env;
     use std::error::Error;
-    use std::path::{Path, PathBuf};
+    use std::path::Path;
 
     // Test function for the setup_context method
     #[tokio::test]
@@ -150,8 +151,13 @@ mod tests {
         };
 
         // Construct the path using PathBuf
-        let path = PathBuf::from("tests").join("mocks");
-
+        let path = env::current_dir()
+            .unwrap()
+            .join("tests")
+            .join("mocks")
+            .canonicalize()
+            .unwrap();
+        eprintln!("path: {:?}", path);
         // Create an instance of ChatService
         let mut chat_service = ChatService::new(
             Box::new(MockChatBackend::new()),
@@ -192,7 +198,12 @@ mod tests {
         };
 
         // Construct the path using PathBuf
-        let path = PathBuf::from("tests").join("mocks");
+        let path = env::current_dir()
+            .unwrap()
+            .join("tests")
+            .join("mocks")
+            .canonicalize()
+            .unwrap();
 
         // Create an instance of ChatService
         let mut chat_service = ChatService::new(

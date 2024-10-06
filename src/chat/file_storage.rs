@@ -95,25 +95,13 @@ impl ChatStorage for DirectoryChatStorage {
 mod tests {
     use super::*;
     use crate::chat::interface::MessageRole;
-    use std::fs;
-    use std::path::PathBuf;
-
-    fn setup_test_storage_dir(nr: u16) -> PathBuf {
-        let dir = PathBuf::from(format!(".test_storage{}", nr));
-        fs::create_dir_all(&dir).unwrap();
-        dir
-    }
-
-    fn cleanup_test_storage_dir(nr: u16) {
-        let dir = PathBuf::from(format!(".test_storage{}", nr));
-        if dir.exists() {
-            fs::remove_dir_all(dir).unwrap();
-        }
-    }
+    use tempfile::TempDir;
 
     #[test]
     fn test_save_and_load_session() {
-        let storage_dir = setup_test_storage_dir(1);
+        let storage_dir = TempDir::new()
+            .expect("Failed to create temp dir")
+            .into_path();
         let mut storage = DirectoryChatStorage::new(storage_dir.clone());
 
         let session_name = "test_session";
@@ -139,14 +127,13 @@ mod tests {
             .expect("Failed to load session.");
 
         assert_eq!(messages, loaded_messages);
-
-        // Clean up test directories
-        cleanup_test_storage_dir(1);
     }
 
     #[test]
     fn test_list_sessions() {
-        let storage_dir = setup_test_storage_dir(2);
+        let storage_dir = TempDir::new()
+            .expect("Failed to create temp dir")
+            .into_path();
         let storage = DirectoryChatStorage::new(storage_dir.clone());
 
         let session_name_1 = "session_one";
@@ -170,21 +157,17 @@ mod tests {
         assert!(session_list.contains(&session_name_1.to_string()));
         assert!(session_list.contains(&session_name_2.to_string()));
         assert_eq!(session_list.len(), 2);
-
-        // Clean up
-        cleanup_test_storage_dir(2);
     }
 
     #[test]
     fn test_load_non_existent_session() {
-        let storage_dir = setup_test_storage_dir(3);
+        let storage_dir = TempDir::new()
+            .expect("Failed to create temp dir")
+            .into_path();
         let mut storage = DirectoryChatStorage::new(storage_dir.clone());
 
         let result = storage.load_session("non_existent_session");
 
         assert!(result.is_err());
-
-        // Clean up
-        cleanup_test_storage_dir(3);
     }
 }

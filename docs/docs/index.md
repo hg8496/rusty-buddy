@@ -4,6 +4,7 @@ Welcome to the official documentation for Rusty Buddy, a command-line tool desig
 
 ## Features Overview
 
+- Ollama support 🆕
 - Context-Aware Interaction
 - Chat Interface
 - Slash Command Auto-Completion

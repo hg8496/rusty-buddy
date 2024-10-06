@@ -145,7 +145,7 @@ mod tests {
     use super::*;
     use std::env;
     use std::fs;
-    use tempdir::TempDir;
+    use tempfile::TempDir;
 
     #[test]
     fn test_get_or_prompt_openai_key_with_env_var() {
@@ -162,7 +162,7 @@ mod tests {
 
     #[test]
     fn test_write_openai_key_to_env_file() {
-        let temp_dir = TempDir::new("test_env").expect("Failed to create temp dir");
+        let temp_dir = TempDir::new().expect("Failed to create temp dir");
         let env_file_path = temp_dir.path().join(".env");
 
         fs::write(env_file_path.clone(), "").unwrap();
@@ -182,7 +182,7 @@ mod tests {
 
     #[test]
     fn test_get_directory_listing() {
-        let temp_dir = TempDir::new("test_dir").expect("Failed to create temp dir");
+        let temp_dir = TempDir::new().expect("Failed to create temp dir");
         fs::File::create(temp_dir.path().join("file1.txt")).unwrap();
         fs::File::create(temp_dir.path().join("file2.txt")).unwrap();
 

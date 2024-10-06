@@ -40,11 +40,11 @@ pub fn get_config_file_from_dir(mut current_dir: PathBuf) -> Result<PathBuf, Str
 mod tests {
     use super::*;
     use std::fs;
-    use tempdir::TempDir;
+    use tempfile::TempDir;
 
     #[test]
     fn test_get_config_file_success_from_temp_directory() {
-        let temp_dir = TempDir::new("example").expect("Failed to create temp dir");
+        let temp_dir = TempDir::new().expect("Failed to create temp dir");
 
         // Create the .rusty directory within the temp directory
         let rusty_dir = temp_dir.path().join(".rusty");
@@ -68,8 +68,7 @@ mod tests {
     #[test]
     fn test_get_config_file_not_found() {
         // Set up a temporary directory without a config file
-        let temp_dir =
-            TempDir::new("test_get_config_file_not_found").expect("Failed to create temp dir");
+        let temp_dir = TempDir::new().expect("Failed to create temp dir");
 
         // Confirm that the path does not exist
         let config_file = temp_dir.path().join(".rusty").join("config.toml");
