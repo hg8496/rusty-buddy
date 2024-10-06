@@ -109,13 +109,31 @@ async fn recommend_persona(
 // Function to write configuration
 fn write_config(recommended_persona: &str) -> Result<(), Box<dyn Error>> {
     let config_content = format!(
-        "default_persona = \"{}\"\n[ai]\nchat_model = \"gpt-4o-2024-08-06\"\ncommit_model = \"gpt-4o-mini\"\n",
+        r#"
+default_persona = "{}"
+
+[ai]
+chat_model = "openai_complex"
+commit_model = "openai_fast"
+wish_model = "openai_complex"
+
+[[models]]
+name = "openai_fast"
+api_name = "gpt-4o-mini"
+backend = "OpenAI"
+
+[[models]]
+name = "openai_complex"
+api_name = "gpt-4o-2024-08-06"
+backend = "OpenAI"
+"#,
         recommended_persona
     );
     fs::create_dir_all(".rusty")?;
     fs::write(".rusty/config.toml", config_content)?;
     Ok(())
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -8,38 +8,48 @@ use crate::cli::editor::{get_multiline_input, get_user_input};
 use crate::cli::spinner::{start_spinner, stop_spinner};
 use crate::cli::style::configure_mad_skin;
 use crate::config;
-use crate::config::get_chat_sessions_dir;
+use crate::config::{get_chat_sessions_dir, Config};
 use crate::persona::{get_persona, Persona};
-use crate::provider::openai::openai_interface::OpenAIInterface;
 use atty::Stream;
 use std::error::Error;
 use std::io::{self, Read};
 
 pub async fn run_chat(args: ChatArgs) -> Result<(), Box<dyn Error>> {
-    let (model, default_persona) = get_config();
-    let openai = OpenAIInterface::new(model.clone());
+    let config = get_config();
     let storage = DirectoryChatStorage::new(get_chat_sessions_dir()?);
     let command_registry = initialize_command_registry();
 
-    let persona = resolve_persona(&args.persona, &default_persona)?;
-    let mut chat_service = ChatService::new(
-        Box::new(openai),
-        Box::new(storage),
-        persona.clone(),
-        args.directory,
-    );
+    let persona = resolve_persona(&args.persona, config.default_persona.as_str())?;
+    let mut chat_service = ChatService::builder()
+        .model_name(config.ai.chat_model.as_str())
+        .storage(Box::new(storage))
+        .persona(persona.clone())
+        .directory(args.directory)
+        .build()?;
 
     handle_session(&mut chat_service, args.new, args.continue_last, &args.load)?;
 
     if args.one_shot {
-        return handle_one_shot_mode(chat_service, args.message, model, persona).await;
+        return handle_one_shot_mode(
+            chat_service,
+            args.message,
+            config.ai.chat_model.clone(),
+            persona,
+        )
+        .await;
     }
 
     if (args.continue_last || args.load.is_some()) && !args.silence {
         print_loaded_messages(&chat_service);
     }
 
-    start_interactive_chat(chat_service, command_registry, model, persona).await
+    start_interactive_chat(
+        chat_service,
+        command_registry,
+        config.ai.chat_model.clone(),
+        persona,
+    )
+    .await
 }
 
 fn initialize_command_registry() -> CommandRegistry {
@@ -237,9 +247,9 @@ fn get_user_input_from_option_or_stdin(
     }
 }
 
-fn get_config() -> (String, String) {
+fn get_config() -> Config {
     let config = config::CONFIG.lock().unwrap();
-    (config.ai.chat_model.clone(), config.default_persona.clone())
+    config.clone()
 }
 
 fn get_last_session_name() -> Result<Option<String>, Box<dyn Error>> {

@@ -3,7 +3,6 @@ use crate::chat::service::ChatService;
 use crate::cli::editor::get_multiline_input;
 use crate::config;
 use crate::persona::get_persona;
-use crate::provider::openai::openai_interface::OpenAIInterface;
 use std::error::Error;
 use std::path::PathBuf;
 
@@ -20,16 +19,15 @@ pub async fn run_wish(directory: &str, use_tools: bool) -> Result<(), Box<dyn Er
 
     // Initialize the chat service with an OpenAI backend and NilStorage
     let (model, default_persona) = get_config();
-    let openai = OpenAIInterface::new(model);
     let storage = NilChatStorage {};
     let persona = get_persona(default_persona.as_str()).unwrap();
 
-    let mut chat_service = ChatService::new(
-        Box::new(openai),
-        Box::new(storage),
-        persona.clone(),
-        Some(directory.to_string()),
-    );
+    let mut chat_service = ChatService::builder()
+        .model_name(model.as_str())
+        .storage(Box::new(storage))
+        .persona(persona.clone())
+        .directory(Some(directory.to_string()))
+        .build()?;
 
     // Get user input for their wish
     let user_input = get_multiline_input("What do you wish? ", vec![])

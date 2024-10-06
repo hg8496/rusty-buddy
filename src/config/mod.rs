@@ -3,6 +3,8 @@ mod config_file;
 use std::env;
 use std::path::PathBuf;
 
+pub use config_file::AIBackend;
+pub use config_file::Config;
 pub use config_file::CONFIG;
 
 static BASE_DIR: &str = ".rusty";

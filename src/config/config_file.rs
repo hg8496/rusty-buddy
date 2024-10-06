@@ -5,7 +5,7 @@ use std::fs;
 use std::sync::Mutex;
 
 // Configuration struct definitions
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Config {
     #[serde(default = "default_persona")]
     pub default_persona: String,
@@ -13,9 +13,11 @@ pub struct Config {
     pub ai: AI,
     #[serde(default = "default_personas")]
     pub personas: Vec<Persona>,
+    #[serde(default = "default_models")]
+    pub models: Option<Vec<Model>>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct AI {
     #[serde(default = "chat_model")]
     pub chat_model: String,
@@ -25,6 +27,24 @@ pub struct AI {
 
     #[serde(default = "wish_model")]
     pub wish_model: String,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct Model {
+    pub name: String,
+    pub api_name: String,
+    #[allow(dead_code)]
+    pub url: Option<String>,
+    #[allow(dead_code)]
+    pub port: Option<u16>,
+    pub backend: AIBackend,
+}
+
+#[derive(Debug, Deserialize, Clone, Default)]
+pub enum AIBackend {
+    #[default]
+    OpenAI,
+    Ollama,
 }
 
 fn default_ai() -> AI {
@@ -59,6 +79,10 @@ fn default_personas() -> Vec<Persona> {
     vec![]
 }
 
+fn default_models() -> Option<Vec<Model>> {
+    None
+}
+
 // Lazy loading of global config to avoid uninitialized states
 lazy_static! {
     pub static ref CONFIG: Mutex<Config> = Mutex::new(load_config().unwrap());
@@ -76,6 +100,22 @@ fn load_config() -> Result<Config, Box<dyn std::error::Error>> {
             default_persona: default_persona(),
             ai: default_ai(),
             personas: default_personas(),
+            ..Config::default()
         }),
+    }
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            default_persona: default_persona(),
+            ai: AI {
+                chat_model: "".to_string(),
+                commit_model: "".to_string(),
+                wish_model: "".to_string(),
+            },
+            personas: vec![],
+            models: None,
+        }
     }
 }

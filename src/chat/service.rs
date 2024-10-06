@@ -1,6 +1,7 @@
 use crate::chat::context::load_files_into_context;
 use crate::chat::interface::ChatStorage;
 use crate::chat::interface::{ChatBackend, Message, MessageRole};
+use crate::chat::service_builder::ChatServiceBuilder;
 use std::error::Error;
 use std::path::Path;
 
@@ -35,6 +36,9 @@ impl ChatService {
         }
     }
 
+    pub fn builder() -> ChatServiceBuilder {
+        ChatServiceBuilder::default()
+    }
     // Sets up the initial context for the chat session, including loading files.
     pub fn setup_context(&mut self) {
         // Remove existing context messages
@@ -50,7 +54,7 @@ impl ChatService {
         }
         // Add persona's chat prompt to the context
         let prompt = self.persona.chat_prompt.clone();
-        self.add_context_message(prompt.as_str());
+        self.add_system_message(prompt.as_str());
     }
 
     // Inserts a new context message into the session
