@@ -1,13 +1,10 @@
-// src/provider/ollama/ollama_interface.rs
-
 use crate::chat::interface::{ChatBackend, Message, MessageRole};
 use async_trait::async_trait;
 use ollama_rs::{
-    generation::chat::{request::ChatMessageRequest, ChatMessage, ChatMessageResponseStream},
+    generation::chat::{request::ChatMessageRequest, ChatMessage, ChatMessageResponse},
     IntoUrlSealed, Ollama,
 };
 use std::error::Error;
-use tokio_stream::StreamExt;
 
 pub struct OllamaInterface {
     ollama: Ollama,
@@ -57,18 +54,14 @@ impl ChatBackend for OllamaInterface {
         let chat_messages = Self::convert_messages(messages);
 
         let request = ChatMessageRequest::new(self.model.clone(), chat_messages.clone());
+        let responseo: ChatMessageResponse = self.ollama.send_chat_messages(request).await?;
 
-        let mut stream: ChatMessageResponseStream =
-            self.ollama.send_chat_messages_stream(request).await?;
+        let mut content = String::new();
 
-        let mut response = String::new();
-
-        while let Some(Ok(res)) = stream.next().await {
-            if let Some(assistant_message) = res.message {
-                response += &assistant_message.content;
-            }
+        if let Some(assistant_message) = responseo.message {
+            content += &assistant_message.content;
         }
-        Ok(response)
+        Ok(content)
     }
 
     fn print_statistics(&self) {

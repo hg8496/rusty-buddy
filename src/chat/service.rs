@@ -50,12 +50,16 @@ impl ChatService {
         self.messages
             .retain(|msg| !matches!(msg.role, MessageRole::Context));
         // Load files into context from a specified directory
-        if let Some(directory) = &self.directory {
-            let mut context = String::from("Use the following context to assist the user.\n");
-            load_files_into_context(Path::new(directory), &self.persona.file_types, &mut context)
-                .unwrap();
-            println!("Context size: {}", context.len());
-            self.add_context_message(context.as_str());
+        if let Some(directory) = self.directory.clone() {
+            self.add_context_message(
+                "The following context are the information I need, to assist the user.\nContext:\n",
+            );
+            load_files_into_context(
+                self,
+                Path::new(&directory),
+                self.persona.file_types.clone().as_slice(),
+            )
+            .unwrap();
         }
     }
 
@@ -175,10 +179,8 @@ mod tests {
 
         assert!(chat_service
             .messages
-            .last()
-            .unwrap()
-            .content
-            .contains("mock_file.rs"));
+            .iter()
+            .any(|message| message.content.contains("mock_file.rs")));
     }
 
     // Test function for multiple invocations of setup_context
@@ -221,11 +223,9 @@ mod tests {
 
         assert!(chat_service
             .messages
-            .last()
-            .unwrap()
-            .content
-            .contains("mock_file.rs"));
-        assert_eq!(chat_service.messages.len(), 2);
+            .iter()
+            .any(|message| message.content.contains("mock_file.rs")));
+        assert_eq!(chat_service.messages.len(), 4);
     }
 
     // Implement a simple ChatBackend mock

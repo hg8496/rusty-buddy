@@ -1,3 +1,4 @@
+use crate::chat::service::ChatService;
 use ignore::WalkBuilder;
 use std::error::Error;
 use std::fs;
@@ -32,9 +33,9 @@ use std::path::Path;
 /// println!("{}", context);
 /// ```
 pub fn load_files_into_context(
+    service: &mut ChatService,
     directory: &Path,
     file_types_or_names: &[String], // A slice of strings representing file extensions or specific filenames to include
-    context: &mut String,
 ) -> Result<(), Box<dyn Error>> {
     // Create a directory walker using the `WalkBuilder`, which respects .gitignore rules
     let walker = WalkBuilder::new(directory)
@@ -57,7 +58,7 @@ pub fn load_files_into_context(
                     .any(|filter| name == filter || name.ends_with(&format!(".{}", filter)))
                 {
                     // Add the file content to the context
-                    add_to_context(context, file_path)?;
+                    add_to_context(service, file_path)?;
                 }
             }
         }
@@ -80,7 +81,7 @@ pub fn load_files_into_context(
 ///
 /// This function can return errors due to failures in reading the file or finding the current
 /// working directory.
-fn add_to_context(context: &mut String, file_path: &Path) -> Result<(), Box<dyn Error>> {
+fn add_to_context(service: &mut ChatService, file_path: &Path) -> Result<(), Box<dyn Error>> {
     // Retrieve the current working directory to determine relative file paths
     let current_dir = std::env::current_dir()
         .map_err(|e| format!("Failed to get current directory for context: {}", e))?;
@@ -96,9 +97,10 @@ fn add_to_context(context: &mut String, file_path: &Path) -> Result<(), Box<dyn 
         .to_string_lossy();
 
     // Append the file's relative path and its content to the context string
-    context.push_str(&format!(
+    service.add_context_message(&format!(
         "Filename: {}\nContent:\n{}\n",
         relative_path, content
     ));
+
     Ok(())
 }
