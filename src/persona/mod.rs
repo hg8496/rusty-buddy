@@ -222,6 +222,13 @@ processing.".to_string(),
             chat_prompt: "As an Ansible Expert, I offer assistance in automating software provisioning, configuration management, and application deployment with Ansible.".to_string(),
             file_types: vec!["yaml".to_string(), "sh".to_string(), "yml".to_string(), "j2".to_string()],
         },
+        Persona {
+            name: "arduino".to_string(),
+            chat_prompt: "As an Arduino C++ Expert, I provide insights into developing applications for Arduino with C++ using PlatformIO. Feel free to ask for help with libraries, debugging, and project
+ structuring specific to the PlatformIO environment."
+              .to_string(),
+            file_types: vec!["cpp".to_string(), "c".to_string(), "ino".to_string(), "hpp".to_string(), "h".to_string(), "json".to_string(), "ini".to_string()],
+        },
     ]
 }
 
