@@ -71,7 +71,7 @@ Rusty Buddy is an **AI-powered command-line tool** designed to supercharge your 
 
 ---
 
-![Quickstart with Rusty Buddy](https://docs.rusty-buddy.org/quickstart.gif)
+![Get Started]({{ '/assets/images/getting_started4-25.png' | relative_url }}){: width="100%" }
 
 [^1]: Applies if you are using a local Ollama installation for AI workloads.
 
