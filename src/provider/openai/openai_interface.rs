@@ -22,6 +22,7 @@ use tokio::time::timeout;
 
 pub struct OpenAIInterface {
     model: String,
+    timeout_duration: Duration,
     last_call_completion_token: u32,
     last_call_prompt_token: u32,
     overall_completion_token: u32,
@@ -36,6 +37,7 @@ impl Default for OpenAIInterface {
             last_call_prompt_token: 0,
             overall_completion_token: 0,
             overall_prompt_token: 0,
+            timeout_duration: Duration::from_secs(30),
         }
     }
 }
@@ -54,14 +56,12 @@ impl ChatBackend for OpenAIInterface {
         let client = self.create_openai_client()?;
         let request = self.create_openai_request(&oai_messages, use_tools)?;
 
-        let timeout_duration = if self.model.starts_with("o1") {
-            Duration::from_secs(900) // 15 minute timeout for "o1" models
-        } else {
-            Duration::from_secs(30) // 30 seconds for other models
-        };
-
-        info!("Sending request to OpenAI with timeout.");
-        let result = timeout(timeout_duration, client.chat().create(request)).await;
+        // Use the timeout_duration from the struct
+        info!(
+            "Sending request to OpenAI with timeout of {:?}.",
+            self.timeout_duration
+        );
+        let result = timeout(self.timeout_duration, client.chat().create(request)).await;
 
         let chat_completion = match result {
             Ok(Ok(chat_completion)) => chat_completion,
@@ -107,9 +107,10 @@ impl ChatBackend for OpenAIInterface {
 }
 
 impl OpenAIInterface {
-    pub fn new(model: String) -> Self {
+    pub fn new(model: String, timeout_secs: u64) -> Self {
         OpenAIInterface {
             model,
+            timeout_duration: Duration::from_secs(timeout_secs),
             ..Default::default()
         }
     }

@@ -16,6 +16,7 @@ nav:
   - Home: index.md
   - Installation: installation.md
   - Getting Started: getting_started.md
+  - Configuration Guide: configuration.md
   - Commands:
       - Overview: commands.md
   - Personas: personas.md

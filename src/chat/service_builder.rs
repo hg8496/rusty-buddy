@@ -52,10 +52,12 @@ impl ChatServiceBuilder {
             .as_ref()
             .and_then(|models| models.iter().find(|m| m.name == model_name))
             .ok_or_else(|| format!("Model '{}' not found in configuration", model_name))?;
-
+        let timeout_secs = config.ai.chat_timeout_secs;
         // Check which provider to use based on the model
         let backend: Box<dyn ChatBackend> = match &model.backend {
-            AIBackend::OpenAI => Box::new(OpenAIInterface::new(model.api_name.clone())), // Additional backends can be added here
+            AIBackend::OpenAI => {
+                Box::new(OpenAIInterface::new(model.api_name.clone(), timeout_secs))
+            } // Additional backends can be added here
             AIBackend::Ollama => Box::new(OllamaInterface::new(
                 model.api_name.clone(),
                 model.url.clone(),

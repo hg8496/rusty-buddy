@@ -152,6 +152,8 @@ rusty-buddy commit-message
 
 - **Installation Guide:** Refer to the [Installation](installation.md) section for detailed instructions on installing Rusty Buddy and any additional steps required for Ollama.
 
+- **Configuration Guide:** Learn how to customize Rusty Buddy in the [Configuration Guide](configuration.md), including setting timeout durations and managing personas.
+
 - **Commands Overview:** Explore the various [CLI Commands](commands.md) available in Rusty Buddy to maximize your productivity.
 
 - **Working with Personas:** Learn how to customize and use different personas in the [Personas](personas.md) section.

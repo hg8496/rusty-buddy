@@ -59,6 +59,7 @@ Unleash the power of AI in your development workflow. [Install Rusty Buddy](inst
 
 - **[Installation Guide](installation.md)**
 - **[Getting Started](getting_started.md)**
+- **[Configuration Guide](configuration.md)**
 - **[Explore Commands](commands.md)**
 
 ## Join Our Community

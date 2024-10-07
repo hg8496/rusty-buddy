@@ -27,7 +27,7 @@ pub async fn run_init_command() -> Result<(), Box<dyn Error>> {
             println!("You chose OpenAI.");
             let openai_key = get_or_prompt_openai_key()?;
             write_openai_key_to_env_file(&openai_key)?;
-            let backend = OpenAIInterface::new("gpt-4o-mini".to_string());
+            let backend = OpenAIInterface::new("gpt-4o-mini".to_string(), 60);
             let recommended_persona = recommend_persona(files, personas, Box::new(backend)).await?;
             write_config(
                 &recommended_persona,
