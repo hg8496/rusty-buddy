@@ -1,176 +1,488 @@
 # CLI Commands
 
-Rusty Buddy offers a variety of command-line tools to streamline development tasks, from AI-powered interactions to file management. This guide details each command and its available options.
+Rusty Buddy offers a variety of command-line tools to streamline development tasks, from AI-powered interactions to file management. This guide details each command and its available options, ensuring you have the most up-to-date information to utilize Rusty Buddy effectively.
+
+---
+
+## Global Options
+
+Before diving into the specific commands, Rusty Buddy provides some options that can be used globally:
+
+- **Shell Completion Generation**
+
+  Generate shell completion scripts for supported shells (e.g., Bash, Zsh, Fish, PowerShell).
+
+```bash
+rusty-buddy --completion [bash|zsh|fish|powershell|elvish|fig|nushell|xonsh]
+```
+
+  **Example:**
+
+```bash
+rusty-buddy --completion bash > ~/.bash_completion
+```
+
+- **List Available Personas**
+
+  Display a list of all available personas that can be used with the `chat` command.
+
+```bash
+rusty-buddy --list-personas
+```
+
+---
+
+## Commands Overview
+
+- [`chat`](#chat)
+- [`commit-message`](#commit-message)
+- [`create-icon`](#create-icon)
+- [`create-background`](#create-background)
+- [`wish`](#wish)
+- [`init`](#init)
+
+---
 
 ## Chat
 
-### Description:
-Engage in conversation with an AI assistant to brainstorm ideas, solve problems, or get assistance with development tasks.
+### Description
 
-### Commands:
+Engage in conversation with an AI assistant to brainstorm ideas, solve problems, or get assistance with development tasks. The chat interface supports context-aware interactions, utilizing personas and even integrating directory context.
+
+### Usage
+
+```bash
+rusty-buddy chat [OPTIONS]
+```
+
+### Options
 
 - **Start a New Chat Session**
 
   Begin a fresh session with the AI.
 
-  ```bash
-  rusty-buddy chat --new
-  ```
+```bash
+rusty-buddy chat --new
+```
+
+  **Option:**
+
+  - `-n`, `--new`
 
 - **Continue the Last Chat Session**
 
   Resume your most recent chat session.
 
-  ```bash
-  rusty-buddy chat --continue
-  ```
+```bash
+rusty-buddy chat --continue
+```
+
+  **Option:**
+
+  - `-c`, `--continue`
 
 - **Load a Specific Chat Session by Name**
 
   Load a previously saved session.
 
-  ```bash
-  rusty-buddy chat --load session_name
-  ```
+```bash
+rusty-buddy chat --load session_name
+```
+
+  **Option:**
+
+  - `-l`, `--load <SESSION_NAME>`
 
 - **Specify a Directory for Chat Context**
 
-Enhance the session with context from a specific directory. 
-The `.gitignore` file will be honored and only required files are added.
-Each Persona has its own set of files it will be looking for.
+  Enhance the session with context from a specific directory. The `.gitignore` file will be honored, and only relevant files are added based on the persona's `file_types`.
 
-  ```bash
-  rusty-buddy chat --directory ./src
-  ```
+```bash
+rusty-buddy chat --directory ./src
+```
+
+  **Option:**
+
+  - `-d`, `--directory <DIRECTORY>`
 
 - **Use a Specific Persona**
 
-  Customize the assistant's personality based on your needs.
+  Customize the assistant's personality based on your needs. Use `rusty-buddy --list-personas` to see available personas.
 
-  ```bash
-  rusty-buddy chat --persona rust
-  ```
+```bash
+rusty-buddy chat --persona rust
+```
+
+  **Option:**
+
+  - `-p`, `--persona <PERSONA_NAME>`
 
 - **One-shot Chat Interaction**
 
-  Send a message and receive an immediate response without starting a session.
+  Send a message and receive an immediate response without starting a session. Useful for quick questions.
 
-  ```bash
-  rusty-buddy chat --one-shot --message "Hello, assistant!"
-  ```
+```bash
+rusty-buddy chat --one-shot --message "Hello, assistant!"
+```
 
-  - **With Piped Input**
-  
-    ```bash
-    echo "What does the program do?" | rusty-buddy chat --one-shot
-    ```
+  **Options:**
+
+  - `-o`, `--one-shot`
+  - `-m`, `--message <MESSAGE>`
+
+  **With Piped Input:**
+
+```bash
+echo "What does the program do?" | rusty-buddy chat --one-shot
+```
+
+- **Silence Output of Previous Messages**
+
+  When loading a session, suppress the output of previous messages.
+
+```bash
+rusty-buddy chat --continue --silence
+```
+
+  **Option:**
+
+  - `-s`, `--silence`
+
+### Slash Commands in Chat
+
+Within a chat session, enhance your experience with the following slash commands:
+
+- **Renew Context**
+
+  Refresh the chat context, clearing previous interactions and reloading specified directory files.
+
+```
+/renew
+```
+
+- **Save Files**
+
+  Save code blocks from the assistant's last message to files.
+
+```
+/save-files
+```
+
+  Options:
+
+  - **Interactive Mode:** You'll be prompted for each code block.
+  - **Greedy Mode:** Quickly save all code blocks without prompts.
+
+```
+/save-files greedy
+```
+
+- **Save Last Answer**
+
+  Save the entire last assistant response to a file.
+
+```
+/save-last-answer
+```
+
+Type the slash command within the chat interface. Use `exit` to end the session, optionally saving it under a specific name.
+
+---
 
 ## Commit Message
 
-### Description:
-Automatically generate clear and consistent commit messages from your current git diff.
+### Description
 
-### Command:
+Automatically generate clear and consistent commit messages from your current git diff, following best practices.
+
+### Usage
+
+```bash
+rusty-buddy commit-message
+```
+
+### Options
+
+This command does not have additional options. Ensure you have staged changes with `git add` before running.
+
+**Example:**
 
 ```bash
 git add .
 rusty-buddy commit-message
 ```
 
-## Icon and Background Generation
+---
 
-### Description:
-Create graphics based on user descriptions, utilizing state-of-the-art AI.
+## Create Icon
 
-### Generate a Background:
+### Description
 
-- **Landscape Orientation**
+Create icons based on user descriptions, utilizing AI image generation capabilities.
 
-  ```bash
-  rusty-buddy create-background --orientation landscape --output ./backgrounds
-  ```
+### Usage
 
-  - **With Piped Input**
-  
-    ```bash
-    echo "Create a sunset-themed background" | rusty-buddy create-background --orientation landscape --output ./backgrounds
-    ```
+```bash
+rusty-buddy create-icon [OPTIONS]
+```
 
-- **Portrait Orientation**
+### Options
 
-  ```bash
-  rusty-buddy create-background --orientation portrait --output ./backgrounds
-  ```
+- **Specify Output Directory**
 
-  - **With Piped Input**
-  
-    ```bash
-    echo "Create a cityscape background" | rusty-buddy create-background --orientation portrait --output ./backgrounds
-    ```
+  Set the directory where generated icons will be saved.
 
-### Generate an Icon:
+```bash
+rusty-buddy create-icon --output ./icons
+```
 
-- **Specify Output Sizes**
+  **Option:**
 
-  Create an icon with multiple sizes.
+  - `-o`, `--output <OUTPUT_DIR>`
 
-  ```bash
-  rusty-buddy create-icon --output ./icons --sizes 16,32,64,128,256,512
-  ```
+  Default: `./icons`
 
-  - **With Piped Input**
+- **Specify Icon Sizes**
 
-    ```bash
-    echo "Design a circular blue logo" | rusty-buddy create-icon --output ./icons --sizes 64,128,256
-    ```
+  Define the sizes (in pixels) for the generated icons.
+
+```bash
+rusty-buddy create-icon --sizes 64,128,256
+```
+
+  **Option:**
+
+  - `-s`, `--sizes <SIZES>`
+
+  Default: `16,32,64,128,256,512`
+
+- **Provide Description**
+
+  If not provided via the CLI, you will be prompted to enter a description.
+
+  **With Piped Input:**
+
+```bash
+echo "Design a circular blue logo" | rusty-buddy create-icon --output ./icons --sizes 64,128,256
+```
+
+---
+
+## Create Background
+
+### Description
+
+Generate background images based on user descriptions. Supports landscape and portrait orientations.
+
+### Usage
+
+```bash
+rusty-buddy create-background [OPTIONS]
+```
+
+### Options
+
+- **Specify Output File**
+
+  Set the file path for the generated background image.
+
+```bash
+rusty-buddy create-background --file ./backgrounds/my_background.png
+```
+
+  **Option:**
+
+  - `-f`, `--file <FILE>`
+
+  Default: `./background.png`
+
+- **Set Orientation**
+
+  Choose the orientation of the background image.
+
+```bash
+rusty-buddy create-background --orientation landscape
+```
+
+  **Option:**
+
+  - `-o`, `--orientation [landscape|portrait]`
+
+  **Examples:**
+
+  - **Landscape Orientation**
+
+```bash
+rusty-buddy create-background --orientation landscape --file ./backgrounds/landscape.png
+```
+
+    **With Piped Input:**
+
+```bash
+echo "Create a sunset-themed background" | rusty-buddy create-background --orientation landscape --file ./backgrounds/sunset.png
+```
+
+  - **Portrait Orientation**
+
+```bash
+rusty-buddy create-background --orientation portrait --file ./backgrounds/portrait.png
+```
+
+    **With Piped Input:**
+
+```bash
+echo "Create a cityscape background" | rusty-buddy create-background --orientation portrait --file ./backgrounds/cityscape.png
+```
+
+---
 
 ## Wish
 
-### Description:
-Fulfill development tasks by creating and modifying files and directories.
+### Description
 
-### Command:
+Fulfill development tasks by creating and modifying files and directories based on your instructions. The `wish` command allows you to "wish" for changes, and Rusty Buddy, using AI, will attempt to make those changes happen.
+
+### Usage
+
+```bash
+rusty-buddy wish [OPTIONS] <DIRECTORY>
+```
+
+### Arguments
+
+- `<DIRECTORY>`
+
+  The directory to collect files from and apply changes.
+
+### Options
+
+- **Activate Usage of Tools**
+
+  Enable the usage of tools that can make changes to your filesystem (e.g., creating/updating files).
 
 ```bash
 rusty-buddy wish ./src --tools
 ```
 
-## Slash Commands in Chat
+  **Option:**
 
-Within a chat session, enrich the experience with slash commands:
+  - `-t`, `--tools`
 
-- **Renew Context:**
+### Examples
 
-  Refresh the chat context, clearing previous interactions and reloading specified directory files.
+- **Simple Wish Command**
 
+```bash
+rusty-buddy wish ./src
+```
+
+  You'll be prompted to describe your wish.
+
+- **Wish with Tools Enabled**
+
+```bash
+rusty-buddy wish ./src --tools
+```
+
+  Allows Rusty Buddy to create or modify files based on your instructions.
+
+---
+
+## Init
+
+### Description
+
+Perform initial configurations, such as setting up API keys and default settings. The `init` command guides you through setting up Rusty Buddy for first-time use.
+
+### Usage
+
+```bash
+rusty-buddy init
+```
+
+### Execution Flow
+
+1. **Choose Your AI Backend**
+
+```plaintext
+Choose backend to use (1 for OpenAI, 2 for Ollama): [User enters 1 or 2]
+```
+
+2. **Enter API Keys or URLs**
+
+- **OpenAI:**
+
+```plaintext
+You chose OpenAI.
+Please enter your OpenAI API key: [User enters key]
+```
+
+- **Ollama:**
+
+```plaintext
+You chose Ollama.
+Please enter the Ollama API URL (default: http://localhost:11434): [User enters URL or presses Enter]
+Please enter the Ollama model (default: llama3.2): [User enters model name or presses Enter]
+```
+
+3. **Project Analysis and Persona Recommendation**
+
+Rusty Buddy analyzes your project and recommends a suitable persona.
+
+```plaintext
+Analyzing project directory...
+Recommended persona: [Persona]
+```
+
+4. **Configuration Files Creation**
+
+   Generates `.env` and `config.toml` files in the `.rusty` directory.
+
+---
+
+## Additional Commands and Features
+
+### Shell Completion
+
+Enhance your command-line experience by enabling shell completion scripts for Rusty Buddy.
+
+- **Generate Shell Completion Script**
+
+  ```bash
+  rusty-buddy --completion [bash|zsh|fish|powershell|elvish|fig|nushell|xonsh]
   ```
-  /renew
+
+  **Example for Bash:**
+
+  ```bash
+  rusty-buddy --completion bash > ~/.bash_completion
+  source ~/.bash_completion
   ```
 
-- **Save Files:**
+### List Available Personas
 
-  Save code blocks from the assistant's message to a file.
+View all personas that can be used with Rusty Buddy's `chat` command.
 
-  ```
-  /save-files
-  ```
-
-  Options: **y** to save, **n** to skip. Quickly save all with:
-
-  ```
-  /save-files greedy
-  ```
-
-- **Save Last Answer:**
-
-  Preserve the entire last chat response in `last_answer.txt`.
-
-  ```
-  /save-last-answer
-  ```
-
-Type the slash command within the chat interface and use `exit` to end the session, optionally saving it under a specific name.
+```bash
+rusty-buddy --list-personas
+```
 
 ---
 
 By leveraging these commands, you can greatly enhance your development workflow with the capabilities of Rusty Buddy. Whether you need to generate commit messages, engage in AI-assisted chats, or create engaging visuals, this toolset provides comprehensive support.
+
+**For more detailed information on each command and its options, you can use the help flag:**
+
+```bash
+rusty-buddy [COMMAND] --help
+```
+
+**Example:**
+
+```bash
+rusty-buddy chat --help
+```
+
+---
+
+**Happy Coding with Rusty Buddy!**

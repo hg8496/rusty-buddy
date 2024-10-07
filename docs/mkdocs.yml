@@ -20,7 +20,7 @@ nav:
       - Overview: commands.md
   - Personas: personas.md
   - Usecases:
-      - Case study Rust development: usecases/case_study_rest.md
+      - Case study Rust development: usecases/case_study_rust.md
       - Assisted Debugging: usecases/assisted_debugging.md
       - Code Refactoring: usecases/code_refactoring.md
       - Dynamic Configuration Automation: usecases/dynamic_config_automation.md
