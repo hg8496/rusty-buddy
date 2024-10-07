@@ -10,7 +10,6 @@ use std::path::Path;
 ///
 /// * `directory` - A reference to the path of the directory to search for files.
 /// * `file_types_or_names` - A slice of strings representing file extensions or full filenames to include in the context.
-/// * `excluded_dirs` - A list of directories to be ignored
 /// * `context` - A mutable reference to a `String` where the content of the files will be appended.
 ///
 /// # Returns
@@ -29,13 +28,12 @@ use std::path::Path;
 /// use std::path::Path;
 ///
 /// let mut context = String::new();
-/// load_files_into_context(Path::new("./src"), &vec!["rs".to_string(), "Gemfile".to_string()], &vec!["target".to_string()], &mut context).unwrap();
+/// load_files_into_context(Path::new("./src"), &vec!["rs".to_string(), "Gemfile".to_string()], &mut context).unwrap();
 /// println!("{}", context);
 /// ```
 pub fn load_files_into_context(
     directory: &Path,
     file_types_or_names: &[String], // A slice of strings representing file extensions or specific filenames to include
-    excluded_dirs: &[String], // A slice of strings representing directories to exclude
     context: &mut String,
 ) -> Result<(), Box<dyn Error>> {
     // Create a directory walker using the `WalkBuilder`, which respects .gitignore rules
@@ -47,11 +45,6 @@ pub fn load_files_into_context(
     for result in walker {
         let entry = result?;
         let file_path = entry.path();
-
-        // Check if the directory should be excluded                                                           
-        if excluded_dirs.iter().any(|dir| file_path.starts_with(directory.join(dir))) {
-            continue;
-        }
 
         // Check if the current path is a file
         if file_path.is_file() {

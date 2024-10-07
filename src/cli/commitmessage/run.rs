@@ -26,7 +26,6 @@ pub async fn run_commitmessage() -> Result<(), Box<dyn std::error::Error>> {
     Following these rules write a concise but short commit message reflecting the following changes:
     ".to_string(),
             file_types: vec![],
-            excluded_dirs: vec![],
         })
         .build()?;
 

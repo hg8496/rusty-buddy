@@ -52,7 +52,7 @@ impl ChatService {
         // Load files into context from a specified directory
         if let Some(directory) = &self.directory {
             let mut context = String::from("Use the following context to assist the user.\n");
-            load_files_into_context(Path::new(directory), &self.persona.file_types, &self.persona.excluded_dirs, &mut context)
+            load_files_into_context(Path::new(directory), &self.persona.file_types, &mut context)
                 .unwrap();
             println!("Context size: {}", context.len());
             self.add_context_message(context.as_str());
