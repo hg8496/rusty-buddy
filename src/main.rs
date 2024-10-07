@@ -9,7 +9,6 @@ use crate::cli::init::run_init_command;
 use crate::config::get_config_file;
 use clap::{Command, CommandFactory, Parser};
 use clap_complete::{generate, Generator};
-use dotenvy::dotenv;
 use log::info;
 use std::io;
 
@@ -24,9 +23,6 @@ async fn main() {
     if let Some(args::Commands::Init) = cli.command {
         run_init_command().await.unwrap();
     }
-    dotenv()
-        .map_err(|e| eprintln!("Failed to load .env file: {}", e))
-        .unwrap();
     if !check_environment() {
         eprintln!("No configuration file found.");
         std::process::exit(1);
@@ -54,9 +50,7 @@ async fn main() {
             args::Commands::Wish(args) => {
                 cli::wish::run(args).await.unwrap();
             }
-            args::Commands::Init => {
-                run_init_command().await.unwrap();
-            }
+            args::Commands::Init => {}
         }
     } else {
         println!("No valid command given. Use `rusty-buddy help` for more information.");
