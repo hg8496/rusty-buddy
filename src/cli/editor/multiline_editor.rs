@@ -5,7 +5,6 @@ use rustyline::{
     highlight::{Highlighter, MatchingBracketHighlighter},
     hint::HistoryHinter,
     history::DefaultHistory,
-    validate::MatchingBracketValidator,
     Completer, Editor, Helper, Hinter, Validator,
 };
 use std::borrow::Cow;
@@ -17,8 +16,6 @@ struct MyHelper {
     #[rustyline(Completer)]
     completer: SlashCommandCompleter,
     highlighter: MatchingBracketHighlighter,
-    #[rustyline(Validator)]
-    validator: MatchingBracketValidator,
     #[rustyline(Hinter)]
     hinter: HistoryHinter,
     colored_prompt: String,
@@ -61,7 +58,6 @@ pub fn get_multiline_input(
         highlighter: MatchingBracketHighlighter::new(),
         hinter: HistoryHinter::new(),
         colored_prompt: "".to_owned(),
-        validator: MatchingBracketValidator::new(),
     };
     rl.set_helper(Some(h));
 

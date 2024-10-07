@@ -4,20 +4,14 @@ use crate::cli::style::configure_mad_skin;
 use rustyline::completion::FilenameCompleter;
 use rustyline::error::ReadlineError;
 use rustyline::highlight::{Highlighter, MatchingBracketHighlighter};
-use rustyline::hint::HistoryHinter;
-use rustyline::validate::MatchingBracketValidator;
-use rustyline::{Cmd, CompletionType, Config, EditMode, Editor, KeyEvent};
-use rustyline::{Completer, Helper, Hinter, Validator};
+use rustyline::{Cmd, CompletionType, Config, EditMode, Editor, KeyEvent, Validator};
+use rustyline::{Completer, Helper, Hinter};
 
 #[derive(Helper, Completer, Hinter, Validator)]
 struct MyHelper {
     #[rustyline(Completer)]
     completer: FilenameCompleter,
     highlighter: MatchingBracketHighlighter,
-    #[rustyline(Validator)]
-    validator: MatchingBracketValidator,
-    #[rustyline(Hinter)]
-    hinter: HistoryHinter,
     colored_prompt: String,
 }
 
@@ -56,9 +50,7 @@ pub fn get_filename_input(prompt: &str) -> Result<String, Box<dyn std::error::Er
     let h = MyHelper {
         completer: FilenameCompleter::new(),
         highlighter: MatchingBracketHighlighter::new(),
-        hinter: HistoryHinter::new(),
         colored_prompt: "".to_owned(),
-        validator: MatchingBracketValidator::new(),
     };
     let mut rl = Editor::with_config(config)?;
     rl.set_helper(Some(h));
