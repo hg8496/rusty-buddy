@@ -92,6 +92,7 @@ async fn recommend_persona(
         name: "project".to_string(),
         chat_prompt: "I know how to match projects to personas".to_string(),
         file_types: vec![],
+        excluded_dirs: vec![],
     };
 
     let mut chat_service =
