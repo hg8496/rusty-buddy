@@ -1,33 +1,75 @@
-Welcome to Rusty Buddy, your AI-powered development companion designed to streamline coding workflows and enhance productivity. Whether you’re seeking to generate code automatically, refine commit messages, or engage in insightful AI-assisted chats, Rusty Buddy brings state-of-the-art machine learning to your development toolkit.
+# Rusty Buddy
+
+## Empower Your Development Workflow with AI
 
 ![Rusty Buddy Logo](https://www.rusty-buddy.org/assets/images/rusty-buddy-logo-128.png)
 
-## News
+Rusty Buddy is an **AI-powered command-line tool** designed to supercharge your development workflow. Whether you're 
+seeking to generate code automatically, refine commit messages, or engage in insightful AI-assisted chats, 
+Rusty Buddy brings state-of-the-art machine learning directly to your terminal.
 
-- For maximum privacy now with Ollama support! (See [Getting Started](https://docs.rusty-buddy.org/getting_started/))
+---
 
-## Unleash Your Development Potential
+## 🚀 What's New in Version 1.0.0
 
-Rusty Buddy is more than just a command-line tool; it’s a suite of utilities tailored to modern developers:
+- **Ollama Support** 🆕  
+  For maximum privacy, Rusty Buddy now supports the **Ollama AI backend**, allowing you to run AI models locally without sending data over the internet.
 
-- **AI-Enhanced Coding**: Leverage AI to automate mundane tasks, generate intelligent code snippets, and manage your projects efficiently.
-- **Context-Aware Interactions**: Elevate your coding experience with an AI that adapts based on your project’s context and needs.
-- **Versatile Personas**: Customize the AI's interaction style to fit various programming languages and roles, ensuring precise and context-specific guidance.
+---
 
-[Get Started Now](https://docs.rusty-buddy.org/getting_started) and transform your coding experience with Rusty Buddy.
+## Why Choose Rusty Buddy?
 
-![quickstart](docs/docs/quickstart.gif)
-## Security
+- **Streamline Workflows**  
+  Automate mundane tasks and focus on building amazing software.
 
-For Rusty Buddy, your security and privacy are our top priorities:
+- **AI-Powered Assistance**  
+  Leverage advanced AI models for code generation, debugging, documentation, and more.
 
-- **Built on Rust**: Rusty Buddy is developed using Rust, known for its focus on memory safety and concurrent development practices. This reduces the risk of vulnerabilities, ensuring a robust and secure toolset.
-  
-- **Privacy First**: We do not collect any of your usage data. Rusty Buddy operates entirely within your local environment[^1], giving you full control and peace of mind regarding your privacy.
+- **Context-Aware Interaction**  
+  Rusty Buddy adapts to your project's context, providing relevant suggestions and insights.
+
+- **Customizable Personas**  
+  Tailor AI interactions with a variety of personas specialized in different domains.
+
+---
+
+## Key Features
+
+- **Intuitive Chat Interface**  
+  Engage in natural language conversations with the AI assistant to brainstorm ideas, solve problems, or get code assistance.
+
+- **Slash Command Auto-Completion**  
+  Boost your efficiency with intelligent command suggestions and auto-completion within the chat interface.
+
+- **Commit Message Generator**  
+  Generate clear and consistent commit messages automatically from your git diffs, following best practices.
+
+- **Icon and Background Image Generation**  
+  Create stunning visuals effortlessly with AI-generated graphics based on your descriptions.
+
+- **Tool Integration**  
+  Automate repetitive tasks by allowing the AI to interact with your files and directories, enhancing your development process.
+
+- **Shell Completion Support**  
+  Improve your command-line experience with shell completion scripts for Bash, Zsh, Fish, and more.
+
+---
+
+## Security and Privacy
+
+- **Developed in Rust**  
+  Benefit from Rust's memory safety guarantees, ensuring a secure and reliable toolset.
+
+- **Privacy First**  
+  Rusty Buddy operates entirely within your local environment[^1], with **no data collection**, giving you complete control and peace of mind.
+
+[^1]: If you are using a local Ollama installation for AI workloads.
+
+---
 
 ## Installation
 
-You can set up Rusty Buddy using either the quick script method or by building it from the source:
+You can set up Rusty Buddy using either the quick script method or by building it from source.
 
 ### Method 1: Install Using Script
 
@@ -37,28 +79,31 @@ For a hassle-free setup, execute the following script:
 curl -sSL https://get.rusty-buddy.org | bash
 ```
 
-This downloads and installs the necessary binaries. Ensure you have the appropriate permissions.
+**Note:** Ensure you have the necessary permissions to run installation scripts on your system.
 
 ### Method 2: Clone and Build
 
-1. Clone the repository:
+1. **Clone the Repository**
+
    ```bash
    git clone https://github.com/hg8496/rusty-buddy.git
    ```
-2. Navigate to the project directory:
+
+2. **Navigate to the Project Directory**
+
    ```bash
    cd rusty-buddy
    ```
-3. Build the project:
+
+3. **Build the Project**
+
    ```bash
    cargo build --release
    ```
-4. Set up an environment file to include your OpenAI API key:
-   ```plaintext
-   OPENAI_KEY=your_openai_api_key
-   ```
 
-## Initial Setup
+---
+
+## Getting Started
 
 After installation, perform initial configurations using the `init` command:
 
@@ -66,58 +111,103 @@ After installation, perform initial configurations using the `init` command:
 rusty-buddy init
 ```
 
-This setup process will prompt you for your OpenAI API key, recommend a persona based on your project's characteristics, and generate necessary configuration files.
+The setup process will:
 
-## Configuration and Customization
+1. **Choose Your AI Backend**
 
-Rusty Buddy supports extensive customization via a `config.toml` file located in the `.rusty` directory. This file allows you to tailor the AI models, set default personas, and define language-specific configurations.
+   - **OpenAI**: Enter your OpenAI API key.
+   - **Ollama**: Enter the Ollama API URL and model name.
 
-### Customizing Personas
+     ```plaintext
+     Choose backend to use (1 for OpenAI, 2 for Ollama): [User enters 1 or 2]
+     ```
 
-Modify the `config.toml` to adjust or add personas to fit your project's needs:
+2. **Persona Recommendation**
 
-```toml
-[[personas]]
-name = "python"
-chat_prompt = "You are an experienced Python developer."
-file_types = ["py", "md"]
-```
+   - Rusty Buddy analyzes your project directory and recommends a suitable persona.
 
-Set a default persona for projects:
+     ```plaintext
+     Analyzing project directory...
+     Recommended persona: [Persona]
+     ```
 
-```toml
-default_persona = "rust"
-```
+3. **Create Configuration Files**
 
-For detailed configuration options, please visit our [Documentation](https://docs.rusty-buddy.org/personas).
+   - Generates `.env` and `config.toml` files in the `.rusty` directory.
 
-## Shell Completion
+---
 
-Enhance your command-line experience with shell completion scripts for Bash, Zsh, Fish, or PowerShell:
+## Example Usage
 
-- For Bash:
+- **Start a New Chat Session**
+
   ```bash
-  rusty-buddy --completion=bash >> ~/.bashrc
-  ```
-- For Zsh:
-  ```zsh
-  rusty-buddy --completion=zsh >> ~/.zshrc
+  rusty-buddy chat --new
   ```
 
-Reload your shell afterwards to activate it.
+- **Generate a Commit Message**
 
-## Contributing
+  ```bash
+  git add .
+  rusty-buddy commit-message
+  ```
 
-We welcome contributions! To collaborate, fork the repository, make improvements, and submit a pull request for review.
+- **Create an Icon**
 
-## License
+  ```bash
+  rusty-buddy create-icon --output ./icons --sizes 64,128,256
+  ```
 
-Rusty Buddy is released under the MIT License. Review the [LICENSE](LICENSE) file for more details.
+- **Use a Specific Persona**
 
-## Contact
+  ```bash
+  rusty-buddy chat --persona rust
+  ```
+
+- **Fulfill a Wish**
+
+  ```bash
+  rusty-buddy wish ./src --tools
+  ```
+
+---
+
+## Documentation
+
+- **[Installation Guide](https://docs.rusty-buddy.org/installation)**
+- **[Getting Started](https://docs.rusty-buddy.org/getting_started)**
+- **[Commands Overview](https://docs.rusty-buddy.org/commands)**
+- **[Working with Personas](https://docs.rusty-buddy.org/personas)**
+- **[Use Cases](https://docs.rusty-buddy.org/usecases/case_study_rust)**
+
+---
+
+## Join Our Community
+
+- **[GitHub Repository](https://github.com/hg8496/rusty-buddy)**
+- **[Official Documentation](https://docs.rusty-buddy.org)**
+- **[Contact Support](mailto:hg8496@cstolz.de)**
+
+---
+
+**Happy Coding with Rusty Buddy!**
+
+---
+
+![Quickstart with Rusty Buddy](https://docs.rusty-buddy.org/quickstart.gif)
+
+---
+
+# License
+
+Rusty Buddy is released under the MIT License. See the [LICENSE](LICENSE) file for more details.
+
+---
+
+# Contact
 
 For further queries or support, feel free to reach out at [hg8496@cstolz.de](mailto:hg8496@cstolz.de).
 
-Embrace the future of development with Rusty Buddy—your AI-powered assistant!
+---
 
-[^1]: If you are using a local Ollama installation for AI workloads.
+**Embrace the future of development with Rusty Buddy—your AI-powered assistant!**
