@@ -54,8 +54,14 @@ impl ChatBackend for OpenAIInterface {
         let client = self.create_openai_client()?;
         let request = self.create_openai_request(&oai_messages, use_tools)?;
 
+        let timeout_duration = if self.model.starts_with("o1") {
+            Duration::from_secs(900) // 15 minute timeout for "o1" models
+        } else {
+            Duration::from_secs(30) // 30 seconds for other models
+        };
+
         info!("Sending request to OpenAI with timeout.");
-        let result = timeout(Duration::from_secs(30), client.chat().create(request)).await;
+        let result = timeout(timeout_duration, client.chat().create(request)).await;
 
         let chat_completion = match result {
             Ok(Ok(chat_completion)) => chat_completion,
@@ -112,9 +118,25 @@ impl OpenAIInterface {
         &self,
         messages: &[Message],
     ) -> Vec<ChatCompletionRequestMessage> {
+        let use_assistant_for_system_messages = self.model.starts_with("o1");
+
         messages
             .iter()
             .map(|msg| match msg.role {
+                MessageRole::System if use_assistant_for_system_messages => {
+                    ChatCompletionRequestAssistantMessageArgs::default()
+                        .content(msg.content.as_str())
+                        .build()
+                        .unwrap()
+                        .into()
+                }
+                MessageRole::Context if use_assistant_for_system_messages => {
+                    ChatCompletionRequestAssistantMessageArgs::default()
+                        .content(msg.content.as_str())
+                        .build()
+                        .unwrap()
+                        .into()
+                }
                 MessageRole::System => ChatCompletionRequestSystemMessageArgs::default()
                     .content(msg.content.as_str())
                     .build()
@@ -138,7 +160,6 @@ impl OpenAIInterface {
             })
             .collect()
     }
-
     fn update_statistics(&mut self, usage: CompletionUsage) {
         self.last_call_completion_token = usage.completion_tokens;
         self.last_call_prompt_token = usage.prompt_tokens;
@@ -159,10 +180,7 @@ impl OpenAIInterface {
         use_tools: bool,
     ) -> Result<CreateChatCompletionRequest, Box<dyn Error>> {
         let mut builder = &mut CreateChatCompletionRequestArgs::default();
-        builder = builder
-            .model(self.model.as_str())
-            .max_tokens(15000u32)
-            .messages(messages);
+        builder = builder.model(self.model.as_str()).messages(messages);
         if use_tools {
             builder = builder
                 .tools(vec![
