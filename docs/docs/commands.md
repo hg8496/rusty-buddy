@@ -87,12 +87,13 @@ rusty-buddy chat --load session_name
 
 Option: `-l`, `--load <SESSION_NAME>`
 
-#### Specify a Directory for Chat Context
+#### Specify a Directories for Chat Context
 
 Enhance the session with context from a specific directory. Only relevant files are added based on the persona's capabilities.
+Can be added multiple times. The respective .gitignore files will be honored.
 
 ```bash
-rusty-buddy chat --directory ./src
+rusty-buddy chat --directory ./src --directory ./docs
 ```
 
 Option: `-d`, `--directory <DIRECTORY>`
@@ -334,16 +335,23 @@ Fulfill development tasks by creating and modifying files and directories based 
 ### Usage
 
 ```bash
-rusty-buddy wish [OPTIONS] <DIRECTORY>
+rusty-buddy wish [OPTIONS] -d <DIRECTORY>
 ```
-
-### Arguments
-
-`<DIRECTORY>`
 
 The directory to collect files from and apply changes.
 
 ### Options
+
+#### Specify a Directories
+
+Enhance the session with context from a specific directory. Only relevant files are added based on the persona's capabilities.
+Can be added multiple times. The respective .gitignore files will be honored.
+
+```bash
+rusty-buddy wish --directory ./src --directory ./docs
+```
+
+Option: `-d`, `--directory <DIRECTORY>`
 
 #### Activate Usage of Tools
 

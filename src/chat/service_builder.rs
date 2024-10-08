@@ -6,6 +6,7 @@ use crate::provider::ollama::ollama_interface::OllamaInterface;
 use crate::provider::openai::openai_interface::OpenAIInterface;
 use log::debug;
 use std::error::Error;
+use std::path::PathBuf;
 
 /// Builder for constructing a `ChatService`.
 ///
@@ -44,7 +45,7 @@ pub struct ChatServiceBuilder {
     model_name: Option<String>,
     storage: Option<Box<dyn ChatStorage>>,
     persona: Option<Persona>,
-    directory: Option<String>,
+    directory: Option<Vec<PathBuf>>,
 }
 
 impl ChatServiceBuilder {
@@ -63,7 +64,7 @@ impl ChatServiceBuilder {
         self
     }
 
-    pub fn directory(mut self, directory: Option<String>) -> Self {
+    pub fn directory(mut self, directory: Option<Vec<PathBuf>>) -> Self {
         self.directory = directory;
         self
     }

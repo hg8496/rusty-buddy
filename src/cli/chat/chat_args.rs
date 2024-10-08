@@ -44,7 +44,9 @@
 //!
 //! This structure is integral in setting up chat-related functionalities,
 //! thereby aiding developers in enhancing the interactive elements of Rusty Buddy.
+
 use clap::Args;
+use std::path::PathBuf;
 
 /// Structure representing command-line arguments for managing a chat session.
 ///
@@ -77,9 +79,11 @@ pub struct ChatArgs {
     #[arg(short, long)]
     pub load: Option<String>,
 
-    /// Directory to add to the chat context
-    #[arg(short, long)]
-    pub directory: Option<String>,
+    /// Directories to add to the chat context
+    ///
+    /// Can be specified multiple times.
+    #[arg(short, long, value_hint = clap::ValueHint::DirPath)]
+    pub directory: Option<Vec<PathBuf>>,
 
     /// Specify a persona for the chat session
     #[arg(short, long)]

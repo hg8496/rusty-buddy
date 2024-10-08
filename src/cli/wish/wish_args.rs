@@ -30,14 +30,16 @@
 //!   which may involve creating or modifying files and directories based on user-specified actions.
 
 use clap::Args;
+use std::path::PathBuf;
 
 /// This struct defines command-line arguments for a wish application using the Clap library.
 /// It includes a mandatory `directory` argument for specifying the source directory,
 /// and an optional `tools` flag to activate the usage of tools.
 #[derive(Args)]
 pub struct WishArgs {
-    /// The directory to collect files from
-    pub directory: String,
+    /// Directories to add to the chat context
+    #[arg(short, long, value_hint = clap::ValueHint::DirPath)]
+    pub directory: Option<Vec<PathBuf>>,
 
     /// Activate the usage of tools
     #[arg(short, long)]

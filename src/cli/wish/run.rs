@@ -64,17 +64,10 @@ use std::path::PathBuf;
 ///
 /// Returns an error wrapped in a Box if any operation fails, including directory validation,
 /// user input reading, or chat service operations.
-pub async fn run_wish(directory: &str, use_tools: bool) -> Result<(), Box<dyn Error>> {
-    // Check if the directory is valid
-    let path = PathBuf::from(directory);
-    if !path.is_dir() {
-        eprintln!(
-            "Error: The specified path '{}' is not a directory.",
-            directory
-        );
-        return Ok(());
-    }
-
+pub async fn run_wish(
+    directory: Option<Vec<PathBuf>>,
+    use_tools: bool,
+) -> Result<(), Box<dyn Error>> {
     // Initialize the chat service with an OpenAI backend and NilStorage
     let (model, default_persona) = get_config();
     let storage = NilChatStorage {};
@@ -84,7 +77,7 @@ pub async fn run_wish(directory: &str, use_tools: bool) -> Result<(), Box<dyn Er
         .model_name(model.as_str())
         .storage(Box::new(storage))
         .persona(persona.clone())
-        .directory(Some(directory.to_string()))
+        .directory(directory)
         .build()?;
 
     // Get user input for their wish
