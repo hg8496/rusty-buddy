@@ -1,3 +1,26 @@
+//! This module provides a command-line interface helper that allows for
+//! filename autocompletion and highlighting effects. It utilizes the `rustyline`
+//! crate to handle user input, completion, and visual styles. The `get_filename_input`
+//! function prompts the user for a filename input, incorporating enhanced features
+//! such as syntax highlighting, command history navigation, and inline completion.
+//!
+//! The `MyHelper` struct implements the `Helper`, `Completer`, `Hinter`,
+//! and `Validator` traits to integrate filename completion and highlighting within
+//! the readline interface. The completion suggestions are based on the filesystem
+//! and enhanced by custom styling.
+//!
+//! # Functions
+//!
+//! - `get_filename_input(prompt: &str)`: Displays a prompt to the user and
+//!   retrieves a valid filename input. It handles potential errors gracefully,
+//!   returning an empty string upon interruption or EOF.
+//!
+//! ## Example
+//!
+//! ```rust
+//! let filename = get_filename_input("Enter filename: ").unwrap();
+//! println!("You entered: {}", filename);
+//! ```
 use std::borrow::Cow::{self, Borrowed, Owned};
 
 use crate::cli::style::configure_mad_skin;
@@ -41,6 +64,27 @@ impl Highlighter for MyHelper {
     }
 }
 
+/// Prompts the user for a filename input, displaying a styled prompt and
+/// providing filename autocompletion features. Returns the entered filename
+/// as a trimmed string. This function handles potential errors gracefully,
+/// returning an empty string on interruption or EOF.
+///
+/// # Arguments
+///
+/// * `prompt` - A string slice that will be displayed as a prompt for the user.
+///
+/// # Returns
+///
+/// This function returns a `Result<String, Box<dyn std::error::Error>>`, where:
+/// - `Ok(String)` contains the user input trimmed of whitespace,
+/// - `Ok(String::new())` is returned if input is interrupted or EOF is received,
+/// - `Err(Box<dyn std::error::Error>)` contains an error if reading input fails.
+///
+/// # Example
+/// ```rust
+/// let input = get_filename_input("Enter your filename: ")?;
+/// println!("You entered: {}", input);
+/// ```
 pub fn get_filename_input(prompt: &str) -> Result<String, Box<dyn std::error::Error>> {
     let config = Config::builder()
         .history_ignore_space(true)
@@ -63,7 +107,7 @@ pub fn get_filename_input(prompt: &str) -> Result<String, Box<dyn std::error::Er
     skin.print_text(&format!("**{}**", prompt)); // Make the prompt bold and colored
     match rl.readline("") {
         Ok(input) => Ok(input.trim().to_string()),
-        Err(ReadlineError::Interrupted) => Ok(String::new()), // Return empty string as cancelation
+        Err(ReadlineError::Interrupted) => Ok(String::new()), // Return empty string as cancellation
         Err(ReadlineError::Eof) => Ok(String::new()),
         Err(err) => Err(Box::new(err)),
     }

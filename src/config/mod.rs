@@ -1,3 +1,71 @@
+//! This module provides configuration management for the application, including the
+//! default settings for AI models, personas, and other related configurations.
+//!
+//! The `Config` struct holds the overall configuration, while the `AI` struct contains
+//! specific settings for the AI models including timeout durations and model identifiers.
+//!
+//! Default values for various settings are provided through functions that utilize the
+//! `serde` library for deserialization of configuration files in TOML format. The
+//! application lazily loads the configuration using a `Mutex` to ensure thread safety
+//! and prevent uninitialized states. The `CONFIG` variable provides a globally accessible
+//! configuration instance which can be accessed throughout the application.
+//!
+//! # Configuration Structure
+//!
+//! The `Config` structure contains:
+//! - `default_persona`: The default persona to use in chat sessions.
+//! - `ai`: The AI settings, containing the models used for various functionalities.
+//! - `personas`: A list of defined personas that can be utilized for tailored interactions.
+//! - `models`: Additional configurations for AI models, including their identifiers and APIs.
+//!
+//! Here’s an example of how you can utilize this module:
+//!
+//! ```rust
+//! // Get the current application configuration
+//! let config = CONFIG.lock().unwrap();
+//! println!("Using AI model: {}", config.ai.chat_model);
+//! ```
+//!
+//! # Loading Configuration
+//!
+//! Configuration is loaded from a file named `config.toml` located in the `.rusty`
+//! directory at runtime. If the file does not exist or cannot be read, a default
+//! configuration will be created to ensure that users have a consistent experience
+//! and don’t encounter unexpected crashes due to missing configurations.
+//!
+//! # Error Handling
+//!
+//! Be aware that functions within this module return `Result` types to encapsulate errors
+//! that may occur during file I/O or deserialization. Always handle errors gracefully
+//! to ensure a smooth user experience.
+//!
+//! # Examples of the Configuration File
+//!
+//! Below is an example of how the `config.toml` might be structured:
+//!
+//! ```toml
+//! default_persona = "rust"
+//!
+//! [ai]
+//! chat_model = "openai_complex"
+//! commit_model = "openai_fast"
+//! wish_model = "openai_complex"
+//!
+//! [[models]]
+//! name = "openai_fast"
+//! api_name = "gpt-4o-mini"
+//! backend = "OpenAI"
+//!
+//! [[models]]
+//! name = "openai_complex"
+//! api_name = "gpt-4o-2024-08-06"
+//! backend = "OpenAI"
+//!
+//! # Add further models and personas as necessary
+//! ```
+//! Functions to locate the configuration file for the application.
+//! The configuration file is expected to be located at '.rusty/config.toml'
+//! relative to the current working directory or any of its parent directories.
 mod config_file;
 
 use std::env;
@@ -9,7 +77,6 @@ pub use config_file::CONFIG;
 
 static BASE_DIR: &str = ".rusty";
 
-// Retrieve the directory for chat sessions
 pub fn get_chat_sessions_dir() -> Result<PathBuf, String> {
     let config_file = get_config_file()?;
     let config_dir = config_file.parent().expect("Expected a parent directory");

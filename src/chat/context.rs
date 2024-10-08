@@ -1,3 +1,37 @@
+//! This module provides functionality for managing the chat context in Rusty Buddy.
+//!
+//! It includes the ability to load files from a specified directory into the
+//! chat context for enhanced interactions with the AI assistant. The loading
+//! process respects `.gitignore` rules and can filter files based on their
+//! extensions or specific filenames. This helps to dynamically enrich the context
+//! available to the AI, making responses more relevant to the user's specific
+//! environment and needs.
+//!
+//! ## Functions
+//!
+//! - `load_files_into_context`: Loads files from the specified directory into
+//!   the context of a `ChatService`, filtering based on provided file types and
+//!   respecting `.gitignore`.
+//!
+//! - `add_to_context`: Appends the contents of a file to the chat context,
+//!   including the relative path and its content to aid in maintaining an accurate
+//!   context for the conversation.
+//!
+//! # Examples
+//!
+//! ```
+//! use std::path::Path;
+//! use crate::chat::service::ChatService;
+//!
+//! let mut service = ChatService::new(...); // Initialize your ChatService
+//! let directory_path = Path::new("./src");
+//! let file_types = vec!["rs".to_string(), "md".to_string()];
+//! load_files_into_context(&mut service, directory_path, &file_types).unwrap();
+//! ```
+//!
+//! In the example above, `load_files_into_context` is used to populate the context
+//! of `ChatService` with all relevant files from the specified directory.
+
 use crate::chat::service::ChatService;
 use ignore::WalkBuilder;
 use std::error::Error;
@@ -7,11 +41,18 @@ use std::path::Path;
 /// Loads files from a specified directory into a context, filtering based on
 /// provided file types and specific filenames, and respecting `.gitignore` rules.
 ///
+/// This function recursively walks through the given directory, fetching files
+/// that match the specified extensions or names, and appends their contents
+/// to a provided context, which is operated by the `ChatService`. It ignores
+/// files and directories specified in `.gitignore`.
+///
 /// # Arguments
 ///
+/// * `service` - A mutable reference to a `ChatService` instance used for adding
+///   context messages with the loaded file contents.
 /// * `directory` - A reference to the path of the directory to search for files.
-/// * `file_types_or_names` - A slice of strings representing file extensions or full filenames to include in the context.
-/// * `context` - A mutable reference to a `String` where the content of the files will be appended.
+/// * `file_types_or_names` - A slice of strings representing file extensions or full
+///   filenames to include in the context.
 ///
 /// # Returns
 ///
@@ -70,7 +111,8 @@ pub fn load_files_into_context(
 ///
 /// # Arguments
 ///
-/// * `context` - A mutable reference to a `String` where the file content will be appended.
+/// * `service` - A mutable reference to a `ChatService` instance used for adding
+///   context messages with the loaded file contents.
 /// * `file_path` - A reference to the path of the file whose content needs to be added.
 ///
 /// # Returns

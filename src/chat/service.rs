@@ -1,3 +1,68 @@
+//! This module defines the `ChatService` struct, which acts as a mediator
+//! between user interactions and backend processing. It is responsible for
+//! managing session messages, interfacing with storage, and communicating
+//! user messages to a backend service. The `ChatService` encapsulates the
+//! entire chat ecosystem, handling context setup, message processing, and
+//! state management for effective AI interaction.
+//!
+//! ## Key Responsibilities
+//!
+//! - **Session Management:** Track user interactions, assistant responses,
+//!   and context-related messages throughout the chat session.
+//! - **Storage Interface:** Load and save session data, managing persistence
+//!   through the designated storage strategy (such as `ChatStorage`).
+//! - **Backend Communication:** Send user messages to the configured AI backend
+//!   (such as OpenAI or Ollama) and retrieve responses for further processing.
+//! - **Context Setup:** Establish context by loading relevant files and
+//!   integrating them into the chat session for responsive interactions.
+//!
+//! ## Example Usage
+//!
+//! ```rust
+//! use crate::chat::service::ChatService;
+//! use crate::chat::interface::{ChatBackend, ChatStorage};
+//! use crate::persona::Persona;
+//!
+//! // Create an instance of a backend and storage
+//! let backend: Box<dyn ChatBackend> = ...; // Your implementation
+//! let storage: Box<dyn ChatStorage> = ...; // Your implementation
+//! let persona = Persona { /* initialization data */ };
+//!
+//! // Initialize the ChatService
+//! let mut chat_service = ChatService::new(backend, storage, persona, None);
+//!
+//! // Start the chat session
+//! chat_service.setup_context();
+//! ```
+//!
+//! ## Methods
+//!
+//! ### `new`
+//!
+//! Constructs a new `ChatService`.
+//!
+//! ### `setup_context`
+//!
+//! Sets up the initial context for the chat session, including loading files.
+//!
+//! ### `send_message`
+//!
+//! Sends a user message to the backend, retrieves the assistant's response,
+//! and records it in the session.
+//!
+//! ### `load_history`
+//!
+//! Loads previous chat messages from storage by session name.
+//!
+//! ### `save_history`
+//!
+//! Saves current chat messages to storage under a given session name.
+//!
+//! ### `print_statistics`
+//!
+//! Outputs statistics detailing the usage of the chat session.
+
+// The `ChatService` struct encapsulates the entirety of chat session management.
 use crate::chat::context::load_files_into_context;
 use crate::chat::interface::ChatStorage;
 use crate::chat::interface::{ChatBackend, Message, MessageRole};
@@ -5,9 +70,8 @@ use crate::chat::service_builder::ChatServiceBuilder;
 use std::error::Error;
 use std::path::Path;
 
-// The ChatService struct acts as a mediator between user interactions and backend processing.
-// It is responsible for managing session messages, interfacing with storage,
-// and communicating user messages to a backend service.
+/// The `ChatService` struct acts as a mediator between user interactions and backend processing.
+/// It is responsible for managing session messages, interfacing with storage, and communicating user messages to a backend service. It handles context setup, message processing, and state management between the user and the chat backend.
 pub struct ChatService {
     backend: Box<dyn ChatBackend>, // Handles message processing and interactions with OpenAI or others
     storage: Box<dyn ChatStorage>, // Manages storing and loading previous chat sessions

@@ -1,8 +1,50 @@
+//! This module provides mechanisms for managing chat session storage in Rusty Buddy.
+//! It defines two struct types, `NilChatStorage` and `DirectoryChatStorage`, which implement
+//! the `ChatStorage` trait for loading, saving, and listing chat sessions.
+//!
+//! ## Components
+//!
+//! - `NilChatStorage`: A placeholder chat storage that does not perform any actual data
+//!   management. It can be used when chat session persistence is not needed.
+//!
+//! - `DirectoryChatStorage`: A structured chat storage that saves chat sessions to a specified
+//!   directory as JSON files. It provides methods to save a session, load a session, and list
+//!   all saved sessions within the storage directory.
+//!
+//! ## Usage Example
+//!
+//! ```rust
+//! use crate::chat::interface::{ChatStorage, Message};
+//! use std::path::PathBuf;
+//!
+//! // Create a new directory chat storage
+//! let storage_dir = PathBuf::from("your_session_directory");
+//! let mut storage = DirectoryChatStorage::new(storage_dir);
+//!
+//! // Save a session
+//! let messages = vec![
+//!     Message { role: MessageRole::User, content: "Hello".to_string() },
+//!     Message { role: MessageRole::Assistant, content: "Hi!".to_string() },
+//! ];
+//! storage.save_session("session_name", &messages).unwrap();
+//!
+//! // Load a session
+//! let loaded_messages = storage.load_session("session_name").unwrap();
+//! ```
+//!
+//! ### Note on Handling Errors
+//!
+//! Methods in this module return `io::Result` to handle errors related to file operations.
+//! Be sure to account for potential errors, especially in scenarios where file access or
+//! writing may fail due to permission issues or invalid paths.
+
 use crate::chat::interface::{ChatStorage, Message};
 use std::fs;
 use std::io;
 use std::path::PathBuf;
 
+/// Represents a chat storage mechanism. This trait defines methods for loading,
+/// saving, and listing chat sessions.
 pub struct NilChatStorage {}
 
 impl ChatStorage for NilChatStorage {

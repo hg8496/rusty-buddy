@@ -1,3 +1,39 @@
+//! This module provides an interface for communicating with the Ollama chat model.
+//! It encapsulates the functionality required to send messages to the Ollama AI backend,
+//! receive responses, and manage the flow of conversation within the Rusty Buddy application.
+//!
+//! The `OllamaInterface` struct acts as a bridge between the chat service and the Ollama API,
+//! allowing for easy interaction with the model while maintaining session context and message history.
+//!
+//! ## Key Responsibilities
+//!
+//! - **Message Handling:** Converts application-specific message formats into the format required by the Ollama API.
+//! - **Session Management:** Retains state and context for ongoing conversations, facilitating a natural dialog flow.
+//! - **Backend Integration:** Implements the `ChatBackend` trait to integrate seamlessly with other components in the chat ecosystem.
+//!
+//! ## Example Usage
+//!
+//! ```rust
+//! use crate::provider::ollama::ollama_interface::OllamaInterface;
+//!
+//! let ollama_backend = OllamaInterface::new("llama2".to_string(), None);
+//! // Here “llama2” is an example model name
+//! ```
+//!
+//! ## Fields
+//!
+//! - `ollama`: An instance of the `Ollama` struct that handles interactions with the Ollama API.
+//! - `model`: A string that specifies the model to be used for generating chat messages.
+//!
+//! ## Methods
+//!
+//! - `new`: Creates a new instance of `OllamaInterface`, initializing it with the provided model and optional URL.
+//! - `convert_messages`: Converts an array of `Message` objects into `ChatMessage` objects for processing by the Ollama API.
+//!
+//! ## Traits Implementations
+//!
+//! - `ChatBackend`: Implements the necessary methods to send requests to the chat model and print statistics about the model in use.
+
 use crate::chat::interface::{ChatBackend, Message, MessageRole};
 use crate::provider::openai::file_diff;
 use crate::provider::openai::file_diff::{create_directory, create_file};
@@ -20,6 +56,11 @@ use std::error::Error;
 use std::time::Duration;
 use tokio::time::timeout;
 
+/// OpenAIInterface provides a wrapper around the OpenAI API for sending chat requests and handling tools.
+/// It implements the ChatBackend trait, allowing it to be integrated into a chat application.
+///
+/// This struct maintains statistics related to token usage, sets a default model,
+/// manages the timeout for requests, and converts messages into the format required by OpenAI's API.
 pub struct OpenAIInterface {
     model: String,
     timeout_duration: Duration,

@@ -1,3 +1,34 @@
+//! Rusty Buddy is an AI-powered command-line interface (CLI) tool designed to enhance development workflows by providing various operations related to personas, chat functionality, and other commands.
+//!
+//! This application utilizes the `clap` library for robust command-line argument parsing and the `tokio` library for asynchronous execution. The `main` function serves as the entry point, initializing the logger, processing command-line arguments, and executing the corresponding command based on user input.
+//!
+//! ## Key Features
+//!
+//! - **Initialization:** Set up configuration and environment for Rusty Buddy.
+//! - **Command Execution:** Supports commands for generating commit messages, starting chat sessions, creating icons and backgrounds, and expressing wishes for automated file manipulations.
+//! - **Persona Management:** Offers a mechanism to list existing personas and allows users to select a specific persona for tailored interactions.
+//! - **Command Completion:** Generates shell completion scripts to enhance user experience by providing command suggestions.
+//!
+//! ## Usage Example
+//!
+//! ```bash
+//! # Start a new chat session
+//! rusty-buddy chat --new
+//!
+//! # Generate a commit message from staged changes
+//! git add .
+//! rusty-buddy commit-message
+//! ```
+//!
+//! ## Modules
+//!
+//! - `args`: Defines the argument structure for command-line interface management.
+//! - `chat`: Handles chat interactions, including session management and persona integration.
+//! - `cli`: Responsible for command execution and general command-line interface functions.
+//! - `config`: Manages configuration settings and file operations.
+//! - `persona`: Defines and provides functionality related to user personas.
+//! - `provider`: Interfaces with different AI backends like OpenAI and Ollama.
+
 mod args;
 mod chat;
 mod cli;

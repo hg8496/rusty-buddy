@@ -1,6 +1,35 @@
+//! This module provides utility functions for message handling within the chat application.
+//!
+//! It primarily focuses on retrieving the last assistant message from the chat history,
+//! facilitating processes like saving the last response or obtaining context from previous interactions.
+//!
+//! ## Functions
+//!
+//! - [`find_last_assistant_message`] - Finds and returns the last message sent by the assistant,
+//!   allowing users to interact with and manage AI output efficiently.
+//!
 use crate::chat::interface::MessageRole;
 use crate::chat::service::ChatService;
 
+/// # Function Details
+///
+/// ## find_last_assistant_message
+///
+/// Finds the last message from the assistant in the chat history.
+///
+/// This function iterates through the messages processed by the given `ChatService`,
+/// looking for messages where the `role` is `MessageRole::Assistant`. If such a message
+/// is found, its content is stored and returned. If no assistant messages are present,
+/// the function returns `None`.
+///
+/// # Arguments
+///
+/// * `chat_service` - A reference to the `ChatService` that processes the chat messages.
+///
+/// # Returns
+///
+/// An `Option<String>`, which contains the content of the last assistant message if it exists,
+/// otherwise `None`.
 pub fn find_last_assistant_message(chat_service: &ChatService) -> Option<String> {
     let mut last_assistant_message = None;
     chat_service.process_messages(|msg| {

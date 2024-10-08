@@ -1,3 +1,40 @@
+//! This module provides the functionality needed for the initialization
+//! of the Rusty Buddy application. It primarily focuses on configuring
+//! the AI backend, managing user inputs for API keys and model types,
+//! and setting up environment variables and configuration files.
+//!
+//! The entry point is the `run_init_command` function, which guides the
+//! user through the setup process and ensures that the application is
+//! ready for use with the selected AI backend (OpenAI or Ollama).
+//
+//! ## Key Functions
+//!
+//! - `run_init_command`: This asynchronous function is responsible for
+//!   initializing the application, managing the choice of AI backend,
+//!   and creating the necessary configuration files. It prompts the user
+//!   for essential details like API keys and model selections.
+//! - `choose_backend_option`: Prompts the user to select their desired
+//!   backend (OpenAI or Ollama) and returns the choice.
+//! - `get_or_prompt_openai_key`: Retrieves the OpenAI API key from
+//!   environment variables or prompts the user to enter it if not found.
+//! - `write_openai_key_to_env_file`: Saves the provided OpenAI API key
+//!   to the `.env` file for future use.
+//! - `get_directory_listing`: Returns a list of files in the specified
+//!   directory, formatted as a string.
+//! - `get_internal_personas`: Retrieves the internal persona configurations,
+//!   providing available options for user interactions with the AI.
+//!
+//! ## Example Usage
+//!
+//! The typical workflow when initializing the application would involve
+//! running the command:
+//!
+//! ```
+//! rusty-buddy init
+//! ```
+//!
+//! This command initiates the setup process, allowing users to configure
+//! the tool according to their specific development needs.
 use crate::chat::file_storage::NilChatStorage;
 use crate::chat::interface::ChatBackend;
 use crate::chat::service::ChatService;
@@ -12,7 +49,10 @@ use std::io::Write;
 use std::{env, fs};
 use walkdir::WalkDir;
 
-// This function represents the entry point of the init command
+/// This function represents the entry point of the init command.
+/// It initializes the configuration based on user choice of AI backend (OpenAI or Ollama),
+/// prompts for necessary configuration details (like API keys and model types),
+/// and sets up the environment and configuration files accordingly.
 pub async fn run_init_command() -> Result<(), Box<dyn Error>> {
     // Load existing environment variables
     dotenv().ok();
@@ -72,7 +112,6 @@ pub async fn run_init_command() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-// Function to recommend a persona
 // Function to recommend a persona
 async fn recommend_persona(
     dir_listing: String,

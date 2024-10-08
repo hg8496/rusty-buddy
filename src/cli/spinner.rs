@@ -1,9 +1,28 @@
+//! This module provides functionality for displaying a simple spinner in the terminal,
+//! which can be useful for indicating ongoing processing or loading states. It allows
+//! starting and stopping the spinner, ensuring that it runs in a separate thread to
+//! maintain responsiveness in the main application flow.
+//!
+//! ## Functions
+//!
+//! - [`start_spinner`] - Starts the spinner in a separate thread, indicating progress or loading state.
+//! - [`stop_spinner`] - Stops the spinner and clears the last displayed character in the terminal.
+//!
+//! ## Examples
+//!
+//! ```
+//! use crate::cli::spinner::{start_spinner, stop_spinner};
+//!
+//! let spinner = start_spinner();
+//! // Simulate some loading work
+//! thread::sleep(Duration::from_secs(5));
+//! stop_spinner(spinner);
+//! ```
 use std::io::Write;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::{thread, time::Duration};
 
-// Function to show a spinner
 pub fn start_spinner() -> Arc<AtomicBool> {
     let spinning = Arc::new(AtomicBool::new(true));
     let spin = spinning.clone();

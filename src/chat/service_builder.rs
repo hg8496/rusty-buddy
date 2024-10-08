@@ -7,7 +7,38 @@ use crate::provider::openai::openai_interface::OpenAIInterface;
 use log::debug;
 use std::error::Error;
 
-// Builder struct
+/// Builder for constructing a `ChatService`.
+///
+/// This struct allows for optional configuration of the `ChatService` through a fluent API.
+///
+/// The following fields can be configured:
+/// - `model_name`: The name of the AI model to be used.
+/// - `storage`: A storage backend implementing the `ChatStorage` trait.
+/// - `persona`: A `Persona` that defines the character of the chat interactions.
+/// - `directory`: An optional directory for storing relevant data.
+///
+/// The `build` method will validate that all required fields are set and create an instance of `ChatService`.
+///
+/// # Example
+///
+/// ```rust
+/// use crate::chat::service_builder::ChatServiceBuilder;
+/// use crate::chat::interface::{ChatBackend, ChatStorage};
+/// use crate::persona::Persona;
+///
+/// let service = ChatServiceBuilder::default()
+///     .model_name("gpt-4o")
+///     .storage(Box::new(MyStorage {}))
+///     .persona(MyPersona {})
+///     .directory(Some("path/to/directory".to_string()))
+///     .build()
+///     .expect("Failed to build ChatService");
+/// ```
+///
+/// # Errors
+///
+/// The `build` method will return an error if any of the required fields are not set.
+/// It will also return an error if the specified AI model cannot be found in the configuration.
 #[derive(Default)]
 pub struct ChatServiceBuilder {
     model_name: Option<String>,

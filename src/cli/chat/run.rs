@@ -1,3 +1,46 @@
+//! This module provides functionality for managing chat sessions, initializing necessary components,
+//! and handling user interactions within the Rusty Buddy application. The primary function, `run_chat`,
+//! is responsible for orchestrating chat interactions, managing session states, and resolving
+//! user-defined personas to ensure an enriched chat experience with the AI assistant.
+//!
+//! ## Key Responsibilities
+//!
+//! - **Session Management**: Initializes and tracks chat sessions, including the ability to continue or load previous sessions.
+//! - **Command Handling**: Interfaces with registered commands, allowing for interaction via chat commands.
+//! - **User Input Handling**: Captures and processes user messages, providing responses derived from the AI backend.
+//! - **Context Setup**: Facilitates loading of relevant files and messages to provide a strengthened context for the chat session.
+//!
+//! ## Example Usage
+//!
+//! Here's how to initiate a chat session and engage with the AI assistant:
+//!
+//! ```rust
+//! use crate::cli::chat::{ChatArgs, run};
+//!
+//! let args = ChatArgs {
+//!     new: true,
+//!     continue_last: false,
+//!     load: None,
+//!     directory: Some(String::from("./src")),
+//!     persona: Some(String::from("rust")),
+//!     one_shot: false,
+//!     message: None,
+//!     silence: false,
+//! };
+//!
+//! run(args).await.unwrap();
+//! ```
+//!
+//! ## Functions
+//!
+//! - `run_chat`: Initializes a `ChatService`, manages the flow of the chat session, and processes user inputs,
+//!   invoking the appropriate logic based on command arguments and context.
+//!
+//! ## Error Handling
+//!
+//! Each function is designed to return a `Result` type, encapsulating any errors that may arise during execution.
+//! Careful attention is given to ensure that users receive meaningful error messages when unexpected conditions occur.
+//! Implementations should handle potential failures gracefully, maintaining a seamless user experience.
 use crate::chat::command_registry::CommandRegistry;
 use crate::chat::commands::initialize_commands;
 use crate::chat::file_storage::DirectoryChatStorage;
@@ -15,6 +58,10 @@ use log::error;
 use std::error::Error;
 use std::io::{self, Read};
 
+/// Runs the chat application, initializing the necessary components,
+/// handling command line arguments, and starting either an interactive
+/// chat session or a one-shot message response based on the provided
+/// arguments. It manages chat sessions and persona resolution.
 pub async fn run_chat(args: ChatArgs) -> Result<(), Box<dyn Error>> {
     let config = get_config();
     let storage = DirectoryChatStorage::new(get_chat_sessions_dir()?);
