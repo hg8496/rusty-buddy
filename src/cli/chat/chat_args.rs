@@ -1,30 +1,29 @@
-//! This module defines the `ChatArgs` structure which holds the command-line arguments
-//! related to managing a chat session in the Rusty Buddy application. Utilizing the
-//! `clap` library, it allows for flexible parsing and control of various options that
-//! affect the behavior and context of the chat application.
+//! This module defines the `ChatArgs` structure, which encapsulates the command-line arguments
+//! for managing a chat session in the Rusty Buddy application. Leveraging the `clap` library,
+//! it facilitates sophisticated parsing and control of various options that can influence
+//! the behavior and context of the chat application.
 //!
 //! ## Overview
 //!
-//! The `ChatArgs` struct encompasses several options that dictate how the chat session
-//! should be initialized and its parameters configured within the application. This
-//! includes the ability to start new sessions, continue previous ones, or send one-off
-//! messages directly. Each field is annotated to provide clarity regarding expected
-//! user input through command-line arguments.
+//! The `ChatArgs` struct comprises several parameters that govern how a chat session
+//! should be launched and configured within the application. Options include starting new sessions,
+//! resuming previous ones, sending immediate messages, and more. Each field is meticulously documented
+//! to clarify expected user inputs via command-line arguments.
 //!
 //! ## Components
 //!
-//! - `new`: Indicates whether to start a new chat session.
-//! - `continue_last`: Allows the continuation of the last active chat session.
-//! - `load`: Specifies the name of a saved session to load.
-//! - `directory`: Defines a directory to be added to the context of the chat.
-//! - `persona`: Specifies a particular persona under which to interact with the AI.
-//! - `one_shot`: Allows sending a single message and exiting the session immediately.
-//! - `message`: Provides a specific message to be used as input for one-off queries.
-//! - `silence`: Silences any output of previous messages when loading sessions.
+//! - `new`: Signals the start of a new chat session.
+//! - `continue_last`: Enables the resumption of the most recent active chat session.
+//! - `load`: Designates a named session to load.
+//! - `directory`: Specifies a directory to integrate into the chat context.
+//! - `persona`: Denotes a particular persona for interacting with the AI.
+//! - `one_shot`: Sends a single message, exiting the session immediately.
+//! - `model`: Defines the AI model to be used during the chat session.
+//! - `silence`: Suppresses outputs of prior messages when loading sessions.
 //!
 //! ## Usage Example
 //!
-//! Here is a basic example of how you might initialize a chat session using the `ChatArgs`:
+//! Below is a simple example demonstrating how to initialize a chat session using `ChatArgs`:
 //!
 //! ```rust
 //! use crate::cli::chat::ChatArgs;
@@ -34,36 +33,36 @@
 //!     continue_last: false,
 //!     load: None,
 //!     directory: Some(String::from("./src")),
-//!     persona: Some(String::from("rust")),
-//!     one_shot: false,
-//!     message: None,
+//!     persona: Some(String::from("rusty")),
+//!     one_shot: None,
+//!     model: Some(String::from("gpt-3.5")),
 //!     silence: false,
 //! };
 //!
-//! // Further code to utilize args in starting the session...
+//! // Further code to utilize args in initiating the session...
 //! ```
 //!
-//! This structure provides the foundational setup for chat-related functionality,
-//! making it easier for developers to enhance the interactive capabilities of Rusty Buddy.
+//! This structure is integral in setting up chat-related functionalities,
+//! thereby aiding developers in enhancing the interactive elements of Rusty Buddy.
 use clap::Args;
 
 /// Structure representing command-line arguments for managing a chat session.
 ///
-/// This struct uses the Clap library to parse command-line arguments and provides various
-/// options to control the behavior of the chat application. The arguments allow the user
-/// to start a new chat session, continue an existing one, load a specific session, set
-/// a directory for context, specify a persona, send a one-time message, or silence old
-/// message outputs.
+/// This struct employs the Clap library for parsing command-line arguments and offers numerous
+/// options to dictate the behavior of the chat application. The arguments empower the user
+/// to initiate a new chat session, resume an existing one, load a specific session, designate
+/// a directory for context, select a persona, send a one-time message, specify an AI model,
+/// or suppress old message outputs.
 ///
-/// The available arguments are:
-/// - `new`: Start a new chat session.
-/// - `continue_last`: Continue the last chat session.
+/// The accessible arguments are:
+/// - `new`: Initiate a new chat session.
+/// - `continue_last`: Resume the last chat session.
 /// - `load`: Load a specific chat session by name.
-/// - `directory`: Specify a directory to add to the chat context.
-/// - `persona`: Specify a persona for the chat session.
-/// - `one_shot`: Send one message and exit.
-/// - `message`: Use a specific message as user input.
-/// - `silence`: Silence the output of old messages.
+/// - `directory`: Indicate a directory to add to the chat context.
+/// - `persona`: Choose a persona for the chat session.
+/// - `one_shot`: Dispatch one message and exit.
+/// - `model`: Define the AI model for the chat session.
+/// - `silence`: Suppress the output of old messages.
 #[derive(Args)]
 pub struct ChatArgs {
     /// Start a new chat session
@@ -86,13 +85,13 @@ pub struct ChatArgs {
     #[arg(short, long)]
     pub persona: Option<String>,
 
-    /// Send one message and quit
+    /// Send one message and quit. If [<ONE_SHOT>] is specified, use it as user input.
     #[arg(short = 'o', long = "one-shot")]
-    pub one_shot: bool,
+    pub one_shot: Option<Option<String>>,
 
-    /// Use this message as user input
-    #[arg(short = 'm', long = "message")]
-    pub message: Option<String>,
+    /// Sets the AI model to use in this chat session
+    #[arg(short = 'm', long = "model")]
+    pub model: Option<String>,
 
     /// Silence the output of old messages
     #[arg(short = 's', long = "silence")]

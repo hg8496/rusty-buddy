@@ -47,7 +47,7 @@ rusty-buddy --list-personas
 
 ### Description
 
-Engage in conversation with an AI assistant to brainstorm ideas, solve problems, or get assistance with development tasks. The chat interface supports context-aware interactions, utilizing personas and even integrating directory context.
+Engage in conversation with an AI assistant to brainstorm ideas, solve problems, or get assistance with development tasks. The chat interface supports context-aware interactions, utilizing personas and integrating directory context.
 
 ### Usage
 
@@ -57,7 +57,7 @@ rusty-buddy chat [OPTIONS]
 
 ### Options
 
-- **Start a New Chat Session**
+#### Start a New Chat Session
 
   Begin a fresh session with the AI.
 
@@ -65,127 +65,126 @@ rusty-buddy chat [OPTIONS]
 rusty-buddy chat --new
 ```
 
-  **Option:**
+Option: `-n`, `--new`
 
-  - `-n`, `--new`
+#### Continue the Last Chat Session
 
-- **Continue the Last Chat Session**
-
-  Resume your most recent chat session.
+Resume your most recent chat session.
 
 ```bash
-rusty-buddy chat --continue
+rusty-buddy chat --continue-last
 ```
 
-  **Option:**
+Option: `-c`, `--continue-last`
 
-  - `-c`, `--continue`
+#### Load a Specific Chat Session by Name
 
-- **Load a Specific Chat Session by Name**
-
-  Load a previously saved session.
+Load a previously saved session.
 
 ```bash
 rusty-buddy chat --load session_name
 ```
 
-  **Option:**
+Option: `-l`, `--load <SESSION_NAME>`
 
-  - `-l`, `--load <SESSION_NAME>`
+#### Specify a Directory for Chat Context
 
-- **Specify a Directory for Chat Context**
-
-  Enhance the session with context from a specific directory. The `.gitignore` file will be honored, and only relevant files are added based on the persona's `file_types`.
+Enhance the session with context from a specific directory. Only relevant files are added based on the persona's capabilities.
 
 ```bash
 rusty-buddy chat --directory ./src
 ```
 
-  **Option:**
+Option: `-d`, `--directory <DIRECTORY>`
 
-  - `-d`, `--directory <DIRECTORY>`
+#### Use a Specific Persona
 
-- **Use a Specific Persona**
-
-  Customize the assistant's personality based on your needs. Use `rusty-buddy --list-personas` to see available personas.
+Customize the assistant's personality based on your needs. Use `rusty-buddy --list-personas` to see available personas.
 
 ```bash
 rusty-buddy chat --persona rust
 ```
 
-  **Option:**
+Option: `-p`, `--persona <PERSONA_NAME>`
 
-  - `-p`, `--persona <PERSONA_NAME>`
+#### One-shot Chat Interaction
 
-- **One-shot Chat Interaction**
-
-  Send a message and receive an immediate response without starting a session. Useful for quick questions.
+Send a one-time message and receive an immediate response. Useful for quick questions or commands.
 
 ```bash
-rusty-buddy chat --one-shot --message "Hello, assistant!"
+rusty-buddy chat --one-shot "Hello, assistant!"
 ```
 
-  **Options:**
+Option: `-o`, `--one-shot [<MESSAGE>]`
 
-  - `-o`, `--one-shot`
-  - `-m`, `--message <MESSAGE>`
-
-  **With Piped Input:**
+**With Piped Input:**
 
 ```bash
 echo "What does the program do?" | rusty-buddy chat --one-shot
 ```
 
-- **Silence Output of Previous Messages**
+#### Specify AI Model
 
-  When loading a session, suppress the output of previous messages.
+Choose a specific AI model for the chat session.
 
 ```bash
-rusty-buddy chat --continue --silence
+rusty-buddy chat --model openai_fast
 ```
 
-  **Option:**
+Option: `-m`, `--model <MODEL>`
 
-  - `-s`, `--silence`
+#### Silence Output of Previous Messages
+
+When loading a session, suppress the output of previous messages.
+
+```bash
+rusty-buddy chat --continue-last --silence
+```
+
+Option: `-s`, `--silence`
 
 ### Slash Commands in Chat
 
 Within a chat session, enhance your experience with the following slash commands:
 
-- **Renew Context**
+#### Renew Context
 
-  Refresh the chat context, clearing previous interactions and reloading specified directory files.
+Refresh the chat context, clearing previous interactions and reloading specified directory files.
 
 ```
 /renew
 ```
 
-- **Save Files**
+##### Save Files
 
-  Save code blocks from the assistant's last message to files.
+Save code blocks from the assistant's last message to files.
 
 ```
 /save-files
 ```
 
-  Options:
+Options:
 
-  - **Interactive Mode:** You'll be prompted for each code block.
-  - **Greedy Mode:** Quickly save all code blocks without prompts.
+- **Interactive Mode:** You'll be prompted for each code block.
+- **Greedy Mode:** Quickly save all code blocks without prompts.
 
 ```
 /save-files greedy
 ```
 
-- **Save Last Answer**
+#### Save Last Answer
 
-  Save the entire last assistant response to a file.
+Save the entire last assistant response to a file.
 
 ```
 /save-last-answer
 ```
 
 Type the slash command within the chat interface. Use `exit` to end the session, optionally saving it under a specific name.
+
+---
+
+By using these updated options, you can maximize the efficiency and effectiveness of Rusty Buddy's chat functionality. Whether for quick responses or engaging full sessions with varied contexts, these enhancements enable comprehensive interaction with the AI capabilities.
 
 ---
 
@@ -228,39 +227,33 @@ rusty-buddy create-icon [OPTIONS]
 
 ### Options
 
-- **Specify Output Directory**
+#### Specify Output Directory
 
-  Set the directory where generated icons will be saved.
+Set the directory where generated icons will be saved.
 
 ```bash
 rusty-buddy create-icon --output ./icons
 ```
 
-  **Option:**
+Option: `-o`, `--output <OUTPUT_DIR>`
 
-  - `-o`, `--output <OUTPUT_DIR>`
+#### Specify Icon Sizes
 
-  Default: `./icons`
-
-- **Specify Icon Sizes**
-
-  Define the sizes (in pixels) for the generated icons.
+Define the sizes (in pixels) for the generated icons.
 
 ```bash
 rusty-buddy create-icon --sizes 64,128,256
 ```
 
-  **Option:**
+Option: `-s`, `--sizes <SIZES>`
 
-  - `-s`, `--sizes <SIZES>`
+Default: `16,32,64,128,256,512`
 
-  Default: `16,32,64,128,256,512`
+#### Provide Description
 
-- **Provide Description**
+If not provided via the CLI, you will be prompted to enter a description.
 
-  If not provided via the CLI, you will be prompted to enter a description.
-
-  **With Piped Input:**
+**With Piped Input:**
 
 ```bash
 echo "Design a circular blue logo" | rusty-buddy create-icon --output ./icons --sizes 64,128,256
@@ -282,53 +275,49 @@ rusty-buddy create-background [OPTIONS]
 
 ### Options
 
-- **Specify Output File**
+#### Specify Output File
 
-  Set the file path for the generated background image.
+Set the file path for the generated background image.
 
 ```bash
 rusty-buddy create-background --file ./backgrounds/my_background.png
 ```
 
-  **Option:**
+Option: `-f`, `--file <FILE>`
 
-  - `-f`, `--file <FILE>`
+Default: `./background.png`
 
-  Default: `./background.png`
+#### Set Orientation
 
-- **Set Orientation**
-
-  Choose the orientation of the background image.
+Choose the orientation of the background image.
 
 ```bash
 rusty-buddy create-background --orientation landscape
 ```
 
-  **Option:**
+Option: `-o`, `--orientation [landscape|portrait]`
 
-  - `-o`, `--orientation [landscape|portrait]`
+**Examples:**
 
-  **Examples:**
-
-  - **Landscape Orientation**
+- **Landscape Orientation**
 
 ```bash
 rusty-buddy create-background --orientation landscape --file ./backgrounds/landscape.png
 ```
 
-    **With Piped Input:**
+**With Piped Input:**
 
 ```bash
 echo "Create a sunset-themed background" | rusty-buddy create-background --orientation landscape --file ./backgrounds/sunset.png
 ```
 
-  - **Portrait Orientation**
+- **Portrait Orientation**
 
 ```bash
 rusty-buddy create-background --orientation portrait --file ./backgrounds/portrait.png
 ```
 
-    **With Piped Input:**
+**With Piped Input:**
 
 ```bash
 echo "Create a cityscape background" | rusty-buddy create-background --orientation portrait --file ./backgrounds/cityscape.png
@@ -350,23 +339,21 @@ rusty-buddy wish [OPTIONS] <DIRECTORY>
 
 ### Arguments
 
-- `<DIRECTORY>`
+`<DIRECTORY>`
 
-  The directory to collect files from and apply changes.
+The directory to collect files from and apply changes.
 
 ### Options
 
-- **Activate Usage of Tools**
+#### Activate Usage of Tools
 
-  Enable the usage of tools that can make changes to your filesystem (e.g., creating/updating files).
+Enable the usage of tools that can make changes to your filesystem (e.g., creating/updating files).
 
 ```bash
 rusty-buddy wish ./src --tools
 ```
 
-  **Option:**
-
-  - `-t`, `--tools`
+Option: `-t`, `--tools`
 
 ### Examples
 
@@ -376,7 +363,7 @@ rusty-buddy wish ./src --tools
 rusty-buddy wish ./src
 ```
 
-  You'll be prompted to describe your wish.
+You'll be prompted to describe your wish.
 
 - **Wish with Tools Enabled**
 
@@ -384,7 +371,7 @@ rusty-buddy wish ./src
 rusty-buddy wish ./src --tools
 ```
 
-  Allows Rusty Buddy to create or modify files based on your instructions.
+Allows Rusty Buddy to create or modify files based on your instructions.
 
 ---
 
@@ -436,7 +423,7 @@ Recommended persona: [Persona]
 
 4. **Configuration Files Creation**
 
-   Generates `.env` and `config.toml` files in the `.rusty` directory.
+Generates `.env` and `config.toml` files in the `.rusty` directory.
 
 ---
 
@@ -446,18 +433,18 @@ Recommended persona: [Persona]
 
 Enhance your command-line experience by enabling shell completion scripts for Rusty Buddy.
 
-- **Generate Shell Completion Script**
+#### Generate Shell Completion Script
 
-  ```bash
-  rusty-buddy --completion [bash|zsh|fish|powershell|elvish|fig|nushell|xonsh]
-  ```
+```bash
+rusty-buddy --completion [bash|zsh|fish|powershell|elvish|fig|nushell|xonsh]
+```
 
-  **Example for Bash:**
+**Example for Bash:**
 
-  ```bash
-  rusty-buddy --completion bash > ~/.bash_completion
-  source ~/.bash_completion
-  ```
+```bash
+rusty-buddy --completion bash > ~/.bash_completion
+source ~/.bash_completion
+```
 
 ### List Available Personas
 
@@ -467,11 +454,9 @@ View all personas that can be used with Rusty Buddy's `chat` command.
 rusty-buddy --list-personas
 ```
 
----
-
 By leveraging these commands, you can greatly enhance your development workflow with the capabilities of Rusty Buddy. Whether you need to generate commit messages, engage in AI-assisted chats, or create engaging visuals, this toolset provides comprehensive support.
 
-**For more detailed information on each command and its options, you can use the help flag:**
+**For more detailed information on each command and its options, use the help flag:**
 
 ```bash
 rusty-buddy [COMMAND] --help
@@ -483,6 +468,6 @@ rusty-buddy [COMMAND] --help
 rusty-buddy chat --help
 ```
 
----
+--- 
 
 **Happy Coding with Rusty Buddy!**

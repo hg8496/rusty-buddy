@@ -68,8 +68,14 @@ pub async fn run_chat(args: ChatArgs) -> Result<(), Box<dyn Error>> {
     let command_registry = initialize_command_registry();
 
     let persona = resolve_persona(&args.persona, config.default_persona.as_str())?;
+    let model_name = if let Some(model) = args.model {
+        model // Use user-specified model
+    } else {
+        config.ai.chat_model.clone() // Default model from configuration
+    };
+
     let mut chat_service = ChatService::builder()
-        .model_name(config.ai.chat_model.as_str())
+        .model_name(model_name.as_str())
         .storage(Box::new(storage))
         .persona(persona.clone())
         .directory(args.directory)
@@ -77,27 +83,16 @@ pub async fn run_chat(args: ChatArgs) -> Result<(), Box<dyn Error>> {
 
     handle_session(&mut chat_service, args.new, args.continue_last, &args.load)?;
 
-    if args.one_shot {
-        return handle_one_shot_mode(
-            chat_service,
-            args.message,
-            config.ai.chat_model.clone(),
-            persona,
-        )
-        .await;
+    if args.one_shot.is_some() {
+        let message = args.one_shot.as_ref().unwrap();
+        return handle_one_shot_mode(chat_service, message.clone(), model_name, persona).await;
     }
 
     if (args.continue_last || args.load.is_some()) && !args.silence {
         print_loaded_messages(&chat_service);
     }
 
-    start_interactive_chat(
-        chat_service,
-        command_registry,
-        config.ai.chat_model.clone(),
-        persona,
-    )
-    .await
+    start_interactive_chat(chat_service, command_registry, model_name, persona).await
 }
 
 fn initialize_command_registry() -> CommandRegistry {
