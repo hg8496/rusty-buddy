@@ -11,6 +11,7 @@ use crate::config;
 use crate::config::{get_chat_sessions_dir, Config};
 use crate::persona::{get_persona, Persona};
 use atty::Stream;
+use log::error;
 use std::error::Error;
 use std::io::{self, Read};
 
@@ -129,11 +130,18 @@ async fn handle_one_shot_mode(
 ) -> Result<(), Box<dyn Error>> {
     let user_input = get_user_input_from_option_or_stdin(input_message)?;
     if user_input.trim().is_empty() {
-        println!("No input provided.");
+        error!("No input provided.");
         return Ok(());
     }
 
-    send_and_display_response(&mut chat_service, &user_input, &model, &persona).await
+    let result = send_and_display_response(&mut chat_service, &user_input, &model, &persona).await;
+    match result {
+        Ok(_) => result,
+        Err(e) => {
+            error!("Error sending message: {}", e);
+            Err(e)
+        }
+    }
 }
 
 async fn start_interactive_chat(
@@ -155,7 +163,7 @@ async fn start_interactive_chat(
         }
 
         if trimmed_input == "exit" || trimmed_input.is_empty() {
-            save_session_if_requested(&mut chat_service)?;
+            save_session_if_requested(&mut chat_service).err();
             // Print exit message only if it's a terminal output
             if is_output_to_terminal() {
                 println!("You have exited the chat.");
@@ -163,7 +171,15 @@ async fn start_interactive_chat(
             break;
         }
 
-        send_and_display_response(&mut chat_service, trimmed_input, &model, &persona).await?;
+        let result =
+            send_and_display_response(&mut chat_service, trimmed_input, &model, &persona).await;
+        match result {
+            Ok(_) => continue,
+            Err(err) => {
+                println!("{}", err);
+                continue;
+            }
+        }
     }
 
     Ok(())
@@ -223,8 +239,16 @@ async fn send_and_display_response(
     } else {
         None
     };
-    let response = chat_service.send_message(user_input.trim(), false).await?;
-
+    let result = chat_service.send_message(user_input.trim(), false).await;
+    let response = match result {
+        Ok(response) => response,
+        Err(err) => {
+            if let Some(spin) = spinner {
+                stop_spinner(spin);
+            }
+            return Err(err);
+        }
+    };
     if let Some(spin) = spinner {
         stop_spinner(spin);
     }

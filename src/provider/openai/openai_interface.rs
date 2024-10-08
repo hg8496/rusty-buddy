@@ -13,7 +13,7 @@ use async_openai::types::{
 use async_openai::Client;
 use async_trait::async_trait;
 use dotenvy::dotenv;
-use log::{debug, error, info};
+use log::{debug, info};
 use serde_json::Value;
 use std::env;
 use std::error::Error;
@@ -66,12 +66,10 @@ impl ChatBackend for OpenAIInterface {
         let chat_completion = match result {
             Ok(Ok(chat_completion)) => chat_completion,
             Ok(Err(e)) => {
-                error!("Failed to get chat completion from OpenAI: {}", e);
                 return Err(e.into());
             }
-            Err(_) => {
-                error!("Request to OpenAI timed out.");
-                return Ok("Request timed out".into());
+            Err(e) => {
+                return Err(e.into());
             }
         };
 
