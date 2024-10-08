@@ -112,12 +112,11 @@ fn print_loaded_messages(chat_service: &ChatService) {
 
     chat_service.process_messages(|msg| match msg.role {
         MessageRole::User => {
-            print_with_optional_formatting(&format!("# User\n{}\n---\n", msg.content), is_terminal)
+            print_with_optional_formatting("User", "", msg.content.as_str(), is_terminal)
         }
-        MessageRole::Assistant => print_with_optional_formatting(
-            &format!("# Assistant\n{}\n---\n", msg.content),
-            is_terminal,
-        ),
+        MessageRole::Assistant => {
+            print_with_optional_formatting("Assistant", "", msg.content.as_str(), is_terminal)
+        }
         _ => {}
     });
 }
@@ -157,13 +156,16 @@ async fn start_interactive_chat(
 
         if trimmed_input == "exit" || trimmed_input.is_empty() {
             save_session_if_requested(&mut chat_service)?;
+            // Print exit message only if it's a terminal output
+            if is_output_to_terminal() {
+                println!("You have exited the chat.");
+            }
             break;
         }
 
         send_and_display_response(&mut chat_service, trimmed_input, &model, &persona).await?;
     }
 
-    println!("You have exited the chat.");
     Ok(())
 }
 
@@ -190,12 +192,18 @@ fn save_session_if_requested(chat_service: &mut ChatService) -> Result<(), Box<d
     Ok(())
 }
 
-fn print_with_optional_formatting(text: &str, use_formatting: bool) {
+fn print_with_optional_formatting(persons: &str, model: &str, context: &str, use_formatting: bool) {
     if use_formatting {
         let skin = configure_mad_skin(); // Assuming you have a function for configuring MadSkin
-        skin.print_text(text);
+        skin.print_text(
+            format!(
+                "---\n# AI Persona:{} Model: {}\n{}",
+                persons, model, context
+            )
+            .as_str(),
+        );
     } else {
-        println!("{}", text);
+        println!("{}", context);
     }
 }
 
@@ -221,18 +229,17 @@ async fn send_and_display_response(
         stop_spinner(spin);
     }
 
-    print_with_optional_formatting(
-        &format!(
-            "---\n# AI Persona:{} Model: {}\n{}",
-            persona.name, model, response
-        ),
-        is_terminal,
-    );
+    // Always print the AI's response
+    print_with_optional_formatting(persona.name.as_str(), model, response.as_str(), is_terminal);
 
-    chat_service.print_statistics();
+    // Print statistics only if output is to terminal
+    if is_terminal {
+        chat_service.print_statistics();
+    }
 
     Ok(())
 }
+
 fn get_user_input_from_option_or_stdin(
     input_message: Option<String>,
 ) -> Result<String, Box<dyn Error>> {
