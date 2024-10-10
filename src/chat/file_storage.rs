@@ -151,10 +151,12 @@ mod tests {
             Message {
                 role: MessageRole::User,
                 content: "Hello, this is a test.".to_string(),
+                ..Default::default()
             },
             Message {
                 role: MessageRole::Assistant,
                 content: "Thank you for the test input.".to_string(),
+                ..Default::default()
             },
         ];
 
@@ -184,6 +186,7 @@ mod tests {
         let messages = vec![Message {
             role: MessageRole::User,
             content: "Dummy content".to_string(),
+            ..Default::default()
         }];
 
         // Save two sessions

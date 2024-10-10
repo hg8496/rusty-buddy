@@ -64,10 +64,11 @@
 
 use std::borrow::Cow;
 // The `ChatService` struct encapsulates the entirety of chat session management.
-use crate::chat::interface::ChatStorage;
 use crate::chat::interface::{ChatBackend, Message, MessageRole};
+use crate::chat::interface::{ChatStorage, MessageInfo};
 use crate::chat::service_builder::ChatServiceBuilder;
 use crate::context::{load_files_into_context, ContextConsumer};
+use chrono::Utc;
 use std::error::Error;
 use std::path::{Path, PathBuf};
 
@@ -116,7 +117,9 @@ impl ChatService {
             .retain(|msg| !matches!(msg.role, MessageRole::Context));
         // Load files into context from a specified directory
         self.add_context_message(
-            "The following context are the information I need, to assist the user.\nContext:\n",
+            "Assistant Definition".into(),
+            "The following context are the information I need, to assist the user.\nContext:\n"
+                .into(),
         );
         if let Some(directories) = self.directory.clone() {
             for directory in directories {
@@ -131,7 +134,7 @@ impl ChatService {
     }
 
     // Inserts a new context message into the session
-    pub fn add_context_message(&mut self, system_message: &str) {
+    pub fn add_context_message(&mut self, filename: Cow<str>, system_message: Cow<str>) {
         let mut pos = 1; // 0 is the persona prompt
         for (i, m) in self.messages.iter().enumerate() {
             if m.role == MessageRole::Context {
@@ -143,6 +146,9 @@ impl ChatService {
             Message {
                 role: MessageRole::Context,
                 content: system_message.to_string(),
+                info: Some(MessageInfo::ContextOrigin {
+                    filename: filename.to_string(),
+                }),
             },
         );
     }
@@ -152,6 +158,7 @@ impl ChatService {
         self.messages.push(Message {
             role: MessageRole::System,
             content: system_message.to_string(),
+            ..Message::default()
         });
     }
 
@@ -174,18 +181,40 @@ impl ChatService {
         // Add the user message to the session messages
         self.messages.push(Message {
             role: MessageRole::User,
-            content: user_message.to_string(),
+            content: user_message.into(),
+            info: Some(MessageInfo::UserInfo {
+                timestamp: Utc::now(),
+            }),
         });
-        // Send the request to the backend service and capture the response
-        let response = self.backend.send_request(&self.messages, use_tools).await?;
-        // Store the assistant's response message
-        self.messages.push(Message {
-            role: MessageRole::Assistant,
-            content: response.clone(),
-        });
-        Ok(response)
-    }
 
+        // Send the request to the backend service and capture the response
+        let mut response = self.backend.send_request(&self.messages, use_tools).await?;
+
+        let answer = response.content.clone();
+
+        // Update the response info if it's of a specific type
+        if let Some(MessageInfo::AssistantInfo {
+            model,
+            prompt_token,
+            completion_token,
+            timestamp,
+            ..
+        }) = &response.info
+        {
+            response.info = Some(MessageInfo::AssistantInfo {
+                model: model.clone(),
+                persona_name: self.persona.name.clone(), // Assuming persona_name needs cloning
+                prompt_token: *prompt_token,
+                completion_token: *completion_token,
+                timestamp: *timestamp,
+            });
+        }
+
+        // Store the assistant's response message
+        self.messages.push(response);
+
+        Ok(answer)
+    }
     // Loads chat history from storage by session name
     pub fn load_history(&mut self, session_name: &str) -> Result<(), Box<dyn Error>> {
         self.messages = self.storage.load_session(session_name)?;
@@ -206,7 +235,8 @@ impl ChatService {
 
 impl ContextConsumer for ChatService {
     fn consume(&mut self, filename: Cow<str>, content: Cow<str>) -> Result<(), Box<dyn Error>> {
-        self.add_context_message(&format!("Filename: {}\nContent:\n{}\n", filename, content));
+        let f_content = format!("Filename: {}\nContent:\n{}\n", filename, content);
+        self.add_context_message(filename, f_content.into());
         Ok(())
     }
 }
@@ -373,8 +403,8 @@ mod tests {
             &mut self,
             _messages: &[Message],
             _use_tools: bool,
-        ) -> Result<String, Box<dyn Error>> {
-            Ok("".to_string())
+        ) -> Result<Message, Box<dyn Error>> {
+            Ok(Message::default())
         }
 
         fn print_statistics(&self) {}

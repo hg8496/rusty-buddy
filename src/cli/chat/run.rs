@@ -41,10 +41,11 @@
 //! Each function is designed to return a `Result` type, encapsulating any errors that may arise during execution.
 //! Careful attention is given to ensure that users receive meaningful error messages when unexpected conditions occur.
 //! Implementations should handle potential failures gracefully, maintaining a seamless user experience.
+
 use crate::chat::command_registry::CommandRegistry;
 use crate::chat::commands::initialize_commands;
 use crate::chat::file_storage::DirectoryChatStorage;
-use crate::chat::interface::{ChatStorage, MessageRole};
+use crate::chat::interface::{ChatStorage, MessageInfo, MessageRole};
 use crate::chat::service::ChatService;
 use crate::cli::chat::ChatArgs;
 use crate::cli::editor::{get_multiline_input, get_user_input};
@@ -54,6 +55,7 @@ use crate::config;
 use crate::config::{get_chat_sessions_dir, Config};
 use crate::persona::{get_persona, Persona};
 use atty::Stream;
+use chrono::{DateTime, Local, Utc};
 use log::error;
 use std::error::Error;
 use std::io::{self, Read};
@@ -153,14 +155,60 @@ fn handle_session_loading(
 fn print_loaded_messages(chat_service: &ChatService) {
     let is_terminal = is_output_to_terminal();
 
-    chat_service.process_messages(|msg| match msg.role {
-        MessageRole::User => {
-            print_with_optional_formatting("User", "", msg.content.as_str(), is_terminal)
+    chat_service.process_messages(|msg| {
+        match msg.role {
+            MessageRole::User => {
+                let timestamp = msg
+                    .info
+                    .as_ref()
+                    .and_then(|info| {
+                        if let MessageInfo::UserInfo { timestamp, .. } = info {
+                            Some(timestamp) // Use a reference to avoid cloning
+                        } else {
+                            None
+                        }
+                    })
+                    .unwrap_or(&DateTime::<Utc>::MIN_UTC); // Default to an empty string if model is None
+
+                print_with_optional_formatting(
+                    "User",
+                    "",
+                    timestamp,
+                    msg.content.as_str(),
+                    is_terminal,
+                );
+            }
+            MessageRole::Assistant => {
+                // Use `and_then` to directly extract the model if it exists.
+                let (model, persona, timestamp) = msg
+                    .info
+                    .as_ref()
+                    .and_then(|info| {
+                        if let MessageInfo::AssistantInfo {
+                            model,
+                            persona_name,
+                            timestamp,
+                            ..
+                        } = info
+                        {
+                            Some((model.as_str(), persona_name.as_str(), timestamp))
+                        // Use a reference to avoid cloning
+                        } else {
+                            None
+                        }
+                    })
+                    .unwrap_or(("", "", &DateTime::<Utc>::MIN_UTC)); // Default to an empty string if model is None
+
+                print_with_optional_formatting(
+                    persona,
+                    model,
+                    timestamp,
+                    msg.content.as_str(),
+                    is_terminal,
+                );
+            }
+            _ => {}
         }
-        MessageRole::Assistant => {
-            print_with_optional_formatting("Assistant", "", msg.content.as_str(), is_terminal)
-        }
-        _ => {}
     });
 }
 
@@ -250,16 +298,31 @@ fn save_session_if_requested(chat_service: &mut ChatService) -> Result<(), Box<d
     Ok(())
 }
 
-fn print_with_optional_formatting(persons: &str, model: &str, context: &str, use_formatting: bool) {
+fn print_with_optional_formatting(
+    persona: &str,
+    model: &str,
+    timestamp: &DateTime<Utc>,
+    context: &str,
+    use_formatting: bool,
+) {
     if use_formatting {
-        let skin = configure_mad_skin(); // Assuming you have a function for configuring MadSkin
-        skin.print_text(
-            format!(
-                "---\n# AI Persona:{} Model: {}\n{}",
-                persons, model, context
-            )
-            .as_str(),
-        );
+        let local_time: DateTime<Local> = timestamp.with_timezone(&Local);
+        let time = local_time.format("%Y-%m-%d %H:%M:%S").to_string();
+        let skin = configure_mad_skin(); // Assuming MadSkin is a struct that should be configured
+
+        // Prepare the output string
+        let mut output = String::from("---\n");
+
+        if persona == "User" {
+            output.push_str(&format!("# User input @{}:\n{}", time, context));
+        } else {
+            output.push_str(&format!(
+                "# AI Persona: {} Model: {} @{}\n{}",
+                persona, model, time, context
+            ));
+        }
+
+        skin.print_text(&output); // Assuming print_text works with `&str`
     } else {
         println!("{}", context);
     }
@@ -296,7 +359,13 @@ async fn send_and_display_response(
     }
 
     // Always print the AI's response
-    print_with_optional_formatting(persona.name.as_str(), model, response.as_str(), is_terminal);
+    print_with_optional_formatting(
+        persona.name.as_str(),
+        model,
+        &Utc::now(),
+        response.as_str(),
+        is_terminal,
+    );
 
     // Print statistics only if output is to terminal
     if is_terminal {

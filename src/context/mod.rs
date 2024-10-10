@@ -1,46 +1,47 @@
 //! This module provides functionality for managing the chat context in Rusty Buddy.
-//!                                                                                 
-//! It includes the ability to load files from a specified directory into the       
-//! chat context for enhanced interactions with the AI assistant. The loading       
-//! process respects `.gitignore` rules and can filter files based on their         
-//! extensions or specific filenames. This dynamically enriches the context         
-//! available to the AI, making responses more relevant to the user's specific      
-//! environment and needs.                                                          
-//!                                                                                 
-//! ## Key Components                                                               
-//!                                                                                 
-//! - **ContextConsumer Trait**: This trait defines methods for managing context,   
-//!   allowing any struct implementing it to add context messages and set up        
-//!   context in a standardized manner. The `ChatService` struct implements         
-//!   this trait, enabling it to use context management capabilities.               
-//!                                                                                 
-//! ## Functions                                                                    
-//!                                                                                 
-//! - `load_files_into_context`: Loads files from the specified directory into      
-//!   the context of any `ContextConsumer`, filtering based on provided file types  
-//!   and respecting `.gitignore`.                                                  
-//!                                                                                 
-//! - `add_to_context`: Appends the contents of a file to the context,              
+//!
+//! It includes the ability to load files from a specified directory into the
+//! chat context for enhanced interactions with the AI assistant. The loading
+//! process respects `.gitignore` rules and can filter files based on their
+//! extensions or specific filenames. This dynamically enriches the context
+//! available to the AI, making responses more relevant to the user's specific
+//! environment and needs.
+//!
+//! ## Key Components
+//!
+//! - **ContextConsumer Trait**: This trait defines methods for managing context,
+//!   allowing any struct implementing it to add context messages and set up
+//!   context in a standardized manner. The `ChatService` struct implements
+//!   this trait, enabling it to use context management capabilities.
+//!
+//! ## Functions
+//!
+//! - `load_files_into_context`: Loads files from the specified directory into
+//!   the context of any `ContextConsumer`, filtering based on provided file types
+//!   and respecting `.gitignore`.
+//!
+//! - `add_to_context`: Appends the contents of a file to the context,
 //!   including the relative path and its content to aid in maintaining an accurate
-//!   context for the conversation.                                                 
-//!                                                                                 
-//! # Examples                                                                      
-//!                                                                                 
-//! ```                                                                             
-//! use std::path::Path;                                                            
-//! use crate::context::load_files_into_context;                                    
-//! use crate::chat::service::ChatService;                                          
-//!                                                                                 
-//! let mut service = ChatService::new(...); // Initialize your ChatService         
-//! let directory_path = Path::new("./src");                                        
-//! let file_types = vec!["rs".to_string(), "md".to_string()];                      
-//! load_files_into_context(&mut service, directory_path, &file_types).unwrap();    
-//! ```                                                                             
-//!                                                                                 
+//!   context for the conversation.
+//!
+//! # Examples
+//!
+//! ```
+//! use std::path::Path;
+//! use crate::context::load_files_into_context;
+//! use crate::chat::service::ChatService;
+//!
+//! let mut service = ChatService::new(...); // Initialize your ChatService
+//! let directory_path = Path::new("./src");
+//! let file_types = vec!["rs".to_string(), "md".to_string()];
+//! load_files_into_context(&mut service, directory_path, &file_types).unwrap();
+//! ```
+//!
 //! In the example above, `load_files_into_context` is used to populate the context
-//! of `ChatService` with all relevant files from the specified directory.          
-//! This implementation supports a decoupled and reusable context management        
-//! system, enhancing the application’s modularity.                                 
+//! of `ChatService` with all relevant files from the specified directory.
+//! This implementation supports a decoupled and reusable context management
+//!
+//! system, enhancing the application’s modularity.
 
 use ignore::WalkBuilder;
 use std::borrow::Cow;

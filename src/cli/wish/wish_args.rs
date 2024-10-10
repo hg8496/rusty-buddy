@@ -19,13 +19,13 @@
 //! use clap::Parser;
 //!
 //! let args = WishArgs::parse();
-//! println!("Directory specified: {}", args.directory);
+//! println!("Directory specified: {:?}", args.directory);
 //! println!("Tools enabled: {}", args.tools);
 //! ```
 //!
 //! ## Fields
 //!
-//! - `directory`: A string representing the source directory from which files will be collected.
+//! - `directory`: A vector of `PathBuf` representing the source directory from which files will be collected.
 //! - `tools`: A boolean flag that indicates whether the application should use tools to fulfill user wishes,
 //!   which may involve creating or modifying files and directories based on user-specified actions.
 

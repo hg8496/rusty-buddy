@@ -33,8 +33,9 @@
 //! ## Trait Implementations
 //!
 //! - `ChatBackend`: Implements the necessary methods to send requests to the chat model and print statistics about the model in use.
-use crate::chat::interface::{ChatBackend, Message, MessageRole};
+use crate::chat::interface::{ChatBackend, Message, MessageInfo, MessageRole};
 use async_trait::async_trait;
+use chrono::Utc;
 use ollama_rs::{
     generation::chat::{request::ChatMessageRequest, ChatMessage, ChatMessageResponse},
     IntoUrlSealed, Ollama,
@@ -87,7 +88,7 @@ impl ChatBackend for OllamaInterface {
         &mut self,
         messages: &[Message],
         _use_tools: bool,
-    ) -> Result<String, Box<dyn Error>> {
+    ) -> Result<Message, Box<dyn Error>> {
         let chat_messages = Self::convert_messages(messages);
 
         let request = ChatMessageRequest::new(self.model.clone(), chat_messages.clone());
@@ -98,7 +99,18 @@ impl ChatBackend for OllamaInterface {
         if let Some(assistant_message) = responseo.message {
             content += &assistant_message.content;
         }
-        Ok(content)
+        let content_len = content.len();
+        Ok(Message {
+            role: MessageRole::Assistant,
+            content,
+            info: Some(MessageInfo::AssistantInfo {
+                model: self.model.clone(),
+                persona_name: String::new(),
+                prompt_token: 0,
+                completion_token: content_len.try_into().unwrap(),
+                timestamp: Utc::now(),
+            }),
+        })
     }
 
     fn print_statistics(&self) {

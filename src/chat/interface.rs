@@ -1,26 +1,38 @@
-//! This module defines a messaging system for chat applications,
-//! including message types and interfaces for sending messages and managing chat sessions.
-//! It uses the `async_trait` for asynchronous operations and the `serde` library for serialization and deserialization
-//! of messages. The `Message` struct encapsulates the role of the message sender and the content of the message.
-//! The `ChatBackend` trait provides an interface for sending requests asynchronously and printing statistics,
-//! while the `ChatStorage` trait allows loading, saving, and listing chat sessions.
+//! This module defines a messaging system tailored for chat applications,
+//! facilitating interactions between users and an AI assistant. It includes
+//! message types and interfaces to send messages and manage chat sessions.
+//! Utilizing the `async_trait` for asynchronous operations, alongside the
+//! `serde` library for serialization and deserialization, the system supports
+//! extensible message handling and session management.
 //!
 //! ## Key Components
 //!
-//! - **Message**: Represents a message exchanged between the user and the assistant,
-//!   including its role (User, Assistant, etc.) and the content of the message.
+//! - **Message**:
+//!   Encapsulates the message's role (e.g., User, Assistant) and its content.
+//!   It also includes optional metadata through the `MessageInfo` struct,
+//!   which provides context about the message's origin and associated details.
 //!
-//! - **MessageRole**: An enum representing the different roles a message can have,
-//!   allowing the user and assistant to distinguish between messages.
+//! - **MessageRole**:
+//!   An enum that defines different roles a message may assume (e.g., System, User, Assistant),
+//!   allowing for clear distinction and handling of messages based on who authored them.
 //!
-//! - **ChatBackend**: A trait that defines methods for sending messages to the chat model,
-//!   allowing different backends (e.g., OpenAI, Ollama) to implement chat functionality.
+//! - **MessageInfo**:
+//!   A structure containing additional contextual information about the message, including
+//!   the timestamp of creation and various model-related metadata. This helps storing information
+//!   to later identify the messages.
 //!
-//! - **ChatStorage**: A trait for managing chat sessions, allowing for session loading, saving, and listing capabilities.
+//! - **ChatBackend**:
+//!   A trait that provides an interface for sending messages to a chat model asynchronously.
+//!   It facilitates the implementation of various backends, enabling flexible integrations
+//!   with models (e.g., OpenAI, Ollama).
+//!
+//! - **ChatStorage**:
+//!   A trait that facilitates management of chat sessions. It allows for loading, saving,
+//!   and listing chat sessions, ensuring state persistence across application runs.
 //!
 //! ## Examples
 //!
-//! Here's how you might create a new message and use the `ChatBackend` trait:
+//! This section illustrates how to create a new message and utilize the `ChatBackend` trait:
 //!
 //! ```rust
 //! use crate::chat::interface::{Message, MessageRole, ChatBackend};
@@ -28,31 +40,65 @@
 //! let msg = Message {
 //!     role: MessageRole::User,
 //!     content: "Hello, assistant!".to_string(),
+//!     info: None, // Information can be added if needed
 //! };
 //!
-//! // Assume `backend` is an instance of a type implementing ChatBackend
-//! let response = backend.send_request(&[msg], false).await;
+//! // Assume `backend` is an instance of a type implementing the ChatBackend trait
+//! let response = backend.send_request(&[msg], false).await.unwrap();
 //! ```
 //!
 //! ## Panic Conditions
 //!
-//! The `send_request` method may panic if the messages passed are malformed or incorrect.
-//! Ensure that messages are validated before sending them to avoid runtime errors.
+//! The `send_request` method may panic under certain circumstances, such as when
+//! malformed or invalid messages are passed. To mitigate this, it's essential to validate
+//! each message before dispatching it, ensuring it adheres to expected structures.
 //!
 //! ## Conclusion
 //!
-//! This module provides a foundational structure for building chat applications,
-//! enabling interactions with AI models in a flexible and extensible manner.
+//! This module provides a robust framework for building chat applications, promoting
+//! seamless interactions with AI models while ensuring flexibility and extensibility in
+//! message management and session handling.
 
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::io;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum MessageInfo {
+    ContextOrigin {
+        filename: String,
+    },
+    UserInfo {
+        timestamp: DateTime<Utc>,
+    },
+    AssistantInfo {
+        model: String,
+        persona_name: String,
+        prompt_token: u32,
+        completion_token: u32,
+        timestamp: DateTime<Utc>,
+    },
+    // Add additional variants as needed
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Message {
     pub role: MessageRole,
     pub content: String,
+    pub info: Option<MessageInfo>,
+}
+
+// Implementing the Default trait for Message
+impl Default for Message {
+    fn default() -> Self {
+        Message {
+            role: MessageRole::User, // Example default role; adjust as necessary
+            content: String::new(),  // Default content is an empty string
+            info: None,              // Set info to None by default
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -69,7 +115,7 @@ pub trait ChatBackend {
         &mut self,
         messages: &[Message],
         use_tools: bool,
-    ) -> Result<String, Box<dyn Error>>;
+    ) -> Result<Message, Box<dyn Error>>;
     fn print_statistics(&self);
 }
 

@@ -84,8 +84,8 @@ mod tests {
             &mut self,
             _messages: &[Message],
             _use_tools: bool,
-        ) -> Result<String, Box<dyn Error>> {
-            Ok(String::new())
+        ) -> Result<Message, Box<dyn Error>> {
+            Ok(Message::default())
         }
 
         fn print_statistics(&self) {}
@@ -105,18 +105,22 @@ mod tests {
             Message {
                 role: MessageRole::User,
                 content: "Hello".to_string(),
+                ..Default::default()
             },
             Message {
                 role: MessageRole::Assistant,
                 content: "Hi, how can I help you?".to_string(),
+                ..Default::default()
             },
             Message {
                 role: MessageRole::User,
                 content: "I'm looking for a Rust library.".to_string(),
+                ..Default::default()
             },
             Message {
                 role: MessageRole::Assistant,
                 content: "I recommend `reqwest` for HTTP requests.".to_string(),
+                ..Default::default()
             },
         ];
 
@@ -142,10 +146,12 @@ mod tests {
             Message {
                 role: MessageRole::User,
                 content: "Hello".to_string(),
+                ..Default::default()
             },
             Message {
                 role: MessageRole::User,
                 content: "I'm looking for a Rust library.".to_string(),
+                ..Default::default()
             },
         ];
 

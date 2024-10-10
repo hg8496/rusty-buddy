@@ -89,7 +89,7 @@ pub struct ChatArgs {
     #[arg(short, long)]
     pub persona: Option<String>,
 
-    /// Send one message and quit. If [<ONE_SHOT>] is specified, use it as user input.
+    /// Send one message and quit. If \[\<ONE_SHOT\>\] is specified, use it as user input.
     #[arg(short = 'o', long = "one-shot")]
     pub one_shot: Option<Option<String>>,
 

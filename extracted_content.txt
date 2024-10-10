@@ -1,0 +1,37 @@
+//! This module defines a messaging system tailored for chat applications,
+//! facilitating interactions between users and an AI assistant. It includes 
+//! message types and interfaces to send messages and manage chat sessions.
+//! Utilizing the `async_trait` for asynchronous operations, alongside the 
+//! `serde` library for serialization and deserialization, the system supports 
+//! extensible message handling and session management.
+//!
+//! ## Key Components
+//!
+//! - **Message**: 
+//!   Encapsulates the message's role (e.g., User, Assistant) and its content. 
+//!   It also includes optional metadata through the `MessageInfo` struct, 
+//!   which provides context about the message's origin and associated details.
+//!
+//! - **MessageRole**: 
+//!   An enum that defines different roles a message may assume (e.g., System, User, Assistant), 
+//!   allowing for clear distinction and handling of messages based on who authored them.
+//!
+//! - **MessageInfo**: 
+//!   A structure containing additional contextual information about the message, including 
+//!   the timestamp of creation and various model-related metadata. This aids in analytics 
+//!   and debugging within chat sessions.
+//!
+//! - **ChatBackend**: 
+//!   A trait that provides an interface for sending messages to a chat model asynchronously. 
+//!   It facilitates the implementation of various backends, enabling flexible integrations 
+//!   with models (e.g., OpenAI, Ollama).
+//!
+//! - **ChatStorage**: 
+//!   A trait that facilitates management of chat sessions. It allows for loading, saving, 
+//!   and listing chat sessions, ensuring state persistence across application runs.
+//!
+//! ## Examples
+//!
+//! This section illustrates how to create a new message and utilize the `ChatBackend` trait:
+//!
+//! 

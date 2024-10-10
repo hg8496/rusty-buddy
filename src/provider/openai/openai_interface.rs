@@ -1,40 +1,60 @@
-//! This module provides an interface for communicating with the Ollama chat model.
-//! It encapsulates the functionality required to send messages to the Ollama AI backend,
+//! This module provides an interface for communicating with the OpenAI AI backend.
+//! It encapsulates the functionality required to send messages to the OpenAI API,
 //! receive responses, and manage the flow of conversation within the Rusty Buddy application.
 //!
-//! The `OllamaInterface` struct acts as a bridge between the chat service and the Ollama API,
+//! The `OpenAIInterface` struct acts as a bridge between the chat service and the OpenAI API,
 //! allowing for easy interaction with the model while maintaining session context and message history.
 //!
 //! ## Key Responsibilities
 //!
-//! - **Message Handling:** Converts application-specific message formats into the format required by the Ollama API.
+//! - **Message Handling:** Converts application-specific message formats into the format required by the OpenAI API.
 //! - **Session Management:** Retains state and context for ongoing conversations, facilitating a natural dialog flow.
 //! - **Backend Integration:** Implements the `ChatBackend` trait to integrate seamlessly with other components in the chat ecosystem.
 //!
 //! ## Example Usage
 //!
 //! ```rust
-//! use crate::provider::ollama::ollama_interface::OllamaInterface;
+//! use crate::provider::openai::openai_interface::OpenAIInterface;
 //!
-//! let ollama_backend = OllamaInterface::new("llama2".to_string(), None);
-//! // Here “llama2” is an example model name
+//! let openai_backend = OpenAIInterface::new("gpt-4".to_string(), 60);
+//! // Here "gpt-4" is an example model name.
 //! ```
 //!
 //! ## Fields
 //!
-//! - `ollama`: An instance of the `Ollama` struct that handles interactions with the Ollama API.
-//! - `model`: A string that specifies the model to be used for generating chat messages.
+//! - `model`: A string that specifies the AI model used for generating chat messages.
+//! - `timeout_duration`: A duration that represents the timeout for API requests.
+//! - `last_call_completion_token`, `last_call_prompt_token`: Track token usage for
+//!   the last API call.
+//! - `overall_completion_token`, `overall_prompt_token`: Cumulative token usage metrics.
 //!
 //! ## Methods
 //!
-//! - `new`: Creates a new instance of `OllamaInterface`, initializing it with the provided model and optional URL.
-//! - `convert_messages`: Converts an array of `Message` objects into `ChatMessage` objects for processing by the Ollama API.
+//! - `new`: Creates a new instance of `OpenAIInterface`, initializing it with the provided model and optional timeout.
+//! - `send_request`: Sends a request with messages to the OpenAI backend and retrieves a response.
+//! - `print_statistics`: Outputs token usage statistics related to the last request and overall usage.
 //!
-//! ## Traits Implementations
+//! ## Using the OpenAIInterface
 //!
-//! - `ChatBackend`: Implements the necessary methods to send requests to the chat model and print statistics about the model in use.
-
-use crate::chat::interface::{ChatBackend, Message, MessageRole};
+//! The `OpenAIInterface` interacts with the OpenAI API to process chat messages.
+//!
+//! ### Example
+//!
+//! Here is an example of using the `send_request` method:
+//!
+//! ```rust
+//! let response = openai_backend
+//!     .send_request(&messages, false)
+//!     .await
+//!     .expect("Failed to send request to OpenAI");
+//! println!("Assistant response: {}", response.content);
+//! ```
+//!
+//! ## Error Handling
+//!
+//! All methods return a `Result`, which will contain an error of type `Box<dyn Error>` on failure.
+//! Therefore, ensure to handle potential errors gracefully when invoking these methods during use.
+use crate::chat::interface::{ChatBackend, Message, MessageInfo, MessageRole};
 use crate::provider::openai::file_diff;
 use crate::provider::openai::file_diff::{create_directory, create_file};
 use async_openai::config::OpenAIConfig;
@@ -48,6 +68,7 @@ use async_openai::types::{
 };
 use async_openai::Client;
 use async_trait::async_trait;
+use chrono::Utc;
 use dotenvy::dotenv;
 use log::{debug, info};
 use serde_json::Value;
@@ -89,7 +110,7 @@ impl ChatBackend for OpenAIInterface {
         &mut self,
         messages: &[Message],
         use_tools: bool,
-    ) -> Result<String, Box<dyn Error>> {
+    ) -> Result<Message, Box<dyn Error>> {
         let oai_messages = self.convert_to_chat_completion_messages(messages);
 
         dotenv().ok();
@@ -131,7 +152,17 @@ impl ChatBackend for OpenAIInterface {
 
         let content = returned_message.content.unwrap_or_default();
         info!("Request processing completed successfully.");
-        Ok(content)
+        Ok(Message {
+            role: MessageRole::Assistant,
+            content,
+            info: Some(MessageInfo::AssistantInfo {
+                model: self.model.clone(),
+                persona_name: String::new(),
+                prompt_token: self.last_call_prompt_token,
+                completion_token: self.last_call_completion_token,
+                timestamp: Utc::now(),
+            }),
+        })
     }
 
     fn print_statistics(&self) {
@@ -200,6 +231,7 @@ impl OpenAIInterface {
             })
             .collect()
     }
+
     fn update_statistics(&mut self, usage: CompletionUsage) {
         self.last_call_completion_token = usage.completion_tokens;
         self.last_call_prompt_token = usage.prompt_tokens;
@@ -233,6 +265,7 @@ impl OpenAIInterface {
         }
         Ok(builder.build()?)
     }
+
     fn create_new_file_tool() -> Result<ChatCompletionTool, Box<dyn Error>> {
         Ok(ChatCompletionToolArgs::default()
             .r#type(ChatCompletionToolType::Function)
@@ -258,6 +291,7 @@ impl OpenAIInterface {
             )
             .build()?)
     }
+
     fn create_new_dir_tool() -> Result<ChatCompletionTool, Box<dyn Error>> {
         Ok(ChatCompletionToolArgs::default()
             .r#type(ChatCompletionToolType::Function)
@@ -279,6 +313,7 @@ impl OpenAIInterface {
             )
             .build()?)
     }
+
     fn create_diff_tool() -> Result<ChatCompletionTool, Box<dyn Error>> {
         Ok(ChatCompletionToolArgs::default()
             .r#type(ChatCompletionToolType::Function)
