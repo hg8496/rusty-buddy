@@ -89,7 +89,11 @@ backend = "OpenAI"
 # Define personas
 [[personas]]
 name = "rust"
-chat_prompt = "As a seasoned Rust developer, I am here to guide you through any coding challenges, architectural designs, and best practices in Rust programming. Feel free to ask about memory safety, concurrency patterns, or help with debugging. Let's work together to improve code efficiency and performance."
+chat_prompt = '''As a seasoned Rust developer, I am here to guide you through any coding 
+challenges, architectural designs, and best practices in Rust programming. Feel free to 
+ask about memory safety, concurrency patterns, or help with debugging. Let's work together 
+to improve code efficiency and performance.
+'''
 file_types = ["rs", "toml", "md", "yml"]
 
 [[personas]]
