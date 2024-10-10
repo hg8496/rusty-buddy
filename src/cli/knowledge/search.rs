@@ -27,11 +27,11 @@ pub async fn search(args: SearchArgs) -> Result<(), Box<dyn Error>> {
         .model_name(model_name.into())
         .build()?;
     let embedding = client.inner.get_embedding(args.search).await?;
-    db.query("DEFINE INDEX hnsw_pts ON embedding_table FIELDS embedding HNSW DIMENSION 3072;")
+    db.query("DEFINE INDEX hnsw_pts ON context_embeddings FIELDS embedding HNSW DIMENSION 3072;")
         .await?;
     // Assuming response.data holds embedding data
     let mut groups = db
-        .query("SELECT file_name, vector::similarity::cosine(embedding, $embedding) AS distance FROM embedding_table WHERE embedding <|10,40|> $embedding ORDER BY distance;")
+        .query("SELECT file_name, vector::similarity::cosine(embedding, $embedding) AS distance FROM context_embeddings WHERE embedding <|10,40|> $embedding ORDER BY distance;")
         .bind(("embedding", embedding))
         .await?;
     let files: Vec<Search> = groups.take(0)?;
