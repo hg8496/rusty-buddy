@@ -48,10 +48,14 @@ use std::io;
 async fn main() {
     // Initialize the logger
     env_logger::init();
-
     // Example info log
     info!("Application started");
     let cli = args::Cli::parse();
+    // Make the completion call the first as it needs no config or environment
+    if let Some(completion) = cli.completion {
+        print_completions(completion, &mut args::Cli::command());
+        std::process::exit(0);
+    }
     if let Some(args::Commands::Init) = cli.command {
         run_init_command().await.unwrap();
     }
@@ -63,9 +67,7 @@ async fn main() {
         persona::print_all_personas();
         return;
     }
-    if let Some(completion) = cli.completion {
-        print_completions(completion, &mut args::Cli::command());
-    } else if let Some(command) = cli.command {
+    if let Some(command) = cli.command {
         match command {
             args::Commands::CommitMessage(args) => {
                 cli::commitmessage::run(args).await.unwrap();
