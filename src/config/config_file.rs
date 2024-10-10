@@ -90,6 +90,10 @@ pub struct AI {
 
     #[serde(default = "wish_model")]
     pub wish_model: String,
+
+    #[serde(default = "embedding_model")]
+    pub embedding_model: String,
+
     #[serde(default = "default_timeout_secs")]
     pub chat_timeout_secs: u64,
 }
@@ -115,6 +119,7 @@ fn default_ai() -> AI {
         commit_model: commit_model(),
         chat_model: chat_model(),
         chat_timeout_secs: default_timeout_secs(),
+        embedding_model: embedding_model(),
     }
 }
 
@@ -132,6 +137,9 @@ fn chat_model() -> String {
 
 fn commit_model() -> String {
     "gpt-4o-mini".to_string()
+}
+fn embedding_model() -> String {
+    "text-embedding-3-large".to_string()
 }
 
 fn wish_model() -> String {
@@ -181,6 +189,7 @@ impl Default for Config {
                 commit_model: "".to_string(),
                 wish_model: "".to_string(),
                 chat_timeout_secs: default_timeout_secs(),
+                embedding_model: "".to_string(),
             },
             personas: vec![],
             models: None,

@@ -22,6 +22,7 @@ pub mod createbackground;
 pub mod createicon;
 pub mod editor;
 pub mod init;
+pub mod knowledge;
 mod slash_completer;
 mod spinner;
 mod style;

@@ -54,7 +54,9 @@
 //!
 //! All methods return a `Result`, which will contain an error of type `Box<dyn Error>` on failure.
 //! Therefore, ensure to handle potential errors gracefully when invoking these methods during use.
+
 use crate::chat::interface::{ChatBackend, Message, MessageInfo, MessageRole};
+use crate::knowledge::EmbeddingService;
 use crate::provider::openai::file_diff;
 use crate::provider::openai::file_diff::{create_directory, create_file};
 use async_openai::config::OpenAIConfig;
@@ -64,7 +66,7 @@ use async_openai::types::{
     ChatCompletionRequestUserMessageArgs, ChatCompletionResponseMessage, ChatCompletionTool,
     ChatCompletionToolArgs, ChatCompletionToolChoiceOption, ChatCompletionToolType,
     CompletionUsage, CreateChatCompletionRequest, CreateChatCompletionRequestArgs,
-    CreateChatCompletionResponse, FunctionObjectArgs,
+    CreateChatCompletionResponse, CreateEmbeddingRequestArgs, FunctionObjectArgs,
 };
 use async_openai::Client;
 use async_trait::async_trait;
@@ -82,6 +84,7 @@ use tokio::time::timeout;
 ///
 /// This struct maintains statistics related to token usage, sets a default model,
 /// manages the timeout for requests, and converts messages into the format required by OpenAI's API.
+#[derive(Clone)]
 pub struct OpenAIInterface {
     model: String,
     timeout_duration: Duration,
@@ -89,19 +92,7 @@ pub struct OpenAIInterface {
     last_call_prompt_token: u32,
     overall_completion_token: u32,
     overall_prompt_token: u32,
-}
-
-impl Default for OpenAIInterface {
-    fn default() -> Self {
-        OpenAIInterface {
-            model: "gpt-4o-2024-08-06".to_string(),
-            last_call_completion_token: 0,
-            last_call_prompt_token: 0,
-            overall_completion_token: 0,
-            overall_prompt_token: 0,
-            timeout_duration: Duration::from_secs(30),
-        }
-    }
+    client: Client<OpenAIConfig>,
 }
 
 #[async_trait]
@@ -112,10 +103,6 @@ impl ChatBackend for OpenAIInterface {
         use_tools: bool,
     ) -> Result<Message, Box<dyn Error>> {
         let oai_messages = self.convert_to_chat_completion_messages(messages);
-
-        dotenv().ok();
-
-        let client = self.create_openai_client()?;
         let request = self.create_openai_request(&oai_messages, use_tools)?;
 
         // Use the timeout_duration from the struct
@@ -123,7 +110,7 @@ impl ChatBackend for OpenAIInterface {
             "Sending request to OpenAI with timeout of {:?}.",
             self.timeout_duration
         );
-        let result = timeout(self.timeout_duration, client.chat().create(request)).await;
+        let result = timeout(self.timeout_duration, self.client.chat().create(request)).await;
 
         let chat_completion = match result {
             Ok(Ok(chat_completion)) => chat_completion,
@@ -176,12 +163,33 @@ impl ChatBackend for OpenAIInterface {
     }
 }
 
+#[async_trait]
+impl EmbeddingService for OpenAIInterface {
+    async fn get_embedding(&self, content: String) -> Result<Box<Vec<f32>>, Box<dyn Error>> {
+        let embedding_request = CreateEmbeddingRequestArgs::default()
+            .model(self.model.clone())
+            .input(content)
+            .build()
+            .unwrap();
+
+        let embedding_response = self.client.embeddings().create(embedding_request).await?;
+        // Assuming response.data holds embedding data
+        Ok(Box::new(embedding_response.data[0].embedding.clone()))
+    }
+}
+
 impl OpenAIInterface {
     pub fn new(model: String, timeout_secs: u64) -> Self {
+        dotenv().ok();
+
         OpenAIInterface {
             model,
             timeout_duration: Duration::from_secs(timeout_secs),
-            ..Default::default()
+            last_call_completion_token: 0,
+            last_call_prompt_token: 0,
+            overall_completion_token: 0,
+            overall_prompt_token: 0,
+            client: OpenAIInterface::create_openai_client().unwrap(),
         }
     }
 
@@ -239,7 +247,7 @@ impl OpenAIInterface {
         self.overall_prompt_token += self.last_call_prompt_token;
     }
 
-    fn create_openai_client(&self) -> Result<Client<OpenAIConfig>, Box<dyn Error>> {
+    fn create_openai_client() -> Result<Client<OpenAIConfig>, Box<dyn Error>> {
         let openai_key = env::var("OPENAI_KEY")?;
         Ok(Client::with_config(
             OpenAIConfig::default().with_api_key(openai_key),

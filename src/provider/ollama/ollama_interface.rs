@@ -34,8 +34,10 @@
 //!
 //! - `ChatBackend`: Implements the necessary methods to send requests to the chat model and print statistics about the model in use.
 use crate::chat::interface::{ChatBackend, Message, MessageInfo, MessageRole};
+use crate::knowledge::EmbeddingService;
 use async_trait::async_trait;
 use chrono::Utc;
+use ollama_rs::generation::embeddings::request::{EmbeddingsInput, GenerateEmbeddingsRequest};
 use ollama_rs::{
     generation::chat::{request::ChatMessageRequest, ChatMessage, ChatMessageResponse},
     IntoUrlSealed, Ollama,
@@ -44,6 +46,7 @@ use std::error::Error;
 
 /// OllamaInterface is a struct that provides an interface to communicate with the Ollama chat model.
 /// It implements the ChatBackend trait which allows sending and receiving messages from the chat model.
+#[derive(Clone)]
 pub struct OllamaInterface {
     ollama: Ollama,
     model: String,
@@ -116,5 +119,15 @@ impl ChatBackend for OllamaInterface {
     fn print_statistics(&self) {
         // Implement statistics if required
         println!("Using Ollama model: {}", self.model);
+    }
+}
+
+#[async_trait]
+impl EmbeddingService for OllamaInterface {
+    async fn get_embedding(&self, content: String) -> Result<Box<Vec<f32>>, Box<dyn Error>> {
+        let request =
+            GenerateEmbeddingsRequest::new(self.model.clone(), EmbeddingsInput::from(content));
+        let result = self.ollama.generate_embeddings(request).await?;
+        Ok(Box::new(result.embeddings[0].clone()))
     }
 }

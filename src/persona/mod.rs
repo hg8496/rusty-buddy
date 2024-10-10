@@ -34,6 +34,7 @@
 
 use crate::config;
 use serde::Deserialize;
+use std::error::Error;
 
 /// Represents a programming or writing persona with a name, specific chat prompt, and associated file types.
 ///
@@ -49,6 +50,18 @@ pub struct Persona {
     pub name: String,
     pub chat_prompt: String,
     pub file_types: Vec<String>,
+}
+
+pub fn resolve_persona(
+    persona_name: &Option<String>,
+    default_persona: &str,
+) -> Result<Persona, Box<dyn Error>> {
+    match persona_name {
+        Some(name) => {
+            get_persona(name).ok_or_else(|| "Specified persona not found. Using default.".into())
+        }
+        None => Ok(get_persona(default_persona).unwrap()),
+    }
 }
 
 pub fn get_internal_persona_configs() -> Vec<Persona> {

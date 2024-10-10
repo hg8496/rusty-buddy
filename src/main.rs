@@ -34,6 +34,7 @@ mod chat;
 mod cli;
 mod config;
 mod context;
+mod knowledge;
 mod persona;
 mod provider;
 
@@ -85,6 +86,9 @@ async fn main() {
                 cli::wish::run(args).await.unwrap();
             }
             args::Commands::Init => {}
+            args::Commands::Knowledge(args) => {
+                cli::knowledge::run_knowledge(args).await.unwrap();
+            }
         }
     } else {
         println!("No valid command given. Use `rusty-buddy help` for more information.");

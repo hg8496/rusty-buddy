@@ -26,6 +26,7 @@ use crate::cli::chat::ChatArgs;
 use crate::cli::commitmessage::CommitMessageArgs;
 use crate::cli::createbackground::BackgroundArgs;
 use crate::cli::createicon::CreateIconArgs;
+use crate::cli::knowledge::KnowledgeArgs;
 use crate::cli::wish::WishArgs;
 use clap::{Parser, Subcommand};
 use clap_complete::aot::Shell;
@@ -65,10 +66,14 @@ pub enum Commands {
     CreateIcon(CreateIconArgs),
 
     /// Create a background using DALL·E based on user input.
-    CreateBackground(BackgroundArgs), // <-- New command
+    CreateBackground(BackgroundArgs),
 
     /// Collect files from a specified directory and create a context for chat.
     Wish(WishArgs),
+
+    /// Manage knowledge entries.
+    #[clap(subcommand)]
+    Knowledge(KnowledgeArgs),
 
     /// Initialize configuration and environment.
     Init,

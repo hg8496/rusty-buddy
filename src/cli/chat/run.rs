@@ -53,7 +53,7 @@ use crate::cli::spinner::{start_spinner, stop_spinner};
 use crate::cli::style::configure_mad_skin;
 use crate::config;
 use crate::config::{get_chat_sessions_dir, Config};
-use crate::persona::{get_persona, Persona};
+use crate::persona::{resolve_persona, Persona};
 use atty::Stream;
 use chrono::{DateTime, Local, Utc};
 use log::error;
@@ -101,18 +101,6 @@ fn initialize_command_registry() -> CommandRegistry {
     let mut command_registry = CommandRegistry::new();
     initialize_commands(&mut command_registry);
     command_registry
-}
-
-fn resolve_persona(
-    persona_name: &Option<String>,
-    default_persona: &str,
-) -> Result<Persona, Box<dyn Error>> {
-    match persona_name {
-        Some(name) => {
-            get_persona(name).ok_or_else(|| "Specified persona not found. Using default.".into())
-        }
-        None => Ok(get_persona(default_persona).unwrap()),
-    }
 }
 
 fn handle_session(
