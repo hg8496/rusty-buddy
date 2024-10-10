@@ -33,6 +33,7 @@ mod args;
 mod chat;
 mod cli;
 mod config;
+mod context;
 mod persona;
 mod provider;
 

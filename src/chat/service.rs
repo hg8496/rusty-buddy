@@ -62,11 +62,12 @@
 //!
 //! Outputs statistics detailing the usage of the chat session.
 
+use std::borrow::Cow;
 // The `ChatService` struct encapsulates the entirety of chat session management.
-use crate::chat::context::load_files_into_context;
 use crate::chat::interface::ChatStorage;
 use crate::chat::interface::{ChatBackend, Message, MessageRole};
 use crate::chat::service_builder::ChatServiceBuilder;
+use crate::context::{load_files_into_context, ContextConsumer};
 use std::error::Error;
 use std::path::{Path, PathBuf};
 
@@ -200,6 +201,13 @@ impl ChatService {
     // Outputs chat session statistics using the backend's built-in function
     pub fn print_statistics(&self) {
         self.backend.print_statistics();
+    }
+}
+
+impl ContextConsumer for ChatService {
+    fn consume(&mut self, filename: Cow<str>, content: Cow<str>) -> Result<(), Box<dyn Error>> {
+        self.add_context_message(&format!("Filename: {}\nContent:\n{}\n", filename, content));
+        Ok(())
     }
 }
 
