@@ -1,7 +1,15 @@
 <footer>
-  <a href="https://github.com/{{ site.github_username }}" style="display: inline-flex; align-items: center; text-decoration: none;">
-    <img src="{{ '/assets/images/github_logo.png' | relative_url }}" alt="GitHub Logo" class="social-logo">
-    <span style="vertical-align: middle; color: inherit;">Visit our GitHub</span>
-  </a>
-  <div>{{ site.footer }}</div>
+  <div style="display: flex; align-items: center; justify-content: space-between;">
+    <div style="display: inline-flex; align-items: center;">
+      <a href="https://github.com/{{ site.social_links.github }}" style="display: inline-flex; align-items: center; text-decoration: none; margin-right: 20px;">
+        <img src="{{ '/assets/images/github_logo.png' | relative_url }}" alt="GitHub Logo" class="social-logo">
+        <span style="vertical-align: middle; color: inherit;">Visit our GitHub</span>
+      </a>
+      <a href="https://x.com/{{ site.social_links.x }}" style="display: inline-flex; align-items: center; text-decoration: none;">
+        <img src="{{ '/assets/images/x-logo-black.png' | relative_url }}" alt="X Logo" class="social-logo x-logo">
+        <span style="vertical-align: middle; color: inherit;">Follow us on X</span>
+      </a>
+    </div>
+    <div>{{ site.footer }}</div>
+  </div>
 </footer>

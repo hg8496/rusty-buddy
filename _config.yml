@@ -7,7 +7,6 @@ tagline: Empower Your Code with AI-Driven Precision and Simplicity
 logo: /asset/images/rusty-buddy-logo-512.png
 baseurl: "" # The subpath of your site, e.g., /blog
 url: "https://www.rusty-buddy.org" # The base URL for your site, e.g., http://example.com
-github_username: hg8496
 
 # Build settings
 plugins:
@@ -40,7 +39,8 @@ kramdown:
 
 # Social media links (optional)
 social_links:
-  github: https://github.com/hg8496/rusty-buddy
+  github: hg8496/rusty-buddy
+  x: RustyBuddy_org
 
 # SEO settings (optional)
 meta_tags:
