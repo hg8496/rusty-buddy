@@ -123,16 +123,12 @@ async fn process_jobs(receiver: Receiver<Job>, db: Surreal<Db>, client: Embeddin
         if let Some(embedding) = embedding {
             // At this point, the embedding has been processed; now we can make the db call.
 
-            if let Ok(reco) = db
+            if let Err(e) = db
                 .upsert::<Option<Record>>(("context_embeddings", filename.clone()))
                 .content(embedding)
                 .await
             {
-                if let Some(record) = reco {
-                    println!("{:?}", record);
-                }
-            } else {
-                eprintln!("Failed to store embedding for {}", filename);
+                eprintln!("Failed to store embedding for {} {}", filename, e);
             }
         }
     }
