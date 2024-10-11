@@ -30,7 +30,7 @@ use clap::Args;
 #[derive(Args)]
 pub struct CreateIconArgs {
     /// Output directory for the generated icons
-    #[arg(short, long, default_value = "./icons")]
+    #[arg(short, long, default_value = "./icons", value_hint = clap::ValueHint::DirPath)]
     pub output: String,
 
     /// Comma-separated list of icon sizes to generate

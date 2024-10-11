@@ -44,7 +44,7 @@ use clap::{Args, ValueEnum};
 #[derive(Args)]
 pub struct BackgroundArgs {
     /// Output directory for the generated backgrounds
-    #[arg(short, long, default_value = "./background.png")]
+    #[arg(short, long, default_value = "./background.png", value_hint = clap::ValueHint::DirPath)]
     pub file: String,
 
     /// Orientation of the background
