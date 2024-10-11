@@ -16,6 +16,7 @@ impl EmbeddingServiceHandle {
 #[async_trait]
 pub trait EmbeddingService: Send + Sync {
     async fn get_embedding(&self, content: String) -> Result<Box<Vec<f32>>, Box<dyn Error>>;
+    fn embedding_len(&self) -> usize;
 }
 
 impl Clone for EmbeddingServiceHandle {

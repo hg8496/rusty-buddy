@@ -130,4 +130,8 @@ impl EmbeddingService for OllamaInterface {
         let result = self.ollama.generate_embeddings(request).await?;
         Ok(Box::new(result.embeddings[0].clone()))
     }
+
+    fn embedding_len(&self) -> usize {
+        1024
+    }
 }

@@ -176,6 +176,10 @@ impl EmbeddingService for OpenAIInterface {
         // Assuming response.data holds embedding data
         Ok(Box::new(embedding_response.data[0].embedding.clone()))
     }
+
+    fn embedding_len(&self) -> usize {
+        3072
+    }
 }
 
 impl OpenAIInterface {
