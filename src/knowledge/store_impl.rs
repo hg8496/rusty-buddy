@@ -4,6 +4,7 @@ use crate::knowledge::{
     KnowledgeStore, Record,
 };
 use async_trait::async_trait;
+use std::borrow::Cow;
 use std::error::Error;
 use surrealdb::engine::local::{Db, RocksDb};
 use surrealdb::Surreal;
@@ -54,7 +55,7 @@ impl KnowledgeStore for KnowledgeStoreImpl {
     /// an embedding from it, and queries the database for relevant documents based on similarity.
     async fn query_knowledge(
         &self,
-        user_input: String,
+        user_input: Cow<'_, str>,
     ) -> Result<Vec<KnowledgeResult>, Box<dyn Error>> {
         // Generate the embedding for the user input
         let embedding = self
@@ -83,7 +84,7 @@ impl KnowledgeStore for KnowledgeStoreImpl {
         Ok(())
     }
 
-    async fn get_embedding(&self, content: String) -> Result<Box<Vec<f32>>, Box<dyn Error>> {
+    async fn get_embedding(&self, content: Cow<'_, str>) -> Result<Box<Vec<f32>>, Box<dyn Error>> {
         Ok(self.embedding_service.inner.get_embedding(content).await?)
     }
 }

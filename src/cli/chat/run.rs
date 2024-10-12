@@ -58,6 +58,7 @@ use crate::persona::{resolve_persona, Persona};
 use atty::Stream;
 use chrono::{DateTime, Local, Utc};
 use log::error;
+use std::borrow::Cow;
 use std::error::Error;
 use std::io::{self, Read};
 use std::sync::Arc;
@@ -77,15 +78,14 @@ pub async fn run_chat(args: ChatArgs) -> Result<(), Box<dyn Error>> {
     let command_registry = initialize_command_registry();
 
     let persona = resolve_persona(&args.persona, config.default_persona.as_str())?;
-    let model_name = if let Some(model) = args.model {
-        model // Use user-specified model
-    } else {
-        config.ai.chat_model.clone() // Default model from configuration
-    };
+    let model_name = args
+        .model
+        .as_deref()
+        .unwrap_or(config.ai.chat_model.as_str());
 
     let mut services = Services {
         chat_service: ChatService::builder()
-            .model_name(model_name.as_str())
+            .model_name(model_name)
             .storage(Box::new(storage))
             .persona(persona.clone())
             .directory(args.directory)
@@ -232,19 +232,18 @@ fn print_loaded_messages(chat_service: &ChatService) {
 async fn handle_one_shot_mode(
     mut chat_service: Services,
     input_message: Option<String>,
-    model: String,
+    model: &str,
     persona: Persona,
     knowledge: bool,
 ) -> Result<(), Box<dyn Error>> {
-    let user_input = get_user_input_from_option_or_stdin(input_message)?;
+    let user_input: Cow<'_, str> = Cow::Owned(get_user_input_from_option_or_stdin(input_message)?);
     if user_input.trim().is_empty() {
         error!("No input provided.");
         return Ok(());
     }
 
     let result =
-        send_and_display_response(&mut chat_service, &user_input, &model, &persona, knowledge)
-            .await;
+        send_and_display_response(&mut chat_service, user_input, model, &persona, knowledge).await;
     match result {
         Ok(_) => result,
         Err(e) => {
@@ -257,15 +256,15 @@ async fn handle_one_shot_mode(
 async fn start_interactive_chat(
     mut chat_service: Services,
     mut command_registry: CommandRegistry,
-    model: String,
+    model: &str,
     persona: Persona,
     knowledge: bool,
 ) -> Result<(), Box<dyn Error>> {
     loop {
-        let user_input = get_multiline_input(
+        let user_input: Cow<'_, str> = Cow::Owned(get_multiline_input(
             "User (use Ctrl+D to submit): ",
             command_registry.get_completions(),
-        )?;
+        )?);
         let trimmed_input = user_input.trim();
 
         if trimmed_input.starts_with('/') {
@@ -288,8 +287,8 @@ async fn start_interactive_chat(
 
         let result = send_and_display_response(
             &mut chat_service,
-            trimmed_input,
-            &model,
+            Cow::Borrowed(trimmed_input),
+            model,
             &persona,
             knowledge,
         )
@@ -365,7 +364,7 @@ fn is_output_to_terminal() -> bool {
 
 async fn send_and_display_response(
     services: &mut Services,
-    user_input: &str,
+    user_input: Cow<'_, str>,
     model: &str,
     persona: &Persona,
     knowledge: bool,
@@ -379,14 +378,11 @@ async fn send_and_display_response(
     if knowledge {
         let knowledge = services
             .knowledge_store
-            .query_knowledge(user_input.to_string())
+            .query_knowledge(user_input.clone())
             .await?;
         services.chat_service.add_knowledge(knowledge).await?;
     }
-    let result = services
-        .chat_service
-        .send_message(user_input.trim(), false)
-        .await;
+    let result = services.chat_service.send_message(user_input, false).await;
     let response = match result {
         Ok(response) => response,
         Err(err) => {
@@ -425,7 +421,7 @@ fn get_user_input_from_option_or_stdin(
         Ok(message)
     } else if !atty::is(Stream::Stdin) {
         io::stdin().read_to_string(&mut buffer)?;
-        Ok(buffer.trim().to_string())
+        Ok(buffer.to_string())
     } else {
         get_multiline_input("Your message (end with Ctrl+D): ", vec![])
     }

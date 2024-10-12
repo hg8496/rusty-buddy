@@ -64,7 +64,7 @@ async fn process_jobs(receiver: Receiver<Job>, db: Arc<dyn KnowledgeStore>) {
         eprintln!("Processing File: {}", filename);
 
         // Now handle success or failure from embedding processing
-        let embedding = match db.get_embedding(content.clone()).await {
+        let embedding = match db.get_embedding(Cow::Owned(content)).await {
             Ok(embedding) => {
                 // Assemble the embedding data (once get_embedding has been successful)
                 Some(EmbeddingData {

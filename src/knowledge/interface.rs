@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
+use std::borrow::Cow;
 use std::error::Error;
 use std::fmt;
 use std::fmt::{Display, Formatter};
@@ -19,7 +20,7 @@ impl EmbeddingServiceHandle {
 
 #[async_trait]
 pub trait EmbeddingService: Send + Sync {
-    async fn get_embedding(&self, content: String) -> Result<Box<Vec<f32>>, Box<dyn Error>>;
+    async fn get_embedding(&self, content: Cow<'_, str>) -> Result<Box<Vec<f32>>, Box<dyn Error>>;
     fn embedding_len(&self) -> usize;
 }
 
@@ -52,10 +53,10 @@ pub trait KnowledgeStore: Send + Sync {
     /// - an error if something fails.
     async fn query_knowledge(
         &self,
-        user_input: String,
+        user_input: Cow<'_, str>,
     ) -> Result<Vec<KnowledgeResult>, Box<dyn Error>>;
     async fn store_knowledge(&self, knowledge: EmbeddingData) -> Result<(), Box<dyn Error>>;
-    async fn get_embedding(&self, content: String) -> Result<Box<Vec<f32>>, Box<dyn Error>>;
+    async fn get_embedding(&self, content: Cow<'_, str>) -> Result<Box<Vec<f32>>, Box<dyn Error>>;
 }
 
 /// Embedding data stored in the database with file name and calculated embedding.

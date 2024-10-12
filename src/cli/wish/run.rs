@@ -86,7 +86,9 @@ pub async fn run_wish(
     let wish = format!("Users wish: {}", user_input);
 
     // Send the wish to the chat service and get the AI response
-    let response = chat_service.send_message(&wish, use_tools).await?;
+    let response = chat_service
+        .send_message(std::borrow::Cow::Borrowed(&wish), use_tools)
+        .await?;
 
     // Print the response and statistics
     println!("AI Context Response: {}", response);

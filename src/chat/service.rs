@@ -148,9 +148,9 @@ impl ChatService {
             pos,
             Message {
                 role: MessageRole::Context,
-                content: system_message.to_string(),
+                content: system_message.into_owned(),
                 info: Some(MessageInfo::ContextOrigin {
-                    filename: filename.to_string(),
+                    filename: filename.into_owned(),
                 }),
             },
         );
@@ -214,13 +214,13 @@ impl ChatService {
     // Sends a user message to the backend, potentially using tools, and captures the response
     pub async fn send_message(
         &mut self,
-        user_message: &str,
+        user_message: Cow<'_, str>,
         use_tools: bool,
     ) -> Result<String, Box<dyn Error>> {
         // Add the user message to the session messages
         self.messages.push(Message {
             role: MessageRole::User,
-            content: user_message.into(),
+            content: user_message.into_owned(),
             info: Some(MessageInfo::UserInfo {
                 timestamp: Utc::now(),
             }),
@@ -274,8 +274,8 @@ impl ChatService {
 
 impl ContextConsumer for ChatService {
     fn consume(&mut self, filename: Cow<str>, content: Cow<str>) -> Result<(), Box<dyn Error>> {
-        let f_content = format!("Filename: {}\nContent:\n{}\n", filename, content);
-        self.add_context_message(filename, f_content.into());
+        let f_content = format!("Filename: {}\nContent:\n{}\n", &*filename, &*content);
+        self.add_context_message(filename, Cow::Owned(f_content));
         Ok(())
     }
 }

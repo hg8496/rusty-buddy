@@ -42,6 +42,7 @@ use crate::chat::file_storage::NilChatStorage;
 use crate::chat::service::ChatService;
 use crate::config;
 use crate::persona::Persona;
+use std::borrow::Cow;
 use std::process::Command;
 
 /// This function runs the commit message generation process.
@@ -77,7 +78,7 @@ pub async fn run_commitmessage() -> Result<(), Box<dyn std::error::Error>> {
         .build()?;
 
     let diff = generate_git_diff_summary().await?;
-    let summary = chat_service.send_message(&diff, false).await?;
+    let summary = chat_service.send_message(Cow::Owned(diff), false).await?;
 
     println!("Summary of git diff (model: {}):\n{}", &model, summary);
 

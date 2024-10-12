@@ -132,7 +132,9 @@ async fn recommend_persona(
         dir_listing, personas
     );
 
-    let response = chat_service.send_message(&prompt, false).await?;
+    let response = chat_service
+        .send_message(std::borrow::Cow::Borrowed(&prompt), false)
+        .await?;
     Ok(response.trim().to_string())
 }
 

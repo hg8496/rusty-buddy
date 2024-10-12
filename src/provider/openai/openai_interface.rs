@@ -74,6 +74,7 @@ use chrono::Utc;
 use dotenvy::dotenv;
 use log::{debug, info};
 use serde_json::Value;
+use std::borrow::Cow;
 use std::env;
 use std::error::Error;
 use std::time::Duration;
@@ -166,7 +167,7 @@ impl ChatBackend for OpenAIInterface {
 #[async_trait]
 #[async_trait]
 impl EmbeddingService for OpenAIInterface {
-    async fn get_embedding(&self, content: String) -> Result<Box<Vec<f32>>, Box<dyn Error>> {
+    async fn get_embedding(&self, content: Cow<'_, str>) -> Result<Box<Vec<f32>>, Box<dyn Error>> {
         // Truncate content to fit within 32,000 bytes
         let truncated_content = truncate_to_max_bytes(&content, 32_000);
         let embedding_request = CreateEmbeddingRequestArgs::default()
