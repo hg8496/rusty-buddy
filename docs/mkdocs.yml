@@ -21,6 +21,7 @@ nav:
       - Overview: commands.md
   - Personas: personas.md
   - Usecases:
+      - Knowledge is Power: usecases/using_knowledge_feature.md
       - Case study Rust development: usecases/case_study_rust.md
       - Assisted Debugging: usecases/assisted_debugging.md
       - Code Refactoring: usecases/code_refactoring.md
@@ -28,11 +29,6 @@ nav:
       - Security Audit: usecases/security_audit.md
       - Test Case Development: usecases/test_cases.md
       - Writing Documentation: usecases/write_documentation.md
-  # Add more categories or files as your documentation expands
-  # For example:
-  # - Advanced Usage: advanced_usage.md
-  # - FAQ: faq.md
-  # - Contributing: contributing.md
 
 # Additional configuration settings
 markdown_extensions:
@@ -41,12 +37,16 @@ markdown_extensions:
   - tables
   - fenced_code
   - footnotes
+  - codehilite:
+      use_pygments: False
 
 # Include any additional files or settings required for deployment or functionality
 extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/hg8496/rusty-buddy
+    - icon: fontawesome/brands/x-twitter
+      link: https://x.com/RustyBuddy_org
   # etc...
 
 # Provide options for deploying the site if using features like GitHub Pages

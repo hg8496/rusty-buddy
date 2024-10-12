@@ -15,43 +15,47 @@ Rusty Buddy integrates state-of-the-art AI capabilities directly into your comma
 
 ## Key Features
 
-- **Ollama Support 🆕**
+- **Knowledge Management 🆕**
 
-  Experience seamless integration with the Ollama AI backend, providing enhanced performance and privacy.
+    Harness the power of a knowledge database to enhance AI interactions. Easily add, search, and initialize knowledge entries from directories, files, or URLs to provide more context-aware suggestions during chat sessions and development tasks.
+
+- **Ollama Support**
+
+    Experience seamless integration with the Ollama AI backend, providing enhanced performance and privacy.
 
 - **Intuitive Chat Interface**
 
-  Engage in natural language conversations with the AI assistant to brainstorm ideas, solve problems, or get code assistance.
+    Engage in natural language conversations with the AI assistant to brainstorm ideas, solve problems, or get code assistance.
 
 - **Slash Command Auto-Completion**
 
-  Boost your efficiency with intelligent command suggestions and auto-completion within the chat interface.
+    Boost your efficiency with intelligent command suggestions and auto-completion within the chat interface.
 
 - **Commit Message Generator**
 
-  Generate clear and consistent commit messages automatically from your git diffs, following best practices.
+    Generate clear and consistent commit messages automatically from your git diffs, following best practices.
 
 - **Icon and Background Image Generation**
 
-  Create stunning icons and backgrounds effortlessly with AI-generated graphics based on your descriptions.
+    Create stunning icons and backgrounds effortlessly with AI-generated graphics based on your descriptions.
 
 - **Tool Integration**
 
-  Automate repetitive tasks by allowing the AI to interact with your files and directories, enhancing your development process.
+    Automate repetitive tasks by allowing the AI to interact with your files and directories, enhancing your development process.
 
 - **Shell Completion Support**
 
-  Improve your command-line experience with shell completion scripts for Bash, Zsh, Fish, and more.
+    Improve your command-line experience with shell completion scripts for Bash, Zsh, Fish, and more.
 
 ## Built with Security and Privacy in Mind
 
 - **Developed in Rust**
 
-  Benefit from Rust's memory safety guarantees, ensuring a secure and reliable toolset.
+    Benefit from Rust's memory safety guarantees, ensuring a secure and reliable toolset.
 
 - **Privacy First**
 
-  Rusty Buddy operates entirely within your local environment[^1], with no data collection, giving you complete control and peace of mind.
+    Rusty Buddy operates entirely within your local environment[^1], with no data collection, giving you complete control and peace of mind.
 
 ## Get Started Today
 

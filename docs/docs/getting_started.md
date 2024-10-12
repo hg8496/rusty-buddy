@@ -45,7 +45,7 @@ You chose OpenAI.
 Please enter your OpenAI API key: [User enters key]
 ```
 
-  The key is stored securely in a `.env` file in the current directory for future use.
+The key is stored securely in a `.env` file in the current directory for future use.
 
 - **Option 2: Ollama**
 
@@ -70,64 +70,40 @@ Recommended persona: [Recommended Persona]
 
    The `init` command will generate the necessary configuration files:
 
-   - A `.env` file for storing your API keys securely.
-   - A `config.toml` file for your settings, including the recommended persona and model configurations.
+    - A `.env` file for storing your API keys securely.
+    - A `config.toml` file for your settings, including the recommended persona and model configurations.
 
    These files are created in the `.rusty` directory within your project.
 
-### Choosing Your AI Backend
+### Motivating Knowledge Enhancement
 
-Depending on your selection during the `init` process, your `config.toml` will be configured for either OpenAI or Ollama.
+To truly maximize the potential of Rusty Buddy, consider building a rich knowledge database. By adding documents such as coding guides, design patterns, and architecture documentation, you empower the AI to provide more contextually relevant and insightful assistance.
 
-#### Using the OpenAI Backend
+**Why Add Documents?**
 
-If you selected the OpenAI backend, ensure that your `.env` file contains your OpenAI API key:
+- **Enhanced Contextual Understanding:** Equip the AI with domain-specific context, allowing it to offer more precise and tailored guidance.
 
-```plaintext
-OPENAI_KEY=your_openai_api_key
+- **Streamline Onboarding:** New team members can access comprehensive resources directly through the AI's knowledge base, reducing onboarding time and resources.
+
+- **Facilitate Code Reviews and Development:** Let Rusty Buddy cross-reference architecture guides and coding standards in real-time for enriched code reviews and development advice.
+
+### How to Add Documents:
+
+- **Coding Guides and Documentation:**
+
+```bash
+rusty-buddy knowledge add --file path/to/coding_guide.md
 ```
 
-Your `config.toml` will include configurations similar to:
+- **Design and Architecture Documents:**
 
-```toml
-default_persona = "[Recommended Persona]"
-
-[ai]
-chat_model = "openai_complex"
-commit_model = "openai_fast"
-wish_model = "openai_complex"
-
-[[models]]
-name = "openai_fast"
-api_name = "gpt-4o-mini"
-backend = "OpenAI"
-
-[[models]]
-name = "openai_complex"
-api_name = "gpt-4o"
-backend = "OpenAI"
+```bash
+rusty-buddy knowledge add --dir path/to/architecture_docs
 ```
 
-#### Using the Ollama Backend
+Initiating this habit enables you and your team to leverage the full intelligence of Rusty Buddy, turning it into an invaluable partner in every stage of your development workflow.
 
-If you selected the Ollama backend, your `config.toml` will include the Ollama configuration:
-
-```toml
-default_persona = "[Recommended Persona]"
-
-[ai]
-chat_model = "ollama_complex"
-commit_model = "ollama_complex"
-wish_model = "ollama_complex"
-
-[[models]]
-name = "ollama_complex"
-api_name = "llama3.2"
-backend = "Ollama"
-url = "http://localhost:11434"
-```
-
-### Example Usage
+## Example Usage
 
 Once your setup is complete, you can start using Rusty Buddy right away. Here are a few common scenarios:
 
@@ -148,39 +124,8 @@ git add .
 rusty-buddy commit-message
 ```
 
-## Using Knowledge Augmentation in Chat
-
-Rusty Buddy includes a powerful feature that allows you to add relevant knowledge to your chat context using the `--knowledge` flag.
-
-When you use the `--knowledge` flag, the Rusty Buddy tool takes your latest user input and searches its knowledge base for any related documents or information that might help you before the assistant provides a response. This is especially useful for highly specialized topics or when dealing with project-specific queries that might require additional documentation.
-
-### Example:
-
-If you're working on a Rust-based project and need documentation about memory safety, you can generate knowledge and chat using:
-
-```bash
-rusty-buddy chat --persona rust --knowledge
-```
-
-This command will:
-1. Use the Rust persona for targeted assistance.
-2. Leverage the `knowledge` feature to search for relevant information based on your latest input.
-3. Provide a more contextually aware response.
-
-Similarly, you can use it in combination with other flags, such as `--directory` or `--model` to refine the chat experience further.
-
-## Additional Resources
-
-- **Installation Guide:** Refer to the [Installation](installation.md) section for detailed instructions on installing Rusty Buddy and any additional steps required for Ollama.
-
-- **Configuration Guide:** Learn how to customize Rusty Buddy in the [Configuration Guide](configuration.md), including setting timeout durations and managing personas.
-
-- **Commands Overview:** Explore the various [CLI Commands](commands.md) available in Rusty Buddy to maximize your productivity.
-
-- **Working with Personas:** Learn how to customize and use different personas in the [Personas](personas.md) section.
-
-- **Use Cases:** Check out practical examples and use cases in the [Use Cases](usecases/case_study_rust.md) section to see Rusty Buddy in action.
+By following these simple steps and enriching the knowledge database, you can leverage the full functionality of Rusty Buddy, integrating it seamlessly into your software development process and achieving new productivity heights. Whether you're starting new chat sessions, managing commits, or generating icons, Rusty Buddy is equipped to assist you.
 
 ---
 
-By following these simple steps, you can leverage the full functionality of Rusty Buddy and integrate it seamlessly into your software development process. Whether you're starting new chat sessions, managing commits, or generating icons, Rusty Buddy is equipped to assist you.
+**Happy Coding with Rusty Buddy!**
