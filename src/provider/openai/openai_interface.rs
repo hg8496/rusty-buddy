@@ -164,14 +164,16 @@ impl ChatBackend for OpenAIInterface {
 }
 
 #[async_trait]
+#[async_trait]
 impl EmbeddingService for OpenAIInterface {
     async fn get_embedding(&self, content: String) -> Result<Box<Vec<f32>>, Box<dyn Error>> {
+        // Truncate content to fit within 32,000 bytes
+        let truncated_content = truncate_to_max_bytes(&content, 32_000);
         let embedding_request = CreateEmbeddingRequestArgs::default()
             .model(self.model.clone())
-            .input(content)
+            .input(truncated_content)
             .build()
             .unwrap();
-
         let embedding_response = self.client.embeddings().create(embedding_request).await?;
         // Assuming response.data holds embedding data
         Ok(Box::new(embedding_response.data[0].embedding.clone()))
@@ -179,6 +181,17 @@ impl EmbeddingService for OpenAIInterface {
 
     fn embedding_len(&self) -> usize {
         3072
+    }
+}
+fn truncate_to_max_bytes(s: &str, max_bytes: usize) -> &str {
+    if s.len() <= max_bytes {
+        s
+    } else {
+        let mut end = max_bytes;
+        while !s.is_char_boundary(end) {
+            end -= 1;
+        }
+        &s[..end]
     }
 }
 
