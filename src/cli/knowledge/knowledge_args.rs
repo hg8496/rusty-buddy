@@ -23,8 +23,4 @@ pub struct InitArgs {
     /// Specify a persona for the knowledge initalisation
     #[arg(short, long)]
     pub persona: Option<String>,
-
-    /// Sets the AI model to use in this knowledge initalisation
-    #[arg(short = 'm', long = "model")]
-    pub model: Option<String>,
 }

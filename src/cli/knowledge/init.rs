@@ -1,17 +1,15 @@
 use crate::cli::knowledge::knowledge_args::InitArgs;
 use crate::config;
-use crate::config::{get_knowledge_dir, Config};
+use crate::config::Config;
 use crate::context::{load_files_into_context, ContextConsumer};
-use crate::knowledge::{EmbeddingServiceBuilder, EmbeddingServiceHandle};
+use crate::knowledge::DataSource::Context;
+use crate::knowledge::{EmbeddingData, KnowledgeStore, StoreBuilder};
 use crate::persona::resolve_persona;
 use async_channel::{Receiver, Sender};
-use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 use std::env;
 use std::error::Error;
-use surrealdb::engine::local::{Db, RocksDb};
-use surrealdb::sql::Thing;
-use surrealdb::Surreal;
+use std::sync::Arc;
 use tokio::task::JoinHandle;
 
 /// Bounded channel size as a constant for readability.
@@ -20,20 +18,6 @@ const MAX_THREADS: usize = 10; // Maximum number of threads
 
 /// Job type alias for clarity
 type Job = (String, String);
-
-/// Embedding data stored in the database with file name and calculated embedding.
-#[derive(Debug, Serialize, Deserialize)]
-pub struct EmbeddingData {
-    pub file_name: String,
-    pub embedding: Vec<f32>, // Adjust size based on the model
-    pub metadata: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct Record {
-    #[allow(dead_code)]
-    id: Thing,
-}
 
 /// Fetch configuration settings as a clone.
 fn get_config() -> Config {
@@ -44,13 +28,12 @@ fn get_config() -> Config {
 /// Entry point for initializing the knowledge system.
 pub async fn init(args: InitArgs) -> Result<(), Box<dyn Error>> {
     let config = get_config();
-    let db = initialize_database().await?;
+    let db = StoreBuilder::new().build().await?;
     let (sender, receiver) = async_channel::bounded(CHANNEL_SIZE);
     let persona = resolve_persona(&args.persona, config.default_persona.as_str())?;
-    let embedding_client = create_embedding_client(args.model, &config)?;
 
     // Spawn workers for processing jobs.
-    let handles = spawn_workers(receiver, db, embedding_client);
+    let handles = spawn_workers(receiver, db);
 
     // Load and process files
     process_files(sender, &persona)?;
@@ -61,57 +44,34 @@ pub async fn init(args: InitArgs) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-/// Initialize the database connection and switch to the correct namespace/database.
-async fn initialize_database() -> Result<Surreal<Db>, Box<dyn Error>> {
-    let db = Surreal::new::<RocksDb>(get_knowledge_dir()?.to_str().unwrap()).await?;
-    db.use_ns("knowledge").use_db("knowledge_db").await?;
-    Ok(db)
-}
-
-/// Create the appropriate embedding client based on user input or configuration.
-fn create_embedding_client(
-    model: Option<String>,
-    config: &Config,
-) -> Result<EmbeddingServiceHandle, Box<dyn Error>> {
-    let model_name = model.unwrap_or_else(|| config.ai.embedding_model.clone());
-    let embedding_client = EmbeddingServiceBuilder::new()
-        .model_name(model_name.into())
-        .build()?;
-    Ok(embedding_client)
-}
-
 /// Spawn workers that will handle processing jobs concurrently.
-fn spawn_workers(
-    receiver: Receiver<Job>,
-    db: Surreal<Db>,
-    client: EmbeddingServiceHandle,
-) -> Vec<JoinHandle<()>> {
+fn spawn_workers(receiver: Receiver<Job>, db: Arc<dyn KnowledgeStore>) -> Vec<JoinHandle<()>> {
     (0..MAX_THREADS)
         .map(|_| {
             let receiver_clone = receiver.clone();
             let db_clone = db.clone();
-            let client_clone = client.clone();
 
             tokio::spawn(async move {
-                process_jobs(receiver_clone, db_clone, client_clone).await;
+                process_jobs(receiver_clone, db_clone).await;
             })
         })
         .collect()
 }
 
 /// Process jobs received from the channel by retrieving embeddings and saving them to the database.
-async fn process_jobs(receiver: Receiver<Job>, db: Surreal<Db>, client: EmbeddingServiceHandle) {
+async fn process_jobs(receiver: Receiver<Job>, db: Arc<dyn KnowledgeStore>) {
     while let Ok((filename, content)) = receiver.recv().await {
         eprintln!("Processing File: {}", filename);
 
         // Now handle success or failure from embedding processing
-        let embedding = match client.inner.get_embedding(content.clone()).await {
+        let embedding = match db.get_embedding(content.clone()).await {
             Ok(embedding) => {
                 // Assemble the embedding data (once get_embedding has been successful)
                 Some(EmbeddingData {
-                    file_name: filename.clone(),
+                    data_source: Context(filename.clone()),
+                    content: None,
                     embedding: embedding.to_vec(),
-                    metadata: Some("Additional details if needed".to_string()),
+                    metadata: None,
                 })
             }
             Err(err) => {
@@ -123,11 +83,7 @@ async fn process_jobs(receiver: Receiver<Job>, db: Surreal<Db>, client: Embeddin
         if let Some(embedding) = embedding {
             // At this point, the embedding has been processed; now we can make the db call.
 
-            if let Err(e) = db
-                .upsert::<Option<Record>>(("context_embeddings", filename.clone()))
-                .content(embedding)
-                .await
-            {
+            if let Err(e) = db.store_knowledge(embedding).await {
                 eprintln!("Failed to store embedding for {} {}", filename, e);
             }
         }

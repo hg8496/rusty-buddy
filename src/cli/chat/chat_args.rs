@@ -98,6 +98,14 @@ pub struct ChatArgs {
     pub model: Option<String>,
 
     /// Silence the output of old messages
-    #[arg(short = 's', long = "silence")]
+    #[arg(short, long)]
     pub silence: bool,
+
+    /// Add relevant knowledge from the knowledge database to the session.
+    ///
+    /// This option uses the latest user input to generate embeddings and search
+    /// the knowledge store for relevant documents, which will be included as
+    /// knowledge context messages before the assistant responds.
+    #[arg(short = 'k', long = "knowledge")]
+    pub knowledge: bool, // <-- New argument
 }

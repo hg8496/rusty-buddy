@@ -64,12 +64,15 @@
 
 use std::borrow::Cow;
 // The `ChatService` struct encapsulates the entirety of chat session management.
+use crate::chat::interface::MessageInfo::KnowledgeInfo;
 use crate::chat::interface::{ChatBackend, Message, MessageRole};
 use crate::chat::interface::{ChatStorage, MessageInfo};
 use crate::chat::service_builder::ChatServiceBuilder;
 use crate::context::{load_files_into_context, ContextConsumer};
+use crate::knowledge::{DataSource, KnowledgeResult};
 use chrono::Utc;
 use std::error::Error;
+use std::fs;
 use std::path::{Path, PathBuf};
 
 /// The `ChatService` struct acts as a mediator between user interactions and backend processing.
@@ -170,6 +173,42 @@ impl ChatService {
         for msg in self.messages.iter() {
             func(msg);
         }
+    }
+
+    pub async fn add_knowledge(
+        &mut self,
+        knowledge: Vec<KnowledgeResult>,
+    ) -> Result<(), Box<dyn Error>> {
+        for k in knowledge {
+            let message = match k.data_source {
+                DataSource::Context(ref filename) => {
+                    let file_path = Path::new(filename);
+                    let text = fs::read_to_string(file_path).map_err(|e| {
+                        format!("Failed to read file '{}': {}", file_path.display(), e)
+                    })?;
+                    Message {
+                        role: MessageRole::Knowledge,
+                        content: text,
+                        info: Some(KnowledgeInfo {
+                            distance: k.distance,
+                            origin: k.data_source.to_string(),
+                        }),
+                    }
+                }
+                DataSource::Internet(ref content) | DataSource::LocalFiles(ref content) => {
+                    Message {
+                        role: MessageRole::Knowledge,
+                        content: k.content.unwrap(),
+                        info: Some(KnowledgeInfo {
+                            distance: k.distance,
+                            origin: content.to_string(),
+                        }),
+                    }
+                }
+            };
+            self.messages.push(message);
+        }
+        Ok(())
     }
 
     // Sends a user message to the backend, potentially using tools, and captures the response

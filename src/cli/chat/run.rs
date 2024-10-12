@@ -53,12 +53,19 @@ use crate::cli::spinner::{start_spinner, stop_spinner};
 use crate::cli::style::configure_mad_skin;
 use crate::config;
 use crate::config::{get_chat_sessions_dir, Config};
+use crate::knowledge::{KnowledgeStore, StoreBuilder};
 use crate::persona::{resolve_persona, Persona};
 use atty::Stream;
 use chrono::{DateTime, Local, Utc};
 use log::error;
 use std::error::Error;
 use std::io::{self, Read};
+use std::sync::Arc;
+
+struct Services {
+    chat_service: ChatService,
+    knowledge_store: Arc<dyn KnowledgeStore>,
+}
 
 /// Runs the chat application, initializing the necessary components,
 /// handling command line arguments, and starting either an interactive
@@ -76,25 +83,47 @@ pub async fn run_chat(args: ChatArgs) -> Result<(), Box<dyn Error>> {
         config.ai.chat_model.clone() // Default model from configuration
     };
 
-    let mut chat_service = ChatService::builder()
-        .model_name(model_name.as_str())
-        .storage(Box::new(storage))
-        .persona(persona.clone())
-        .directory(args.directory)
-        .build()?;
+    let mut services = Services {
+        chat_service: ChatService::builder()
+            .model_name(model_name.as_str())
+            .storage(Box::new(storage))
+            .persona(persona.clone())
+            .directory(args.directory)
+            .build()?,
+        knowledge_store: StoreBuilder::new().build().await?,
+    };
 
-    handle_session(&mut chat_service, args.new, args.continue_last, &args.load)?;
+    handle_session(
+        &mut services.chat_service,
+        args.new,
+        args.continue_last,
+        &args.load,
+    )?;
 
     if args.one_shot.is_some() {
         let message = args.one_shot.as_ref().unwrap();
-        return handle_one_shot_mode(chat_service, message.clone(), model_name, persona).await;
+        return handle_one_shot_mode(
+            services,
+            message.clone(),
+            model_name,
+            persona,
+            args.knowledge,
+        )
+        .await;
     }
 
     if (args.continue_last || args.load.is_some()) && !args.silence {
-        print_loaded_messages(&chat_service);
+        print_loaded_messages(&services.chat_service);
     }
 
-    start_interactive_chat(chat_service, command_registry, model_name, persona).await
+    start_interactive_chat(
+        services,
+        command_registry,
+        model_name,
+        persona,
+        args.knowledge,
+    )
+    .await
 }
 
 fn initialize_command_registry() -> CommandRegistry {
@@ -201,10 +230,11 @@ fn print_loaded_messages(chat_service: &ChatService) {
 }
 
 async fn handle_one_shot_mode(
-    mut chat_service: ChatService,
+    mut chat_service: Services,
     input_message: Option<String>,
     model: String,
     persona: Persona,
+    knowledge: bool,
 ) -> Result<(), Box<dyn Error>> {
     let user_input = get_user_input_from_option_or_stdin(input_message)?;
     if user_input.trim().is_empty() {
@@ -212,7 +242,9 @@ async fn handle_one_shot_mode(
         return Ok(());
     }
 
-    let result = send_and_display_response(&mut chat_service, &user_input, &model, &persona).await;
+    let result =
+        send_and_display_response(&mut chat_service, &user_input, &model, &persona, knowledge)
+            .await;
     match result {
         Ok(_) => result,
         Err(e) => {
@@ -223,10 +255,11 @@ async fn handle_one_shot_mode(
 }
 
 async fn start_interactive_chat(
-    mut chat_service: ChatService,
+    mut chat_service: Services,
     mut command_registry: CommandRegistry,
     model: String,
     persona: Persona,
+    knowledge: bool,
 ) -> Result<(), Box<dyn Error>> {
     loop {
         let user_input = get_multiline_input(
@@ -236,12 +269,16 @@ async fn start_interactive_chat(
         let trimmed_input = user_input.trim();
 
         if trimmed_input.starts_with('/') {
-            handle_command(&mut command_registry, trimmed_input, &mut chat_service);
+            handle_command(
+                &mut command_registry,
+                trimmed_input,
+                &mut chat_service.chat_service,
+            );
             continue;
         }
 
         if trimmed_input == "exit" || trimmed_input.is_empty() {
-            save_session_if_requested(&mut chat_service).err();
+            save_session_if_requested(&mut chat_service.chat_service).err();
             // Print exit message only if it's a terminal output
             if is_output_to_terminal() {
                 println!("You have exited the chat.");
@@ -249,8 +286,14 @@ async fn start_interactive_chat(
             break;
         }
 
-        let result =
-            send_and_display_response(&mut chat_service, trimmed_input, &model, &persona).await;
+        let result = send_and_display_response(
+            &mut chat_service,
+            trimmed_input,
+            &model,
+            &persona,
+            knowledge,
+        )
+        .await;
         match result {
             Ok(_) => continue,
             Err(err) => {
@@ -321,10 +364,11 @@ fn is_output_to_terminal() -> bool {
 }
 
 async fn send_and_display_response(
-    chat_service: &mut ChatService,
+    services: &mut Services,
     user_input: &str,
     model: &str,
     persona: &Persona,
+    knowledge: bool,
 ) -> Result<(), Box<dyn Error>> {
     let is_terminal = is_output_to_terminal();
     let spinner = if is_terminal {
@@ -332,7 +376,17 @@ async fn send_and_display_response(
     } else {
         None
     };
-    let result = chat_service.send_message(user_input.trim(), false).await;
+    if knowledge {
+        let knowledge = services
+            .knowledge_store
+            .query_knowledge(user_input.to_string())
+            .await?;
+        services.chat_service.add_knowledge(knowledge).await?;
+    }
+    let result = services
+        .chat_service
+        .send_message(user_input.trim(), false)
+        .await;
     let response = match result {
         Ok(response) => response,
         Err(err) => {
@@ -357,7 +411,7 @@ async fn send_and_display_response(
 
     // Print statistics only if output is to terminal
     if is_terminal {
-        chat_service.print_statistics();
+        services.chat_service.print_statistics();
     }
 
     Ok(())

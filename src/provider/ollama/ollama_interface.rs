@@ -79,6 +79,9 @@ impl OllamaInterface {
                 MessageRole::System => {
                     chat_messages.push(ChatMessage::system(msg.content.clone()));
                 }
+                MessageRole::Knowledge => {
+                    chat_messages.push(ChatMessage::system(msg.content.clone()));
+                }
             }
         }
         chat_messages

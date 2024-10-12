@@ -80,7 +80,10 @@ pub enum MessageInfo {
         completion_token: u32,
         timestamp: DateTime<Utc>,
     },
-    // Add additional variants as needed
+    KnowledgeInfo {
+        origin: String,
+        distance: f32,
+    }, // Add additional variants as needed
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -107,6 +110,7 @@ pub enum MessageRole {
     User,
     Assistant,
     Context,
+    Knowledge,
 }
 
 #[async_trait]
@@ -116,6 +120,7 @@ pub trait ChatBackend {
         messages: &[Message],
         use_tools: bool,
     ) -> Result<Message, Box<dyn Error>>;
+
     fn print_statistics(&self);
 }
 

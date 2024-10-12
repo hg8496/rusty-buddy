@@ -1,45 +1,13 @@
 use crate::cli::knowledge::knowledge_args::SearchArgs;
-use crate::config;
-use crate::config::{get_knowledge_dir, Config};
-use crate::knowledge::EmbeddingServiceBuilder;
-use serde::{Deserialize, Serialize};
+use crate::knowledge::{KnowledgeResult, StoreBuilder};
 use std::error::Error;
-use surrealdb::engine::local::RocksDb;
-use surrealdb::Surreal;
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Search {
-    distance: f32,
-    file_name: String,
-}
-
-fn get_config() -> Config {
-    let config = config::CONFIG.lock().unwrap();
-    config.clone()
-}
 
 pub async fn search(args: SearchArgs) -> Result<(), Box<dyn Error>> {
-    let config = get_config();
-    let db = Surreal::new::<RocksDb>(get_knowledge_dir()?.to_str().unwrap()).await?;
-    db.use_ns("knowledge").use_db("knowledge_db").await?;
-    let model_name = config.ai.embedding_model.clone();
-    let client = EmbeddingServiceBuilder::new()
-        .model_name(model_name.into())
-        .build()?;
-    let embedding = client.inner.get_embedding(args.search).await?;
-    db.query(format!(
-        "DEFINE INDEX hnsw_pts ON context_embeddings FIELDS embedding HNSW DIMENSION {};",
-        client.inner.embedding_len()
-    ))
-    .await?;
-    // Assuming response.data holds embedding data
-    let mut groups = db
-        .query("SELECT file_name, vector::similarity::cosine(embedding, $embedding) AS distance FROM context_embeddings WHERE embedding <|10,40|> $embedding ORDER BY distance;")
-        .bind(("embedding", embedding))
-        .await?;
-    let files: Vec<Search> = groups.take(0)?;
-    for file in files {
-        println!("{} {}", file.file_name, file.distance);
+    let db = StoreBuilder::new().build().await?;
+    // Assuming response.d sata holds embedding data
+    let knowledge: Vec<KnowledgeResult> = db.query_knowledge(args.search).await?;
+    for piece in knowledge {
+        println!("{} {}", piece.data_source, piece.distance);
     }
     Ok(())
 }

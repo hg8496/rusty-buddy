@@ -47,7 +47,7 @@ rusty-buddy --list-personas
 
 ### Description
 
-Engage in conversation with an AI assistant to brainstorm ideas, solve problems, or get assistance with development tasks. The chat interface supports context-aware interactions, utilizing personas and integrating directory context.
+Engage in conversation with an AI assistant to brainstorm ideas, solve problems, or get assistance with development tasks. The chat interface supports context-aware interactions, utilizing personas and integrating directory context. Additionally, it can query a knowledge database to augment interactions with relevant information specific to the user input.
 
 ### Usage
 
@@ -59,90 +59,50 @@ rusty-buddy chat [OPTIONS]
 
 #### Start a New Chat Session
 
-  Begin a fresh session with the AI.
+Start a new chat session from scratch.
 
 ```bash
 rusty-buddy chat --new
 ```
 
-Option: `-n`, `--new`
-
 #### Continue the Last Chat Session
 
-Resume your most recent chat session.
+Continue the previous chat session.
 
 ```bash
 rusty-buddy chat --continue-last
 ```
 
-Option: `-c`, `--continue-last`
-
 #### Load a Specific Chat Session by Name
 
-Load a previously saved session.
+Load a previously saved session by name.
 
 ```bash
-rusty-buddy chat --load session_name
+rusty-buddy chat --load <SESSION_NAME>
 ```
 
-Option: `-l`, `--load <SESSION_NAME>`
+#### Fetch and Use Knowledge Before You Chat (`--knowledge`)
 
-#### Specify a Directories for Chat Context
-
-Enhance the session with context from a specific directory. Only relevant files are added based on the persona's capabilities.
-Can be added multiple times. The respective .gitignore files will be honored.
+When the `--knowledge` flag is used, the command will use the latest user input to generate embeddings and search the knowledge store for relevant documents. The relevant documents are added to the chat context before the assistant responds.
 
 ```bash
-rusty-buddy chat --directory ./src --directory ./docs
+rusty-buddy chat --knowledge
 ```
 
-Option: `-d`, `--directory <DIRECTORY>`
+**Tip:** You can combine the knowledge search with any other chat options, such as adding directory contexts or specifying a persona (e.g., Rust programming persona).
 
-#### Use a Specific Persona
+**With Other Context:**
+```bash
+rusty-buddy chat --persona rust --directory ./src --knowledge
+```
 
-Customize the assistant's personality based on your needs. Use `rusty-buddy --list-personas` to see available personas.
+#### Fetch Knowledge Once in a One-Shot Chat
+
+You can also fetch knowledge before running a one-shot query to the AI.
 
 ```bash
-rusty-buddy chat --persona rust
+rusty-buddy chat --one-shot "Need help optimizing memory management" --knowledge
 ```
-
-Option: `-p`, `--persona <PERSONA_NAME>`
-
-#### One-shot Chat Interaction
-
-Send a one-time message and receive an immediate response. Useful for quick questions or commands.
-
-```bash
-rusty-buddy chat --one-shot "Hello, assistant!"
-```
-
-Option: `-o`, `--one-shot [<MESSAGE>]`
-
-**With Piped Input:**
-
-```bash
-echo "What does the program do?" | rusty-buddy chat --one-shot
-```
-
-#### Specify AI Model
-
-Choose a specific AI model for the chat session.
-
-```bash
-rusty-buddy chat --model openai_fast
-```
-
-Option: `-m`, `--model <MODEL>`
-
-#### Silence Output of Previous Messages
-
-When loading a session, suppress the output of previous messages.
-
-```bash
-rusty-buddy chat --continue-last --silence
-```
-
-Option: `-s`, `--silence`
 
 ### Slash Commands in Chat
 

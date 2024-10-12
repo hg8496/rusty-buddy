@@ -213,6 +213,13 @@ impl OpenAIInterface {
                         .unwrap()
                         .into()
                 }
+                MessageRole::Knowledge if use_assistant_for_system_messages => {
+                    ChatCompletionRequestAssistantMessageArgs::default()
+                        .content(msg.content.as_str())
+                        .build()
+                        .unwrap()
+                        .into()
+                }
                 MessageRole::Context if use_assistant_for_system_messages => {
                     ChatCompletionRequestAssistantMessageArgs::default()
                         .content(msg.content.as_str())
@@ -226,6 +233,11 @@ impl OpenAIInterface {
                     .unwrap()
                     .into(),
                 MessageRole::Context => ChatCompletionRequestSystemMessageArgs::default()
+                    .content(msg.content.as_str())
+                    .build()
+                    .unwrap()
+                    .into(),
+                MessageRole::Knowledge => ChatCompletionRequestSystemMessageArgs::default()
                     .content(msg.content.as_str())
                     .build()
                     .unwrap()

@@ -148,6 +148,27 @@ git add .
 rusty-buddy commit-message
 ```
 
+## Using Knowledge Augmentation in Chat
+
+Rusty Buddy includes a powerful feature that allows you to add relevant knowledge to your chat context using the `--knowledge` flag.
+
+When you use the `--knowledge` flag, the Rusty Buddy tool takes your latest user input and searches its knowledge base for any related documents or information that might help you before the assistant provides a response. This is especially useful for highly specialized topics or when dealing with project-specific queries that might require additional documentation.
+
+### Example:
+
+If you're working on a Rust-based project and need documentation about memory safety, you can generate knowledge and chat using:
+
+```bash
+rusty-buddy chat --persona rust --knowledge
+```
+
+This command will:
+1. Use the Rust persona for targeted assistance.
+2. Leverage the `knowledge` feature to search for relevant information based on your latest input.
+3. Provide a more contextually aware response.
+
+Similarly, you can use it in combination with other flags, such as `--directory` or `--model` to refine the chat experience further.
+
 ## Additional Resources
 
 - **Installation Guide:** Refer to the [Installation](installation.md) section for detailed instructions on installing Rusty Buddy and any additional steps required for Ollama.
