@@ -57,31 +57,31 @@ Perform initial configurations, such as setting up API keys and default settings
 
 1. **Choose Your AI Backend**
 
-   :::plaintext
-   Choose backend to use (1 for OpenAI, 2 for Ollama): [User enters 1 or 2]
+        :::plaintext
+        Choose backend to use (1 for OpenAI, 2 for Ollama): [User enters 1 or 2]
 
 2. **Enter API Keys or URLs**
 
-  - **OpenAI:**
+    - **OpenAI:**
 
-    :::plaintext
-    You chose OpenAI.
-    Please enter your OpenAI API key: [User enters key]
+            :::plaintext
+            You chose OpenAI.
+            Please enter your OpenAI API key: [User enters key]
 
-  - **Ollama:**
+    - **Ollama:**
 
-    :::plaintext
-    You chose Ollama.
-    Please enter the Ollama API URL (default: http://localhost:11434): [User enters URL or presses Enter]
-    Please enter the Ollama model (default: llama3.2): [User enters model name or presses Enter]
+            :::plaintext
+            You chose Ollama.
+            Please enter the Ollama API URL (default: http://localhost:11434): [User enters URL or presses Enter]
+            Please enter the Ollama model (default: llama3.2): [User enters model name or presses Enter]
 
 3. **Project Analysis and Persona Recommendation**
 
-   Rusty Buddy analyzes your project and recommends a suitable persona.
+    Rusty Buddy analyzes your project and recommends a suitable persona.
 
-   :::plaintext
-   Analyzing project directory...
-   Recommended persona: [Persona]
+        :::plaintext
+        Analyzing project directory...
+        Recommended persona: [Persona]
 
 4. **Configuration Files Creation**
 
@@ -133,8 +133,6 @@ Add content from a single file or URL:
 
     :::bash
     rusty-buddy knowledge add --file <path_to_file>
-
-    :::bash
     rusty-buddy knowledge add --url <web_url>
 
 - **`--file <path_to_file>`**: Add a single file to the database.
@@ -144,24 +142,24 @@ Add content from a single file or URL:
 
 1. **Initialize with a Specific Persona**:
 
-   :::bash
-   rusty-buddy knowledge init --persona rust
+        :::bash
+        rusty-buddy knowledge init --persona rust
 
-   Initializes entries tailored to Rust programming expertise.
+    Initializes entries tailored to Rust programming expertise.
 
 2. **Perform a Knowledge Search**:
 
-   :::bash
-   rusty-buddy knowledge search "memory management"
+        :::bash
+        rusty-buddy knowledge search "memory management"
 
-   Searches for entries related to memory management to aid chat sessions.
+     Searches for entries related to memory management to aid chat sessions.
 
 3. **Add a Directory to the Knowledge Database**:
 
-   :::bash
-   rusty-buddy knowledge add --dir ./docs/articles
+        :::bash
+        rusty-buddy knowledge add --dir ./docs/articles
 
-   Adds all files from the `./docs/articles` directory for future use.
+     Adds all files from the `./docs/articles` directory for future use.
 
 ---
 

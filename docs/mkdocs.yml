@@ -4,11 +4,37 @@ site_description: A comprehensive guide to Rusty Buddy, an AI-powered command-li
 
 # Define the theme for the documentation
 theme:
-  name: readthedocs
+  name: material
+  palette:
+    - media: "(prefers-color-scheme)"
+      primary: brown
+      accent: deep orange
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      primary: brown
+      accent: deep orange
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      primary: brown
+      accent: deep orange
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
 
 # Enable plugins, if needed
 plugins:
   - search  # Enables full-text search within the documentation
+  - social
   # Add more plugins if required
 
 # Navigation structure for the documentation
