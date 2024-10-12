@@ -2,6 +2,7 @@
 //! It allows users to store, retrieve, and delete knowledge entries that enhance the interactivity
 //! of whether it's for wishes or chats.                                                           
 
+mod add;
 mod init;
 mod knowledge_args;
 mod run;
