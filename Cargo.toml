@@ -35,3 +35,4 @@ chrono = { version = "0.4", features = ["serde"]}
 chrono-tz = "0.10"
 surrealdb = { version = "2.0", features = ["kv-rocksdb"] }
 async-channel = "2.3"
+fern = "0.6"

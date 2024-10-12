@@ -4,6 +4,7 @@ use crate::knowledge::{
     KnowledgeStore, Record,
 };
 use async_trait::async_trait;
+use log::{info, warn};
 use std::borrow::Cow;
 use std::error::Error;
 use surrealdb::engine::local::{Db, RocksDb};
@@ -63,24 +64,44 @@ impl KnowledgeStore for KnowledgeStoreImpl {
             .inner
             .get_embedding(user_input)
             .await?;
-
+        info!("Searching for knowledge for embedding");
         // Query the knowledge base for the closest embeddings (most relevant documents)
-        let mut results = self.db
+        let mut results = match self.db
             .query("SELECT data_source, content, metadata, vector::similarity::cosine(embedding, $embedding) AS distance FROM context_embeddings WHERE embedding <|10,40|> $embedding ORDER BY distance;")
             .bind(("embedding", embedding))
-            .await?;
-
+            .await {
+            Ok(results) => {
+                info!("Successfully searched knowledge for embedding");
+                results
+            },
+            Err(e) => {
+                warn!("Failed to search for knowledge for embedding: {}", e);
+                return Err(Box::new(e));
+            }
+        };
         // Collect file names and create relevant knowledge messages for each document found
-        let files: Vec<KnowledgeResult> = results.take(0)?; // Assuming each result is a document file_name
+        let files: Vec<KnowledgeResult> = results.take(0)?;
 
         Ok(files)
     }
 
     async fn store_knowledge(&self, knowledge: EmbeddingData) -> Result<(), Box<dyn Error>> {
-        self.db
+        let data_source = knowledge.data_source.to_string();
+        info!("Storing knowledge for: {}", data_source);
+
+        match self
+            .db
             .upsert::<Option<Record>>(("context_embeddings", knowledge.data_source.to_string()))
             .content(knowledge)
-            .await?;
+            .await
+        {
+            Ok(_) => info!("Knowledge successfully stored!"),
+            Err(err) => {
+                warn!("Failed to store knowledge for {}: {}", data_source, err);
+                return Err(err.into());
+            }
+        };
+
         Ok(())
     }
 

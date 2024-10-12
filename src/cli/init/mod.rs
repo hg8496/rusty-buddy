@@ -210,6 +210,8 @@ fn write_config(
     let config_content = format!(
         r#"
 default_persona = "{}"
+console_log_level = "Warn"                                                                     
+file_log_level = "Info"                                                                        
 
 [ai]
 chat_model = "{}"

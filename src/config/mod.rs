@@ -89,6 +89,12 @@ pub fn get_knowledge_dir() -> Result<PathBuf, String> {
     Ok(config_dir.join("knowledge"))
 }
 
+pub fn get_log_file() -> Result<PathBuf, String> {
+    let config_file = get_config_file()?;
+    let config_dir = config_file.parent().expect("Expected a parent directory");
+    Ok(config_dir.join("rusty.log"))
+}
+
 pub fn get_config_file() -> Result<PathBuf, String> {
     get_config_file_from_dir(
         env::current_dir().map_err(|e| format!("Failed to get the current directory: {}", e))?,

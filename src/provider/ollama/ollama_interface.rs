@@ -38,9 +38,10 @@ use crate::chat::interface::{ChatBackend, Message, MessageInfo, MessageRole};
 use crate::knowledge::EmbeddingService;
 use async_trait::async_trait;
 use chrono::Utc;
+use log::{debug, error, info, warn}; // Ensure to import appropriate logging macros
 use ollama_rs::generation::embeddings::request::{EmbeddingsInput, GenerateEmbeddingsRequest};
 use ollama_rs::{
-    generation::chat::{request::ChatMessageRequest, ChatMessage, ChatMessageResponse},
+    generation::chat::{request::ChatMessageRequest, ChatMessage},
     IntoUrlSealed, Ollama,
 };
 use std::borrow::Cow;
@@ -57,36 +58,25 @@ pub struct OllamaInterface {
 impl OllamaInterface {
     pub fn new(model: String, ourl: Option<String>) -> Self {
         let url = ourl.unwrap_or("http://localhost:11434".into());
-        OllamaInterface {
-            ollama: Ollama::from_url(url.clone().into_url().unwrap()),
-            model,
-        }
+        let ollama = Ollama::from_url(url.clone().into_url().unwrap());
+        info!(
+            "Creating Ollama interface with model: {} and URL: {}",
+            model, url
+        );
+        OllamaInterface { ollama, model }
     }
 
     fn convert_messages(messages: &[Message]) -> Vec<ChatMessage> {
-        let mut chat_messages: Vec<ChatMessage> = Vec::new();
-
-        // Convert Message into ChatMessage for ollama
-        for msg in messages {
-            match msg.role {
-                MessageRole::User => {
-                    chat_messages.push(ChatMessage::user(msg.content.clone()));
+        messages
+            .iter()
+            .map(|msg| match msg.role {
+                MessageRole::User => ChatMessage::user(msg.content.clone()),
+                MessageRole::Assistant => ChatMessage::assistant(msg.content.clone()),
+                MessageRole::Context | MessageRole::System | MessageRole::Knowledge => {
+                    ChatMessage::system(msg.content.clone())
                 }
-                MessageRole::Assistant => {
-                    chat_messages.push(ChatMessage::assistant(msg.content.clone()));
-                }
-                MessageRole::Context => {
-                    chat_messages.push(ChatMessage::system(msg.content.clone()));
-                }
-                MessageRole::System => {
-                    chat_messages.push(ChatMessage::system(msg.content.clone()));
-                }
-                MessageRole::Knowledge => {
-                    chat_messages.push(ChatMessage::system(msg.content.clone()));
-                }
-            }
-        }
-        chat_messages
+            })
+            .collect()
     }
 }
 
@@ -97,45 +87,72 @@ impl ChatBackend for OllamaInterface {
         messages: &[Message],
         _use_tools: bool,
     ) -> Result<Message, Box<dyn Error>> {
+        info!("Sending request to Ollama with {} messages", messages.len());
         let chat_messages = Self::convert_messages(messages);
+        debug!("Converted messages for Ollama: {:?}", chat_messages);
 
-        let request = ChatMessageRequest::new(self.model.clone(), chat_messages.clone());
-        let responseo: ChatMessageResponse = self.ollama.send_chat_messages(request).await?;
+        let request = ChatMessageRequest::new(self.model.clone(), chat_messages);
+        info!(
+            "Sending chat message request to Ollama for model: {}",
+            self.model
+        );
 
-        let mut content = String::new();
-
-        if let Some(assistant_message) = responseo.message {
-            content += &assistant_message.content;
+        match self.ollama.send_chat_messages(request).await {
+            Ok(response) => {
+                info!("Received response from Ollama");
+                if let Some(assistant_message) = response.message {
+                    debug!("Got assistant message: {}", assistant_message.content);
+                    let content_len = assistant_message.content.len();
+                    Ok(Message {
+                        role: MessageRole::Assistant,
+                        content: assistant_message.content,
+                        info: Some(MessageInfo::AssistantInfo {
+                            model: self.model.clone(),
+                            persona_name: String::new(),
+                            prompt_token: 0,
+                            completion_token: content_len as u32,
+                            timestamp: Utc::now(),
+                        }),
+                    })
+                } else {
+                    warn!("No message received from Ollama response");
+                    Err("No message found in Ollama response.".into())
+                }
+            }
+            Err(e) => {
+                error!("Failed to get response from Ollama: {}", e);
+                Err(e.into())
+            }
         }
-        let content_len = content.len();
-        Ok(Message {
-            role: MessageRole::Assistant,
-            content,
-            info: Some(MessageInfo::AssistantInfo {
-                model: self.model.clone(),
-                persona_name: String::new(),
-                prompt_token: 0,
-                completion_token: content_len.try_into().unwrap(),
-                timestamp: Utc::now(),
-            }),
-        })
     }
 
     fn print_statistics(&self) {
-        // Implement statistics if required
-        println!("Using Ollama model: {}", self.model);
+        debug!("Using Ollama model: {}", self.model);
     }
 }
 
 #[async_trait]
 impl EmbeddingService for OllamaInterface {
     async fn get_embedding(&self, content: Cow<'_, str>) -> Result<Box<Vec<f32>>, Box<dyn Error>> {
+        info!(
+            "Generating embedding for content of length {}",
+            content.len()
+        );
         let request = GenerateEmbeddingsRequest::new(
             self.model.clone(),
             EmbeddingsInput::from(content.into_owned()),
         );
-        let result = self.ollama.generate_embeddings(request).await?;
-        Ok(Box::new(result.embeddings[0].clone()))
+
+        match self.ollama.generate_embeddings(request).await {
+            Ok(result) => {
+                info!("Successfully generated embeddings");
+                Ok(Box::new(result.embeddings[0].clone()))
+            }
+            Err(e) => {
+                error!("Error generating embeddings: {}", e);
+                Err(e.into())
+            }
+        }
     }
 
     fn embedding_len(&self) -> usize {

@@ -78,8 +78,19 @@ pub struct Config {
     pub personas: Vec<Persona>,
     #[serde(default = "default_models")]
     pub models: Option<Vec<Model>>,
+    #[serde(default = "default_console_log_level")]
+    pub console_log_level: String,
+    #[serde(default = "default_file_log_level")]
+    pub file_log_level: String,
 }
 
+fn default_console_log_level() -> String {
+    "Warn".to_string()
+}
+
+fn default_file_log_level() -> String {
+    "Info".to_string()
+}
 #[derive(Debug, Deserialize, Clone)]
 pub struct AI {
     #[serde(default = "chat_model")]
@@ -193,6 +204,8 @@ impl Default for Config {
             },
             personas: vec![],
             models: None,
+            console_log_level: default_console_log_level(),
+            file_log_level: default_file_log_level(),
         }
     }
 }

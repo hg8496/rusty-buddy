@@ -71,6 +71,7 @@ use crate::chat::service_builder::ChatServiceBuilder;
 use crate::context::{load_files_into_context, ContextConsumer};
 use crate::knowledge::{DataSource, KnowledgeResult};
 use chrono::Utc;
+use log::{info, warn};
 use std::error::Error;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -182,9 +183,11 @@ impl ChatService {
         for k in knowledge {
             let message = match k.data_source {
                 DataSource::Context(ref filename) => {
+                    info!("Adding knowledge to session from file: {}", filename); // Log the added file
                     let file_path = Path::new(filename);
                     let text = fs::read_to_string(file_path).map_err(|e| {
-                        format!("Failed to read file '{}': {}", file_path.display(), e)
+                        warn!("Failed to read file '{}': {}", file_path.display(), e); // Log failures
+                        ""
                     })?;
                     Message {
                         role: MessageRole::Knowledge,
@@ -196,6 +199,7 @@ impl ChatService {
                     }
                 }
                 DataSource::Internet(ref content) | DataSource::LocalFiles(ref content) => {
+                    info!("Adding knowledge from external source: {}", content);
                     Message {
                         role: MessageRole::Knowledge,
                         content: k.content.unwrap(),
@@ -208,9 +212,9 @@ impl ChatService {
             };
             self.messages.push(message);
         }
+
         Ok(())
     }
-
     // Sends a user message to the backend, potentially using tools, and captures the response
     pub async fn send_message(
         &mut self,

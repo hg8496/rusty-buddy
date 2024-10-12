@@ -42,15 +42,14 @@ use crate::cli::init::run_init_command;
 use crate::config::get_config_file;
 use clap::{Command, CommandFactory, Parser};
 use clap_complete::{generate, Generator};
-use log::info;
+use fern::{log_file, Dispatch};
+use log::{error, info, LevelFilter};
 use std::io;
 
 #[tokio::main]
 async fn main() {
     // Initialize the logger
-    env_logger::init();
-    // Example info log
-    info!("Application started");
+    info!("Rusty Buddy started");
     let cli = args::Cli::parse();
     // Make the completion call the first as it needs no config or environment
     if let Some(completion) = cli.completion {
@@ -61,8 +60,11 @@ async fn main() {
         run_init_command().await.unwrap();
     }
     if !check_environment() {
-        eprintln!("No configuration file found.");
+        error!("No configuration file found.");
         std::process::exit(1);
+    }
+    if let Err(e) = setup_logging() {
+        eprintln!("Failed to initialize logger: {}", e);
     }
     if cli.list_personas {
         persona::print_all_personas();
@@ -91,7 +93,7 @@ async fn main() {
             }
         }
     } else {
-        println!("No valid command given. Use `rusty-buddy help` for more information.");
+        error!("No valid command given. Use `rusty-buddy help` for more information.");
     }
 }
 
@@ -101,4 +103,44 @@ fn check_environment() -> bool {
 
 fn print_completions<G: Generator>(gen: G, cmd: &mut Command) {
     generate(gen, cmd, cmd.get_name().to_string(), &mut io::stdout());
+}
+
+pub fn setup_logging() -> Result<(), Box<dyn std::error::Error>> {
+    let config = config::CONFIG.lock().unwrap();
+
+    let console_level = config.console_log_level.parse::<LevelFilter>()?;
+    let file_level = config.file_log_level.parse::<LevelFilter>()?;
+
+    let log_file_path = config::get_log_file()?;
+
+    let file_dispatch = Dispatch::new()
+        .format(|out, message, record| {
+            out.finish(format_args!(
+                "[{}][{}] {}",
+                chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
+                record.level(),
+                message
+            ))
+        })
+        .level(file_level)
+        .chain(log_file(log_file_path)?);
+
+    let console_dispatch = Dispatch::new()
+        .format(|out, message, record| {
+            out.finish(format_args!(
+                "[{}][{}] {}",
+                chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
+                record.level(),
+                message
+            ))
+        })
+        .level(console_level)
+        .chain(std::io::stderr());
+
+    Dispatch::new()
+        .chain(file_dispatch)
+        .chain(console_dispatch)
+        .apply()?;
+
+    Ok(())
 }

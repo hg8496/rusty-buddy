@@ -72,7 +72,7 @@ use async_openai::Client;
 use async_trait::async_trait;
 use chrono::Utc;
 use dotenvy::dotenv;
-use log::{debug, info};
+use log::{debug, error, info, trace, warn};
 use serde_json::Value;
 use std::borrow::Cow;
 use std::env;
@@ -103,22 +103,33 @@ impl ChatBackend for OpenAIInterface {
         messages: &[Message],
         use_tools: bool,
     ) -> Result<Message, Box<dyn Error>> {
-        let oai_messages = self.convert_to_chat_completion_messages(messages);
-        let request = self.create_openai_request(&oai_messages, use_tools)?;
-
-        // Use the timeout_duration from the struct
-        info!(
-            "Sending request to OpenAI with timeout of {:?}.",
-            self.timeout_duration
+        trace!(
+            "Preparing to send a request to OpenAI with messages: {:?}",
+            messages
         );
+
+        let oai_messages = self.convert_to_chat_completion_messages(messages);
+        trace!("Converted messages: {:?}", oai_messages);
+
+        let request = self.create_openai_request(&oai_messages, use_tools)?;
+        info!(
+            "Sending request to OpenAI with model '{}' and timeout {:?}.",
+            self.model, self.timeout_duration
+        );
+
         let result = timeout(self.timeout_duration, self.client.chat().create(request)).await;
 
         let chat_completion = match result {
-            Ok(Ok(chat_completion)) => chat_completion,
+            Ok(Ok(chat_completion)) => {
+                info!("Received a successful response from OpenAI.");
+                chat_completion
+            }
             Ok(Err(e)) => {
+                error!("Error while sending request to OpenAI: {:#?}", e);
                 return Err(e.into());
             }
             Err(e) => {
+                error!("Timeout error while waiting for OpenAI response: {:#?}", e);
                 return Err(e.into());
             }
         };
@@ -165,18 +176,31 @@ impl ChatBackend for OpenAIInterface {
 }
 
 #[async_trait]
-#[async_trait]
 impl EmbeddingService for OpenAIInterface {
     async fn get_embedding(&self, content: Cow<'_, str>) -> Result<Box<Vec<f32>>, Box<dyn Error>> {
-        // Truncate content to fit within 32,000 bytes
+        info!("Generating embedding for content.");
         let truncated_content = truncate_to_max_bytes(&content, 32_000);
         let embedding_request = CreateEmbeddingRequestArgs::default()
             .model(self.model.clone())
             .input(truncated_content)
             .build()
             .unwrap();
-        let embedding_response = self.client.embeddings().create(embedding_request).await?;
-        // Assuming response.data holds embedding data
+
+        info!(
+            "Sending embedding request to OpenAI: {:?}",
+            embedding_request.model
+        );
+        let embedding_response = match self.client.embeddings().create(embedding_request).await {
+            Ok(embedding_response) => {
+                info!("Embedding created successfully.");
+                embedding_response
+            }
+            Err(e) => {
+                error!("Error creating embedding: {}", e);
+                return Err(e.into());
+            }
+        };
+
         Ok(Box::new(embedding_response.data[0].embedding.clone()))
     }
 
@@ -184,10 +208,12 @@ impl EmbeddingService for OpenAIInterface {
         3072
     }
 }
+
 fn truncate_to_max_bytes(s: &str, max_bytes: usize) -> &str {
     if s.len() <= max_bytes {
         s
     } else {
+        warn!("Truncating to {} bytes.", max_bytes);
         let mut end = max_bytes;
         while !s.is_char_boundary(end) {
             end -= 1;
@@ -275,6 +301,7 @@ impl OpenAIInterface {
         self.last_call_prompt_token = usage.prompt_tokens;
         self.overall_completion_token += self.last_call_completion_token;
         self.overall_prompt_token += self.last_call_prompt_token;
+        info!("Updated token statistics: Last call completion tokens: {}, Last call prompt tokens: {}", self.last_call_completion_token, self.last_call_prompt_token);
     }
 
     fn create_openai_client() -> Result<Client<OpenAIConfig>, Box<dyn Error>> {
@@ -301,6 +328,7 @@ impl OpenAIInterface {
                 .tool_choice(ChatCompletionToolChoiceOption::Required)
                 .parallel_tool_calls(true);
         }
+        debug!("Created request for OpenAI with tools: {}", use_tools);
         Ok(builder.build()?)
     }
 
