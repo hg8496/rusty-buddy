@@ -10,10 +10,20 @@ Rusty Buddy brings state-of-the-art machine learning directly to your terminal.
 
 ---
 
-## 🚀 What's New in Version 1.0.0
+## 🚀 What's New in Version 1.1.0
 
-- **Ollama Support** 🆕  
-  For maximum privacy, Rusty Buddy now supports the **Ollama AI backend**, allowing you to run AI models locally without sending data over the internet.
+### Knowledge Management System 💡
+- **Structured Knowledge Integration**: Introducing a comprehensive knowledge management system that lets you effortlessly add, search, and use knowledge entries. This enhances Rusty Buddy's ability to interact with your project context, offering tailored suggestions and insights.
+- **Enhanced Contextual Assistance**: Utilize the `--knowledge` flag in chats to access a knowledge database, enriching AI's responses with precise, context-aware information for your tasks.
+
+### New CLI Commands and Enhancements 🤖
+- **Copy Commands**: Streamline your coding process with `/copy-last-message` and `/copy-files`, making it easier to access past messages or code snippets directly.
+- **Extended Command Flexibility**: Now supporting multiple directory specifications and a direct message input option to improve command usability.
+
+### Improved Documentation 📚
+- A modern update with mkdocs-material, enhancing command readability and including additional examples to help you use the new knowledge features effectively.
+
+Explore these features and improve your development workflow with Rusty Buddy v1.1.0, bringing a smarter, more intuitive assistance to your projects.
 
 ---
 
