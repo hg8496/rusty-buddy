@@ -104,13 +104,13 @@ You can also fetch knowledge before running a one-shot query to the AI.
 rusty-buddy chat --one-shot "Need help optimizing memory management" --knowledge
 ```
 
-### Slash Commands in Chat
+## Slash Commands in Chat
 
-Within a chat session, enhance your experience with the following slash commands:
+Within a chat session, you can enhance your experience with the following slash commands:
 
 #### Renew Context
 
-Refresh the chat context, clearing previous interactions and reloading specified directory files.
+Refresh the current chat context to reload any previous interactions or settings:
 
 ```
 /renew
@@ -120,14 +120,13 @@ Refresh the chat context, clearing previous interactions and reloading specified
 
 Save code blocks from the assistant's last message to files.
 
+- **Standard Mode:** The users will be prompted for each block.
+
 ```
 /save-files
 ```
 
-Options:
-
-- **Interactive Mode:** You'll be prompted for each code block.
-- **Greedy Mode:** Quickly save all code blocks without prompts.
+- **Greedy Mode:** Quickly save all code blocks without user prompts.
 
 ```
 /save-files greedy
@@ -145,7 +144,41 @@ Type the slash command within the chat interface. Use `exit` to end the session,
 
 ---
 
-By using these updated options, you can maximize the efficiency and effectiveness of Rusty Buddy's chat functionality. Whether for quick responses or engaging full sessions with varied contexts, these enhancements enable comprehensive interaction with the AI capabilities.
+#### Copy Last Message
+
+Copy the last message from the assistant to your clipboard. This command is useful for quickly storing a response that you may want to refer back to or use in another application.
+
+```
+/copy-last-message
+```
+
+**Key Points:**
+- Copies the last assistant message directly to the clipboard using platform-specific clipboard access.
+- Useful for efficiently using snippets from the conversation in other contexts or applications.
+
+#### Copy Files
+
+Extract and copy code blocks from the last assistant message to the clipboard.
+
+- **Standard Mode:** Iterate over each code block, presenting the user with an option to copy.
+
+```
+/copy-files
+```
+
+- **Greedy Mode:** Automatically copies all detected code blocks in the assistant message without prompt.
+
+```
+/copy-files greedy
+```
+
+**Key Points:**
+- Designed to streamline the process of acquiring code snippets from chat sessions.
+- Can dramatically speed up the workflow when working on multiple projects or tasks that involve frequent context-switching.
+
+---
+
+Using these new commands, you can create a more efficient interaction loop, allowing Rusty Buddy to assist you with actionable insights and facilitating easy integration into your current workflow. By harnessing these capabilities, you greatly enhance the utility of the chat sessions, accessing and reusing information more effectively.
 
 ---
 

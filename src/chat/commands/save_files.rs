@@ -89,7 +89,6 @@ fn save_block(block_content: &str) -> Result<(), Box<dyn Error>> {
 
 fn prompt_and_save_block(index: usize, block_content: &str) -> Result<(), Box<dyn Error>> {
     println!("Found code block #{}:", index + 1);
-    println!("{}", block_content);
 
     if get_user_input("Do you want to save this code block? (y/n): ")?
         .trim()

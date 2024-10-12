@@ -31,10 +31,14 @@
 
 use crate::chat::command::RegisterableCommand;
 use crate::chat::command_registry::CommandRegistry;
+use crate::chat::commands::copy_files::CopyFilesCommand;
+use crate::chat::commands::copy_last_answer::CopyLastMessageCommand;
 use crate::chat::commands::refresh::RenewCommand;
 use crate::chat::commands::save_files::SaveFilesCommand;
 use crate::chat::commands::save_last_answer::SaveLastAnswerCommand;
 
+mod copy_files;
+mod copy_last_answer;
 mod refresh;
 mod save_files;
 mod save_last_answer;
@@ -44,4 +48,6 @@ pub fn initialize_commands(registry: &mut CommandRegistry) {
     RenewCommand::register_with_registry(registry);
     SaveFilesCommand::register_with_registry(registry);
     SaveLastAnswerCommand::register_with_registry(registry);
+    CopyFilesCommand::register_with_registry(registry);
+    CopyLastMessageCommand::register_with_registry(registry);
 }
