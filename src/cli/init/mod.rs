@@ -73,6 +73,7 @@ pub async fn run_init_command() -> Result<(), Box<dyn Error>> {
                 &recommended_persona,
                 "openai_complex",
                 "openai_fast",
+                "openai_embedding",
                 "http://localhost:11434",
                 "llama3.2",
             )?;
@@ -99,6 +100,7 @@ pub async fn run_init_command() -> Result<(), Box<dyn Error>> {
                 &recommended_persona,
                 "ollama_complex",
                 "ollama_complex",
+                "ollama_embedding",
                 ollama_url.as_str(),
                 model.as_str(),
             )?;
@@ -204,6 +206,7 @@ fn write_config(
     recommended_persona: &str,
     model_complex: &str,
     model_fast: &str,
+    model_embedding: &str,
     ollama_url: &str,
     ollama_model: &str,
 ) -> Result<(), Box<dyn Error>> {
@@ -217,6 +220,7 @@ file_log_level = "Info"
 chat_model = "{}"
 commit_model = "{}"
 wish_model = "{}"
+embedding_model = "{}"
 
 [[models]]
 name = "openai_fast"
@@ -229,12 +233,31 @@ api_name = "gpt-4o"
 backend = "OpenAI"
 
 [[models]]
+name = "openai_embedding"
+api_name = "text-embedding-3-large"
+backend = "OpenAI"
+
+[[models]]
 name = "ollama_complex"
 api_name = "{}"
 backend = "Ollama"
 url = "{}"
+
+[[models]]
+name = "ollama_embedding"
+api_name = "mxbai-embed-large"
+backend = "Ollama"
+url = "{}"
+
 "#,
-        recommended_persona, model_complex, model_fast, model_complex, ollama_model, ollama_url
+        recommended_persona,
+        model_complex,
+        model_fast,
+        model_complex,
+        model_embedding,
+        ollama_model,
+        ollama_url,
+        ollama_url
     );
 
     fs::create_dir_all(".rusty")?;
