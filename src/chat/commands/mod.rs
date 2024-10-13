@@ -39,6 +39,7 @@ use crate::chat::commands::save_last_answer::SaveLastAnswerCommand;
 
 mod copy_files;
 mod copy_last_answer;
+mod message_files;
 mod refresh;
 mod save_files;
 mod save_last_answer;
