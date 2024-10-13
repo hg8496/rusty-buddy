@@ -5,6 +5,8 @@ site_description: A comprehensive guide to Rusty Buddy, an AI-powered command-li
 # Define the theme for the documentation
 theme:
   name: material
+  logo: logo.png
+  favicon: logo.png
   palette:
     - media: "(prefers-color-scheme)"
       primary: brown
@@ -34,8 +36,9 @@ theme:
 # Enable plugins, if needed
 plugins:
   - search  # Enables full-text search within the documentation
-  - social
-  # Add more plugins if required
+  - social:
+      cards_layout_options:
+        font_family: "Source Code Pro"
 
 # Navigation structure for the documentation
 nav:
