@@ -60,7 +60,9 @@ async fn main() {
         run_init_command().await.unwrap();
     }
     if !check_environment() {
-        error!("No configuration file found.");
+        eprintln!(
+            "No configuration file found. Use --help for more information or try rusty-buddy init."
+        );
         std::process::exit(1);
     }
     if let Err(e) = setup_logging() {

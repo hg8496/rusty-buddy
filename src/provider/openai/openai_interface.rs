@@ -225,6 +225,11 @@ fn truncate_to_max_bytes(s: &str, max_bytes: usize) -> &str {
 impl OpenAIInterface {
     pub fn new(model: String, timeout_secs: u64) -> Self {
         dotenv().ok();
+        // Check if the OPENAI_KEY is set in the environment
+        if env::var("OPENAI_KEY").is_err() {
+            eprintln!("Error: The environment variable 'OPENAI_KEY' must be set.");
+            std::process::exit(1);
+        }
 
         OpenAIInterface {
             model,
