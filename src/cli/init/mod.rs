@@ -44,10 +44,11 @@ use crate::persona::{get_internal_persona_configs, Persona};
 use crate::provider::ollama::ollama_interface::OllamaInterface;
 use crate::provider::openai::openai_interface::OpenAIInterface;
 use dotenvy::dotenv;
+use ignore::WalkBuilder;
+use log::warn;
 use std::error::Error;
 use std::io::Write;
 use std::{env, fs};
-use walkdir::WalkDir;
 
 /// This function represents the entry point of the init command.
 /// It initializes the configuration based on user choice of AI backend (OpenAI or Ollama),
@@ -114,6 +115,19 @@ pub async fn run_init_command() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+fn truncate_to_max_bytes(s: &str, max_bytes: usize) -> &str {
+    if s.len() <= max_bytes {
+        s
+    } else {
+        warn!("Truncating to {} bytes.", max_bytes);
+        let mut end = max_bytes;
+        while !s.is_char_boundary(end) {
+            end -= 1;
+        }
+        &s[..end]
+    }
+}
+
 // Function to recommend a persona
 async fn recommend_persona(
     dir_listing: String,
@@ -128,10 +142,10 @@ async fn recommend_persona(
     };
 
     let mut chat_service = ChatService::new(backend, Box::new(storage), persona.clone(), None);
-
+    let trunced_dir_listing = truncate_to_max_bytes(&dir_listing, 500_000);
     let prompt = format!(
         "Analyze the following directory structure:\n{}\n\nChoose the most suitable persona from this list: {:?}. Just answer with one value from that list. No explanation needed.",
-        dir_listing, personas
+        trunced_dir_listing, personas
     );
 
     let response = chat_service
@@ -174,7 +188,10 @@ fn write_openai_key_to_env_file(openai_key: &str) -> Result<(), Box<dyn Error>> 
 
 // Function to list directory
 fn get_directory_listing(path: &str) -> String {
-    WalkDir::new(path)
+    let walker = WalkBuilder::new(path)
+        .standard_filters(true) // Apply standard .gitignore rules
+        .build();
+    walker
         .into_iter()
         .filter_map(Result::ok)
         .map(|entry| entry.path().display().to_string())
