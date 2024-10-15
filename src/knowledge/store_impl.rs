@@ -38,7 +38,7 @@ impl KnowledgeStoreImpl {
 
         // Ensure the knowledge database has an index for HNSW-based embeddings similarity search
         db.query(format!(
-            "DEFINE INDEX hnsw_pts ON context_embeddings FIELDS embedding HNSW DIMENSION {};",
+            "DEFINE INDEX idx_mtree_cosine ON context_embeddings FIELDS embedding MTREE DIMENSION {} DIST COSINE TYPE F32;",
             embedding_service.inner.embedding_len()
         ))
         .await?;
@@ -67,7 +67,7 @@ impl KnowledgeStore for KnowledgeStoreImpl {
         info!("Searching for knowledge for embedding");
         // Query the knowledge base for the closest embeddings (most relevant documents)
         let mut results = match self.db
-            .query("SELECT data_source, content, metadata, vector::similarity::cosine(embedding, $embedding) AS distance FROM context_embeddings WHERE embedding <|10,40|> $embedding ORDER BY distance;")
+            .query("SELECT data_source, content, metadata, vector::similarity::cosine(embedding, $embedding) AS distance FROM context_embeddings WHERE embedding <|10|> $embedding ORDER BY distance;")
             .bind(("embedding", embedding))
             .await {
             Ok(results) => {
