@@ -3,7 +3,7 @@ use crate::config;
 use crate::config::Config;
 use crate::context::{load_files_into_context, ContextConsumer};
 use crate::knowledge::DataSource::Context;
-use crate::knowledge::{EmbeddingData, KnowledgeStore, StoreBuilder};
+use crate::knowledge::{ConnectionMode, EmbeddingData, KnowledgeStore, StoreBuilder};
 use crate::persona::resolve_persona;
 use async_channel::{Receiver, Sender};
 use std::borrow::Cow;
@@ -28,7 +28,10 @@ fn get_config() -> Config {
 /// Entry point for initializing the knowledge system.
 pub async fn init(args: InitArgs) -> Result<(), Box<dyn Error>> {
     let config = get_config();
-    let db = StoreBuilder::new().build().await?;
+    let db = StoreBuilder::new()
+        .connection_mode(ConnectionMode::Persistent)
+        .build()
+        .await?;
     let (sender, receiver) = async_channel::bounded(CHANNEL_SIZE);
     let persona = resolve_persona(&args.persona, config.default_persona.as_str())?;
 

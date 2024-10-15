@@ -1,12 +1,13 @@
 use crate::config::{get_knowledge_dir, CONFIG};
 use crate::knowledge::{
-    EmbeddingData, EmbeddingServiceBuilder, EmbeddingServiceHandle, KnowledgeResult,
-    KnowledgeStore, Record,
+    ConnectionMode, EmbeddingData, EmbeddingServiceBuilder, EmbeddingServiceHandle,
+    KnowledgeResult, KnowledgeStore, Record,
 };
 use async_trait::async_trait;
 use log::{info, warn};
 use std::borrow::Cow;
 use std::error::Error;
+use std::sync::Arc;
 use surrealdb::engine::local::{Db, RocksDb};
 use surrealdb::Surreal;
 
@@ -15,39 +16,47 @@ use surrealdb::Surreal;
 /// using the EmbeddingServiceHandle.
 pub struct KnowledgeStoreImpl {
     embedding_service: EmbeddingServiceHandle,
-    db: Surreal<Db>,
+    db: Option<Arc<Surreal<Db>>>,
 }
 
 impl KnowledgeStoreImpl {
-    /// Creates a new instance of `KnowledgeStoreImpl` by connecting to the knowledge database
-    /// and initializing an `EmbeddingServiceHandle` based on the current configuration.
-    pub async fn new() -> Result<Self, Box<dyn Error>> {
-        // Get the embedding model from the configuration
+    pub async fn new(mode: ConnectionMode) -> Result<Self, Box<dyn Error>> {
         let embedding_model = {
             let config = CONFIG.lock().unwrap();
             config.ai.embedding_model.clone()
         };
-        // Create an embedding service based on the selected model
         let embedding_service = EmbeddingServiceBuilder::new()
             .model_name(embedding_model.into())
             .build()?;
 
-        // Connect to the SurrealDB local database
-        let db = Surreal::new::<RocksDb>(get_knowledge_dir()?.to_str().unwrap()).await?;
-        db.use_ns("knowledge").use_db("knowledge_db").await?;
-
-        // Ensure the knowledge database has an index for HNSW-based embeddings similarity search
-        db.query(format!(
-            "DEFINE INDEX idx_mtree_cosine ON context_embeddings FIELDS embedding MTREE DIMENSION {} DIST COSINE TYPE F32;",
-            embedding_service.inner.embedding_len()
-        ))
-        .await?;
+        let db = match mode {
+            ConnectionMode::Persistent => {
+                Some(connect_to_db(embedding_service.inner.embedding_len()).await?)
+            }
+            ConnectionMode::OnDemand => None,
+        };
 
         Ok(KnowledgeStoreImpl {
             embedding_service,
             db,
         })
     }
+
+    async fn connect(&self, idx_len: usize) -> Result<Arc<Surreal<Db>>, Box<dyn Error>> {
+        connect_to_db(idx_len).await
+    }
+}
+
+async fn connect_to_db(idx_len: usize) -> Result<Arc<Surreal<Db>>, Box<dyn Error>> {
+    info!("Connecting to db");
+    let db = Surreal::new::<RocksDb>(get_knowledge_dir()?.to_str().unwrap()).await?;
+    db.use_ns("knowledge").use_db("knowledge_db").await?;
+    db.query(format!(
+        "DEFINE INDEX idx_mtree_cosine ON context_embeddings FIELDS embedding MTREE DIMENSION {} DIST COSINE TYPE F32;",
+        idx_len
+    ))
+        .await?;
+    Ok(Arc::new(db))
 }
 
 #[async_trait]
@@ -65,8 +74,15 @@ impl KnowledgeStore for KnowledgeStoreImpl {
             .get_embedding(user_input)
             .await?;
         info!("Searching for knowledge for embedding");
+        let db_handle = if let Some(db) = &self.db {
+            db
+        } else {
+            &self
+                .connect(self.embedding_service.inner.embedding_len())
+                .await?
+        };
         // Query the knowledge base for the closest embeddings (most relevant documents)
-        let mut results = match self.db
+        let mut results = match db_handle
             .query("SELECT data_source, content, metadata, vector::similarity::cosine(embedding, $embedding) AS distance FROM context_embeddings WHERE embedding <|10|> $embedding ORDER BY distance;")
             .bind(("embedding", embedding))
             .await {
@@ -88,9 +104,15 @@ impl KnowledgeStore for KnowledgeStoreImpl {
     async fn store_knowledge(&self, knowledge: EmbeddingData) -> Result<(), Box<dyn Error>> {
         let data_source = knowledge.data_source.to_string();
         info!("Storing knowledge for: {}", data_source);
+        let db_handle = if let Some(db) = &self.db {
+            db
+        } else {
+            &self
+                .connect(self.embedding_service.inner.embedding_len())
+                .await?
+        };
 
-        match self
-            .db
+        match db_handle
             .upsert::<Option<Record>>(("context_embeddings", knowledge.data_source.to_string()))
             .content(knowledge)
             .await

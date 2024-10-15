@@ -32,6 +32,13 @@ impl Clone for EmbeddingServiceHandle {
     }
 }
 
+#[derive(Debug, Clone, Copy, Default)]
+pub enum ConnectionMode {
+    #[default]
+    OnDemand, // Open/close connection as needed
+    Persistent, // Keep connection open
+}
+
 /// KnowledgeStore trait to abstract knowledge retrieval.
 /// It should generate embeddings from the user input and then perform the database query
 /// to retrieve relevant documents.

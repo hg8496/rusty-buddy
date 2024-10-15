@@ -1,5 +1,5 @@
 use crate::cli::knowledge::knowledge_args::AddArgs;
-use crate::knowledge::{DataSource, EmbeddingData, KnowledgeStore, StoreBuilder};
+use crate::knowledge::{ConnectionMode, DataSource, EmbeddingData, KnowledgeStore, StoreBuilder};
 use log::{info, warn};
 use std::borrow::Cow;
 use std::error::Error;
@@ -10,7 +10,10 @@ use tokio::task::JoinHandle;
 use walkdir::WalkDir;
 
 pub async fn add(add: AddArgs) -> Result<(), Box<dyn Error>> {
-    let store = StoreBuilder::new().build().await?;
+    let store = StoreBuilder::new()
+        .connection_mode(ConnectionMode::Persistent)
+        .build()
+        .await?;
 
     if let Some(dir) = add.dir {
         add_directory_to_knowledge(&dir, &store).await?;
