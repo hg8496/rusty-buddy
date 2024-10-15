@@ -7,6 +7,8 @@ theme:
   name: material
   logo: logo.png
   favicon: logo.png
+  features:
+    - content.tabs.link
   palette:
     - media: "(prefers-color-scheme)"
       primary: brown
@@ -51,6 +53,7 @@ nav:
   - Personas: personas.md
   - Usecases:
       - Knowledge is Power: usecases/using_knowledge_feature.md
+      - Start for Free: usecases/start_for_free.md
       - Case study Rust development: usecases/case_study_rust.md
       - Assisted Debugging: usecases/assisted_debugging.md
       - Code Refactoring: usecases/code_refactoring.md
@@ -68,6 +71,9 @@ markdown_extensions:
   - footnotes
   - codehilite:
       use_pygments: False
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
 
 # Include any additional files or settings required for deployment or functionality
 extra:
