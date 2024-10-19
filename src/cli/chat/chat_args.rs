@@ -107,5 +107,5 @@ pub struct ChatArgs {
     /// the knowledge store for relevant documents, which will be included as
     /// knowledge context messages before the assistant responds.
     #[arg(short = 'k', long = "knowledge")]
-    pub knowledge: bool, // <-- New argument
+    pub knowledge: Option<Option<usize>>, // <-- New argument
 }

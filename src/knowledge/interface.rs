@@ -61,6 +61,7 @@ pub trait KnowledgeStore: Send + Sync {
     async fn query_knowledge(
         &self,
         user_input: Cow<'_, str>,
+        limit: usize,
     ) -> Result<Vec<KnowledgeResult>, Box<dyn Error>>;
     async fn store_knowledge(&self, knowledge: EmbeddingData) -> Result<(), Box<dyn Error>>;
     async fn get_embedding(&self, content: Cow<'_, str>) -> Result<Box<Vec<f32>>, Box<dyn Error>>;

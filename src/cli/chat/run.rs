@@ -234,7 +234,7 @@ async fn handle_one_shot_mode(
     input_message: Option<String>,
     model: &str,
     persona: Persona,
-    knowledge: bool,
+    knowledge: Option<Option<usize>>,
 ) -> Result<(), Box<dyn Error>> {
     let user_input: Cow<'_, str> = Cow::Owned(get_user_input_from_option_or_stdin(input_message)?);
     if user_input.trim().is_empty() {
@@ -258,7 +258,7 @@ async fn start_interactive_chat(
     mut command_registry: CommandRegistry,
     model: &str,
     persona: Persona,
-    knowledge: bool,
+    knowledge: Option<Option<usize>>,
 ) -> Result<(), Box<dyn Error>> {
     loop {
         let user_input: Cow<'_, str> = Cow::Owned(get_multiline_input(
@@ -367,7 +367,7 @@ async fn send_and_display_response(
     user_input: Cow<'_, str>,
     model: &str,
     persona: &Persona,
-    knowledge: bool,
+    knowledge: Option<Option<usize>>,
 ) -> Result<(), Box<dyn Error>> {
     let is_terminal = is_output_to_terminal();
     let spinner = if is_terminal {
@@ -375,10 +375,10 @@ async fn send_and_display_response(
     } else {
         None
     };
-    if knowledge {
+    if knowledge.is_some() {
         let knowledge = services
             .knowledge_store
-            .query_knowledge(user_input.clone())
+            .query_knowledge(user_input.clone(), knowledge.unwrap().unwrap_or(10))
             .await?;
         services.chat_service.add_knowledge(knowledge).await?;
     }

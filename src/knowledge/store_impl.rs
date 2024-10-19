@@ -66,6 +66,7 @@ impl KnowledgeStore for KnowledgeStoreImpl {
     async fn query_knowledge(
         &self,
         user_input: Cow<'_, str>,
+        limit: usize,
     ) -> Result<Vec<KnowledgeResult>, Box<dyn Error>> {
         // Generate the embedding for the user input
         let embedding = self
@@ -83,8 +84,9 @@ impl KnowledgeStore for KnowledgeStoreImpl {
         };
         // Query the knowledge base for the closest embeddings (most relevant documents)
         let mut results = match db_handle
-            .query("SELECT data_source, content, metadata, vector::similarity::cosine(embedding, $embedding) AS distance FROM context_embeddings WHERE embedding <|10|> $embedding ORDER BY distance;")
+            .query("SELECT data_source, content, metadata, vector::similarity::cosine(embedding, $embedding) AS distance FROM context_embeddings WHERE embedding <|$limit|> $embedding ORDER BY distance DESC;")
             .bind(("embedding", embedding))
+            .bind(("limit", limit))
             .await {
             Ok(results) => {
                 info!("Successfully searched knowledge for embedding");

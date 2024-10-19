@@ -17,6 +17,8 @@ pub enum KnowledgeArgs {
 #[derive(Args)]
 pub struct SearchArgs {
     pub search: String,
+    #[arg(short = 'n', long, default_value = "10")]
+    pub limit: Option<usize>,
 }
 
 #[derive(Args)]
