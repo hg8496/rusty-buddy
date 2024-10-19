@@ -48,43 +48,184 @@ use std::error::Error;
 pub(super) fn process_code_blocks<F>(
     content: &str,
     greedy: bool,
-    action: F,
+    mut action: F,
 ) -> Result<(), Box<dyn Error>>
 where
-    F: Fn(usize, &str) -> Result<(), Box<dyn Error>>,
+    F: FnMut(usize, &str) -> Result<(), Box<dyn Error>>,
 {
-    // Regular expression to capture content preceding a code block
-    let re = Regex::new(r"(?s)(.*?)```")?;
-
     if greedy {
-        // Find the first and last occurrence of triple backticks
         if let Some(start) = content.find("```") {
             if let Some(end) = content.rfind("```") {
                 if start < end {
                     // Extract and prepare the content within these backticks
                     let block_content = &content[start + 3..end].trim();
-                    let prepared_content =
-                        block_content.lines().skip(1).collect::<Vec<_>>().join("\n");
-
                     // Apply the action closure to the prepared content
-                    action(1, &prepared_content)?;
+                    action(1, block_content)?;
                 }
             }
         }
     } else {
+        let re = Regex::new(r"```([a-zA-Z]*\n)?(?s)(.*?)```")?;
         let mut count = 1;
-        // Iterate over individual code blocks matched by the regular expression
         for cap in re.captures_iter(content) {
-            let block_content = &cap[1];
-            let prepared_content = block_content.lines().skip(1).collect::<Vec<_>>().join("\n");
-
-            // Apply the action closure with the block index
-            action(count, &prepared_content)?;
-
-            // Increment the block index for each capture
-            count += 1;
+            if let Some(block_content) = cap.get(2) {
+                action(count, block_content.as_str())?;
+                count += 1;
+            }
         }
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::error::Error;
+
+    #[test]
+    fn test_process_code_blocks_greedy_mode() -> Result<(), Box<dyn Error>> {
+        let content = r#"
+        Here is a block of code:
+        ```
+        fn main() {
+            println!("Hello, World!");
+        }
+        ```
+        And here's some more text.
+
+        Here’s another block:
+        ```
+        fn add(a: i32, b: i32) -> i32 {
+            a + b
+        }
+        ```
+        "#;
+
+        let mut blocks = Vec::new();
+
+        // Execute in greedy mode.
+        process_code_blocks(content, true, |_, block| {
+            blocks.push(block.to_string());
+            Ok(())
+        })?;
+
+        // There should be only one block captured in greedy mode
+        assert_eq!(blocks.len(), 1);
+        assert_eq!(
+            blocks[0],
+            r#"fn main() {
+            println!("Hello, World!");
+        }
+        ```
+        And here's some more text.
+
+        Here’s another block:
+        ```
+        fn add(a: i32, b: i32) -> i32 {
+            a + b
+        }"#
+        );
+        // Verify the content of the block
+        assert!(blocks[0].contains("fn main()"));
+        Ok(())
+    }
+
+    #[test]
+    fn test_process_code_blocks_standard_mode() -> Result<(), Box<dyn Error>> {
+        let content = r#"
+        Here is a block of code:
+        ```rust
+        fn main() {
+            println!("Hello, World!");
+        }
+        ```
+        And other text.
+        "#;
+
+        let mut blocks = Vec::new();
+
+        // Execute in standard mode.
+        process_code_blocks(content, false, |_, block| {
+            blocks.push(block.to_string());
+            Ok(())
+        })?;
+
+        // There should be one block captured in standard mode
+        assert_eq!(blocks.len(), 1);
+        assert_eq!(
+            blocks[0],
+            r#"        fn main() {
+            println!("Hello, World!");
+        }
+        "#
+        );
+
+        Ok(())
+    }
+    #[test]
+    fn test_process_multi_code_blocks_standard_mode() -> Result<(), Box<dyn Error>> {
+        let content = r#"
+        Here is a block of code:
+        ```
+        fn main() {
+            println!("Hello, World!");
+        }
+        ```
+        
+        Here is some more text.
+        And then some more code:
+        ```rust
+        fn main() {
+            println!("Hello, World2!");
+        }
+        ```
+        Followd by more text!
+        "#;
+
+        let mut blocks = Vec::new();
+
+        // Execute in standard mode.
+        process_code_blocks(content, false, |_, block| {
+            blocks.push(block.to_string());
+            Ok(())
+        })?;
+
+        // There should be one block captured in standard mode
+        assert_eq!(blocks.len(), 2);
+        assert_eq!(
+            blocks[0],
+            r#"        fn main() {
+            println!("Hello, World!");
+        }
+        "#
+        );
+        assert_eq!(
+            blocks[1],
+            r#"        fn main() {
+            println!("Hello, World2!");
+        }
+        "#
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_process_code_blocks_no_code_blocks() -> Result<(), Box<dyn Error>> {
+        let content = "This text contains no code blocks.";
+
+        let mut blocks = Vec::new();
+
+        // Execute in standard mode.
+        process_code_blocks(content, false, |_, block| {
+            blocks.push(block.to_string());
+            Ok(())
+        })?;
+
+        // There should be no blocks captured
+        assert!(blocks.is_empty());
+
+        Ok(())
+    }
 }
