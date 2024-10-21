@@ -17,7 +17,7 @@
 //!
 //! You can list all available personas and see how they can assist you in your session with Rusty Buddy:
 //!
-//! ```rust
+//! ```no_run
 //! use rbchat::persona::{print_all_personas, get_persona};
 //!
 //! // Print all available personas

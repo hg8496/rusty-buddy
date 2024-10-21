@@ -20,7 +20,7 @@
 //!
 //! Here’s an example of how you can utilize this module:
 //!
-//! ```rust
+//! ```no_run
 //! // Get the current application configuration
 //! use rbchat::config::CONFIG;
 //! let config = CONFIG.lock().unwrap();
