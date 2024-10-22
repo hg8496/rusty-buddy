@@ -88,14 +88,11 @@ impl KnowledgeStore for KnowledgeStoreImpl {
         WHERE embedding <|{}|> $embedding \
         ORDER BY distance DESC;", limit);
         // Query the knowledge base for the closest embeddings (most relevant documents)
-        let mut results = match db_handle
-            .query(query)
-            .bind(("embedding", embedding))
-            .await {
+        let mut results = match db_handle.query(query).bind(("embedding", embedding)).await {
             Ok(results) => {
                 info!("Successfully searched knowledge for embedding");
                 results
-            },
+            }
             Err(e) => {
                 warn!("Failed to search for knowledge for embedding: {}", e);
                 return Err(Box::new(e));
