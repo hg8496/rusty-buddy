@@ -82,11 +82,15 @@ impl KnowledgeStore for KnowledgeStoreImpl {
                 .connect(self.embedding_service.inner.embedding_len())
                 .await?
         };
+        let query = format!("SELECT \
+        data_source, content, metadata, vector::similarity::cosine(embedding, $embedding) AS distance \
+        FROM context_embeddings \
+        WHERE embedding <|{}|> $embedding \
+        ORDER BY distance DESC;", limit);
         // Query the knowledge base for the closest embeddings (most relevant documents)
         let mut results = match db_handle
-            .query("SELECT data_source, content, metadata, vector::similarity::cosine(embedding, $embedding) AS distance FROM context_embeddings WHERE embedding <|$limit|> $embedding ORDER BY distance DESC;")
+            .query(query)
             .bind(("embedding", embedding))
-            .bind(("limit", limit))
             .await {
             Ok(results) => {
                 info!("Successfully searched knowledge for embedding");
