@@ -40,7 +40,7 @@ use rbchat::chat::command::{ChatCommand, RegisterableCommand};
 use rbchat::chat::command_registry::CommandRegistry;
 use rbchat::chat::message_helpers::find_last_assistant_message;
 use rbchat::chat::service::ChatService;
-//TODO use crate::cli::editor::get_user_input;
+use crate::cli::editor::get_user_input;
 use arboard::Clipboard;
 use std::error::Error;
 
@@ -86,7 +86,7 @@ impl ChatCommand for CopyFilesCommand {
 
             println!("Copied code block {}", counter);
             // Await user interaction in standard mode
-            //get_user_input("Press <Enter> to copy the next block: ")?;
+            get_user_input("Press <Enter> to copy the next block: ")?;
 
             Ok(())
         })?;
