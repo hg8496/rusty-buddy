@@ -13,30 +13,34 @@ Rusty Buddy is an **AI-powered command-line tool** designed to supercharge your 
 
 ---
 
-# Rusty Buddy v1.1.0 Release Notes 🎉
+# Rusty Buddy v1.2.0 Release Notes 🎉
 
-We are excited to announce the release of Rusty Buddy v1.1.0, packed with significant improvements and innovative features to elevate your development experience. The headline of this release is the **Knowledge Management Feature**, which brings a new dimension of interactivity and intelligence to your workflow.
+We are thrilled to announce the release of Rusty Buddy v1.2.0, featuring groundbreaking improvements that elevate your development experience. The highlight of this release is the **Image-Inclusive Chat Feature**, enabling richer interactions with AI.
 
 ## 🚀 Major Features and Improvements
 
-### Knowledge Management System 💡
-- **Structured Knowledge Integration**: Rusty Buddy now includes a comprehensive knowledge management system that allows you to add, search, and use knowledge entries seamlessly. This system empowers Rusty Buddy to interact with your project context more effectively, providing tailored suggestions and insights during your development tasks.
-- **Enhanced Contextual Assistance**: By using the *--knowledge* flag during chats, Rusty Buddy can query a newly integrated knowledge database for relevant information based on your input, augmenting the AI's capability to offer precise and context-aware responses.
+### Image Upload in Chat 📷
+- **Visual Context Integration**: Enhance your chat sessions by uploading images alongside your textual inputs. This feature allows Rusty Buddy to analyze images and provide more insightful responses.
+- **Easy to Use**: Simply use the `--image` or `-i` flag with the chat command to include an image file.
+
+#### Example:
+```bash
+rusty-buddy chat --new --image ./path/to/your_image.png --persona rust
+```
 
 ### Improved Documentation 📚
-- An upgraded documentation site with mkdocs-material for a modern and visually appealing interface. Command formatting has been enhanced for better readability.
-- Additional examples and thorough explanations have been provided to help you leverage the full potential of the new knowledge features.
+- A polished documentation site with mkdocs-material for a modern and visually appealing user experience.
+- New examples and detailed guides on leveraging the full potential of Rusty Buddy's AI features, including image uploads.
 
 ### New CLI Commands and Enhancements 🤖
-- **New Copy Commands**: Effortlessly handle responses with */copy-last-message* and */copy-files* to streamline your coding process by quickly accessing past messages or code snippets.
-- **Extended Command Flexibility**: Support for multiple directory specifications and the introduction of a direct message input option simplify command usability and enhance user control.
+- **Enhanced Flexibility**: Support for multiple directory specifications and direct message input options simplify command usability and enhance user control.
 
 ## 🛠️ Other Improvements and Fixes
-- Enhanced error handling for improved robustness across various application components.
-- Refactorings to revamp the codebase for better maintainability, including context management and message handling.
-- Added shell autocompletions and refactored CLI execution for smoother interactions.
+- Refined error handling for enhanced robustness across applications.
+- Codebase refactorings for improved maintainability, including context management and image message handling.
+- Added shell autocompletions for improved command-line interactions.
 
-With Rusty Buddy v1.1.0, dive deeper into your projects with a smarter and more intuitive tool by your side. We're committed to making development smoother, faster, and more enjoyable. We thank the community for the continued support and contributions that help make Rusty Buddy a helpful companion in the world of development.
+With Rusty Buddy v1.2.0, explore new dimensions of productivity and creativity by combining text and imagery in your AI interactions. We are committed to continuously improving your toolset to make development smoother, faster, and more enjoyable. We extend our gratitude to the community for its support and contributions.
 
 Enjoy coding with Rusty Buddy! 🚀
 
