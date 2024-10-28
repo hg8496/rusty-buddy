@@ -12,7 +12,7 @@ tokio-stream = "0.1"
 dotenvy = "0.15.7"
 clap = { version = "4", features = ["derive"] }
 clap_complete = "4"
-termimad = "0.30"
+termimad = "0.31"
 rustyline = { version = "14.0", features = ["derive"] }
 unicode-width = "0.2"
 atty = "0.2"
