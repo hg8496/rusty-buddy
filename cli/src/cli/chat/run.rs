@@ -62,6 +62,7 @@ use rbchat::persona::{resolve_persona, Persona};
 use std::borrow::Cow;
 use std::error::Error;
 use std::io::{self, Read};
+use std::path::PathBuf;
 use std::sync::Arc;
 
 struct Services {
@@ -109,6 +110,7 @@ pub async fn run_chat(args: ChatArgs) -> Result<(), Box<dyn Error>> {
             model_name,
             persona,
             args.knowledge,
+            &args.image,
         )
         .await;
     }
@@ -123,6 +125,7 @@ pub async fn run_chat(args: ChatArgs) -> Result<(), Box<dyn Error>> {
         model_name,
         persona,
         args.knowledge,
+        &args.image,
     )
     .await
 }
@@ -237,6 +240,7 @@ async fn handle_one_shot_mode(
     model: &str,
     persona: Persona,
     knowledge: Option<Option<usize>>,
+    image_path: &Option<PathBuf>,
 ) -> Result<(), Box<dyn Error>> {
     let user_input: Cow<'_, str> = Cow::Owned(get_user_input_from_option_or_stdin(input_message)?);
     if user_input.trim().is_empty() {
@@ -244,8 +248,15 @@ async fn handle_one_shot_mode(
         return Ok(());
     }
 
-    let result =
-        send_and_display_response(&mut chat_service, user_input, model, &persona, knowledge).await;
+    let result = send_and_display_response(
+        &mut chat_service,
+        user_input,
+        model,
+        &persona,
+        knowledge,
+        image_path,
+    )
+    .await;
     match result {
         Ok(_) => result,
         Err(e) => {
@@ -261,7 +272,9 @@ async fn start_interactive_chat(
     model: &str,
     persona: Persona,
     knowledge: Option<Option<usize>>,
+    image_path: &Option<PathBuf>,
 ) -> Result<(), Box<dyn Error>> {
+    let mut ipath = image_path;
     loop {
         let user_input: Cow<'_, str> = Cow::Owned(get_multiline_input(
             "User (use Ctrl+D to submit): ",
@@ -293,8 +306,10 @@ async fn start_interactive_chat(
             model,
             &persona,
             knowledge,
+            ipath,
         )
         .await;
+        ipath = &None;
         match result {
             Ok(_) => continue,
             Err(err) => {
@@ -370,6 +385,7 @@ async fn send_and_display_response(
     model: &str,
     persona: &Persona,
     knowledge: Option<Option<usize>>,
+    image_path: &Option<PathBuf>,
 ) -> Result<(), Box<dyn Error>> {
     let is_terminal = is_output_to_terminal();
     let spinner = if is_terminal {
@@ -384,7 +400,10 @@ async fn send_and_display_response(
             .await?;
         services.chat_service.add_knowledge(knowledge).await?;
     }
-    let result = services.chat_service.send_message(user_input, false).await;
+    let result = services
+        .chat_service
+        .send_message(user_input, image_path, false)
+        .await;
     let response = match result {
         Ok(response) => response,
         Err(err) => {

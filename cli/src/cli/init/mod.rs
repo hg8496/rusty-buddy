@@ -149,7 +149,7 @@ async fn recommend_persona(
     );
 
     let response = chat_service
-        .send_message(std::borrow::Cow::Borrowed(&prompt), false)
+        .send_message(std::borrow::Cow::Borrowed(&prompt), &None, false)
         .await?;
     Ok(response.trim().to_string())
 }

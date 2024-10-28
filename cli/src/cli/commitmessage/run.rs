@@ -78,7 +78,9 @@ pub async fn run_commitmessage() -> Result<(), Box<dyn std::error::Error>> {
         .build()?;
 
     let diff = generate_git_diff_summary().await?;
-    let summary = chat_service.send_message(Cow::Owned(diff), false).await?;
+    let summary = chat_service
+        .send_message(Cow::Owned(diff), &None, false)
+        .await?;
 
     println!("Summary of git diff (model: {}):\n{}", &model, summary);
 

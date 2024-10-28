@@ -59,6 +59,7 @@ pub enum MessageInfo {
     },
     UserInfo {
         timestamp: DateTime<Utc>,
+        image_path: Option<String>,
     },
     AssistantInfo {
         model: String,

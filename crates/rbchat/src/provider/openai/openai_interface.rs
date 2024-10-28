@@ -41,14 +41,19 @@ use crate::provider::openai::file_diff::{create_directory, create_file};
 use async_openai::config::OpenAIConfig;
 use async_openai::types::{
     ChatCompletionMessageToolCall, ChatCompletionRequestAssistantMessageArgs,
-    ChatCompletionRequestMessage, ChatCompletionRequestSystemMessageArgs,
-    ChatCompletionRequestUserMessageArgs, ChatCompletionResponseMessage, ChatCompletionTool,
+    ChatCompletionRequestMessage, ChatCompletionRequestMessageContentPartImageArgs,
+    ChatCompletionRequestMessageContentPartTextArgs, ChatCompletionRequestSystemMessageArgs,
+    ChatCompletionRequestUserMessageArgs, ChatCompletionRequestUserMessageContent,
+    ChatCompletionRequestUserMessageContentPart, ChatCompletionResponseMessage, ChatCompletionTool,
     ChatCompletionToolArgs, ChatCompletionToolChoiceOption, ChatCompletionToolType,
     CompletionUsage, CreateChatCompletionRequest, CreateChatCompletionRequestArgs,
-    CreateChatCompletionResponse, CreateEmbeddingRequestArgs, FunctionObjectArgs,
+    CreateChatCompletionResponse, CreateEmbeddingRequestArgs, FunctionObjectArgs, ImageDetail,
+    ImageUrlArgs,
 };
 use async_openai::Client;
 use async_trait::async_trait;
+use base64::prelude::BASE64_STANDARD;
+use base64::Engine;
 use chrono::Utc;
 use dotenvy::dotenv;
 use log::{debug, error, info, trace, warn};
@@ -87,7 +92,7 @@ impl ChatBackend for OpenAIInterface {
             messages
         );
 
-        let oai_messages = self.convert_to_chat_completion_messages(messages);
+        let oai_messages = self.convert_to_chat_completion_messages(messages)?;
         trace!("Converted messages: {:?}", oai_messages);
 
         let request = self.create_openai_request(&oai_messages, use_tools)?;
@@ -224,10 +229,10 @@ impl OpenAIInterface {
     fn convert_to_chat_completion_messages(
         &self,
         messages: &[Message],
-    ) -> Vec<ChatCompletionRequestMessage> {
+    ) -> Result<Vec<ChatCompletionRequestMessage>, Box<dyn Error>> {
         let use_assistant_for_system_messages = self.model.starts_with("o1");
 
-        messages
+        Ok(messages
             .iter()
             .map(|msg| match msg.role {
                 MessageRole::System if use_assistant_for_system_messages => {
@@ -266,18 +271,52 @@ impl OpenAIInterface {
                     .build()
                     .unwrap()
                     .into(),
-                MessageRole::User => ChatCompletionRequestUserMessageArgs::default()
-                    .content(msg.content.as_str())
-                    .build()
-                    .unwrap()
-                    .into(),
+                MessageRole::User => Self::create_user_message(msg)
+                    .map_err(|_| ChatCompletionRequestUserMessageContent::default())
+                    .unwrap(),
                 MessageRole::Assistant => ChatCompletionRequestAssistantMessageArgs::default()
                     .content(msg.content.as_str())
                     .build()
                     .unwrap()
                     .into(),
             })
-            .collect()
+            .collect())
+    }
+
+    fn create_user_message(msg: &Message) -> Result<ChatCompletionRequestMessage, Box<dyn Error>> {
+        let user_msg = ChatCompletionRequestMessageContentPartTextArgs::default()
+            .text(msg.content.as_str())
+            .build()?
+            .into();
+        let mut contents: Vec<ChatCompletionRequestUserMessageContentPart> = vec![user_msg];
+        let image_path = if let Some(MessageInfo::UserInfo { image_path, .. }) = &msg.info {
+            image_path.as_deref()
+        } else {
+            None
+        };
+        if let Some(image_path) = image_path {
+            info!("Adding image to user message from {}", image_path);
+            let image_data = std::fs::read(image_path)?;
+            let base64_image = BASE64_STANDARD.encode(image_data);
+
+            contents.push(
+                ChatCompletionRequestMessageContentPartImageArgs::default()
+                    .image_url(
+                        ImageUrlArgs::default()
+                            .url(format!("data:image/png;base64,{}", base64_image))
+                            .detail(ImageDetail::High)
+                            .build()?,
+                    )
+                    .build()?
+                    .into(),
+            );
+        }
+
+        Ok(ChatCompletionRequestUserMessageArgs::default()
+            .content(contents)
+            .build()
+            .unwrap()
+            .into())
     }
 
     fn update_statistics(&mut self, usage: CompletionUsage) {

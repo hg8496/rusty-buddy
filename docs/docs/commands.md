@@ -201,7 +201,19 @@ Load a previously saved session by name.
     :::bash
     rusty-buddy chat --load <SESSION_NAME>
 
-#### Fetch and Use Knowledge Before You Chat (`--knowledge`)
+#### Add an Image to the Chat (`--image/-i`)
+
+Include an image with the chat to provide more context or visual information that the AI can analyze.
+
+    :::bash
+    rusty-buddy chat --image path/to/your/image.png
+
+**Example:**
+
+    :::bash
+    rusty-buddy chat --image ./images/sample.png --directory ./src --knowledge
+
+#### Fetch and Use Knowledge Before You Chat (`--knowledge/-k`)
 
 When the `--knowledge` flag is used, the command will use the latest user input to generate embeddings and search the knowledge store for relevant documents. The relevant documents are added to the chat context before the assistant responds.
 

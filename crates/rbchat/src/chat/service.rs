@@ -200,6 +200,7 @@ impl ChatService {
     pub async fn send_message(
         &mut self,
         user_message: Cow<'_, str>,
+        image: &Option<PathBuf>,
         use_tools: bool,
     ) -> Result<String, Box<dyn Error>> {
         // Add the user message to the session messages
@@ -208,6 +209,7 @@ impl ChatService {
             content: user_message.into_owned(),
             info: Some(MessageInfo::UserInfo {
                 timestamp: Utc::now(),
+                image_path: image.clone().map(|p| p.to_string_lossy().to_string()),
             }),
         });
 

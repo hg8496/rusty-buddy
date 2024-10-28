@@ -107,5 +107,9 @@ pub struct ChatArgs {
     /// the knowledge store for relevant documents, which will be included as
     /// knowledge context messages before the assistant responds.
     #[arg(short = 'k', long = "knowledge")]
-    pub knowledge: Option<Option<usize>>, // <-- New argument
+    pub knowledge: Option<Option<usize>>,
+
+    /// Image file to add to the chat. Only works with vision capable models!                            
+    #[arg(short = 'i', long = "image", value_hint = clap::ValueHint::FilePath)]
+    pub image: Option<PathBuf>,
 }

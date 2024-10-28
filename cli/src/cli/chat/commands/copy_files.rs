@@ -36,12 +36,12 @@
 //! This example illustrates instantiation and execution, governed under standard mode for thoughtful interaction.
 
 use crate::cli::chat::commands::message_files::process_code_blocks;
+use crate::cli::editor::get_user_input;
+use arboard::Clipboard;
 use rbchat::chat::command::{ChatCommand, RegisterableCommand};
 use rbchat::chat::command_registry::CommandRegistry;
 use rbchat::chat::message_helpers::find_last_assistant_message;
 use rbchat::chat::service::ChatService;
-use crate::cli::editor::get_user_input;
-use arboard::Clipboard;
 use std::error::Error;
 
 /// A command to copy code blocks from the last assistant message to the clipboard.
