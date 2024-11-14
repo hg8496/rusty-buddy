@@ -10,20 +10,20 @@ Rusty Buddy brings state-of-the-art machine learning directly to your terminal.
 
 ---
 
-## 🚀 What's New in Version 1.1.0
+## Rusty Buddy v1.2.0 Release Notes 🎉
 
-### Knowledge Management System 💡
-- **Structured Knowledge Integration**: Introducing a comprehensive knowledge management system that lets you effortlessly add, search, and use knowledge entries. This enhances Rusty Buddy's ability to interact with your project context, offering tailored suggestions and insights.
-- **Enhanced Contextual Assistance**: Utilize the `--knowledge` flag in chats to access a knowledge database, enriching AI's responses with precise, context-aware information for your tasks.
+We are thrilled to announce the release of Rusty Buddy v1.2.0, featuring groundbreaking improvements that elevate your development experience. The highlight of this release is the **Image-Inclusive Chat Feature**, enabling richer interactions with AI.
 
-### New CLI Commands and Enhancements 🤖
-- **Copy Commands**: Streamline your coding process with `/copy-last-message` and `/copy-files`, making it easier to access past messages or code snippets directly.
-- **Extended Command Flexibility**: Now supporting multiple directory specifications and a direct message input option to improve command usability.
+### 🚀 Major Features and Improvements
 
-### Improved Documentation 📚
-- A modern update with mkdocs-material, enhancing command readability and including additional examples to help you use the new knowledge features effectively.
+#### Image Upload in Chat 📷
+- **Visual Context Integration**: Enhance your chat sessions by uploading images alongside your textual inputs. This feature allows Rusty Buddy to analyze images and provide more insightful responses.
+- **Easy to Use**: Simply use the `--image` or `-i` flag with the chat command to include an image file.
 
-Explore these features and improve your development workflow with Rusty Buddy v1.1.0, bringing a smarter, more intuitive assistance to your projects.
+##### Example:
+```bash
+rusty-buddy chat --new --image ./path/to/your_image.png --persona rust
+```
 
 ---
 
