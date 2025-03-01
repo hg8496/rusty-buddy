@@ -44,7 +44,6 @@ use std::error::Error;
 ///     Ok(())                                                                                          
 /// }).unwrap();                                                                                        
 /// ```
-
 pub fn process_code_blocks<F>(
     content: &str,
     greedy: bool,

@@ -49,7 +49,6 @@ use std::path::Path;
 /// - `setup_context()`: Prepares the context for a chat session, which may include        
 ///   loading files or initializing relevant state information.                            
 ///                                                                                        
-
 pub trait ContextConsumer {
     fn consume(&mut self, filename: Cow<str>, content: Cow<str>) -> Result<(), Box<dyn Error>>;
 }

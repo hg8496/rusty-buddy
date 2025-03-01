@@ -29,7 +29,7 @@ use crate::chat::interface::{ChatBackend, Message, MessageInfo, MessageRole};
 use crate::knowledge::EmbeddingService;
 use async_trait::async_trait;
 use chrono::Utc;
-use log::{debug, error, info, warn}; // Ensure to import appropriate logging macros
+use log::{debug, error, info}; // Ensure to import appropriate logging macros
 use ollama_rs::generation::embeddings::request::{EmbeddingsInput, GenerateEmbeddingsRequest};
 use ollama_rs::{
     generation::chat::{request::ChatMessageRequest, ChatMessage},
@@ -91,24 +91,20 @@ impl ChatBackend for OllamaInterface {
         match self.ollama.send_chat_messages(request).await {
             Ok(response) => {
                 info!("Received response from Ollama");
-                if let Some(assistant_message) = response.message {
-                    debug!("Got assistant message: {}", assistant_message.content);
-                    let content_len = assistant_message.content.len();
-                    Ok(Message {
-                        role: MessageRole::Assistant,
-                        content: assistant_message.content,
-                        info: Some(MessageInfo::AssistantInfo {
-                            model: self.model.clone(),
-                            persona_name: String::new(),
-                            prompt_token: 0,
-                            completion_token: content_len as u32,
-                            timestamp: Utc::now(),
-                        }),
-                    })
-                } else {
-                    warn!("No message received from Ollama response");
-                    Err("No message found in Ollama response.".into())
-                }
+                let assistant_message = response.message;
+                debug!("Got assistant message: {}", assistant_message.content);
+                let content_len = assistant_message.content.len();
+                Ok(Message {
+                    role: MessageRole::Assistant,
+                    content: assistant_message.content,
+                    info: Some(MessageInfo::AssistantInfo {
+                        model: self.model.clone(),
+                        persona_name: String::new(),
+                        prompt_token: 0,
+                        completion_token: content_len as u32,
+                        timestamp: Utc::now(),
+                    }),
+                })
             }
             Err(e) => {
                 error!("Failed to get response from Ollama: {}", e);

@@ -18,7 +18,6 @@ use std::error::Error;
 /// - `execute_command`: Executes a registered command by its name with the provided arguments, interacting with a `ChatService`.
 ///
 /// This error handling allows the caller to manage unrecognized commands gracefully, enhancing user experience.
-
 struct CommandInformation {
     command: Box<dyn ChatCommand>,
     completions: Vec<String>,

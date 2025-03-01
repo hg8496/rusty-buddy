@@ -26,7 +26,7 @@ use std::borrow::Cow::{self, Borrowed, Owned};
 use crate::cli::style::configure_mad_skin;
 use rustyline::completion::FilenameCompleter;
 use rustyline::error::ReadlineError;
-use rustyline::highlight::{Highlighter, MatchingBracketHighlighter};
+use rustyline::highlight::{CmdKind, Highlighter, MatchingBracketHighlighter};
 use rustyline::{Cmd, CompletionType, Config, EditMode, Editor, KeyEvent, Validator};
 use rustyline::{Completer, Helper, Hinter};
 
@@ -59,7 +59,7 @@ impl Highlighter for MyHelper {
         Owned("\x1b[1m".to_owned() + hint + "\x1b[m")
     }
 
-    fn highlight_char(&self, line: &str, pos: usize, forced: bool) -> bool {
+    fn highlight_char(&self, line: &str, pos: usize, forced: CmdKind) -> bool {
         self.highlighter.highlight_char(line, pos, forced)
     }
 }

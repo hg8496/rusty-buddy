@@ -40,7 +40,7 @@
 //! and the input is masked to maintain confidentiality.
 
 use rustyline::config::Configurer;
-use rustyline::highlight::Highlighter;
+use rustyline::highlight::{CmdKind, Highlighter};
 use rustyline::{ColorMode, Editor, Result};
 use rustyline::{Completer, Helper, Hinter, Validator};
 use std::borrow::Cow::{self, Borrowed, Owned};
@@ -60,7 +60,7 @@ impl Highlighter for MaskingHighlighter {
         }
     }
 
-    fn highlight_char(&self, _line: &str, _pos: usize, _forced: bool) -> bool {
+    fn highlight_char(&self, _line: &str, _pos: usize, _forced: CmdKind) -> bool {
         self.masking
     }
 }

@@ -38,6 +38,7 @@
 //   enhances input readability and user experience.
 use crate::cli::slash_completer::SlashCommandCompleter;
 use crate::cli::style::configure_mad_skin;
+use rustyline::highlight::CmdKind;
 use rustyline::{
     error::ReadlineError,
     highlight::{Highlighter, MatchingBracketHighlighter},
@@ -82,7 +83,7 @@ impl Highlighter for MyHelper {
         Owned("\x1b[1m".to_owned() + hint + "\x1b[m")
     }
 
-    fn highlight_char(&self, line: &str, pos: usize, forced: bool) -> bool {
+    fn highlight_char(&self, line: &str, pos: usize, forced: CmdKind) -> bool {
         self.highlighter.highlight_char(line, pos, forced)
     }
 }
