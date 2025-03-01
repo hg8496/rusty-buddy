@@ -75,12 +75,13 @@ impl KnowledgeStore for KnowledgeStoreImpl {
             .get_embedding(user_input)
             .await?;
         info!("Searching for knowledge for embedding");
-        let db_handle = if let Some(db) = &self.db {
-            db
-        } else {
-            &self
-                .connect(self.embedding_service.inner.embedding_len())
-                .await?
+        let db_handle = match &self.db {
+            Some(db) => db,
+            _ => {
+                &self
+                    .connect(self.embedding_service.inner.embedding_len())
+                    .await?
+            }
         };
         let query = format!("SELECT \
         data_source, content, metadata, vector::similarity::cosine(embedding, $embedding) AS distance \
@@ -107,12 +108,13 @@ impl KnowledgeStore for KnowledgeStoreImpl {
     async fn store_knowledge(&self, knowledge: EmbeddingData) -> Result<(), Box<dyn Error>> {
         let data_source = knowledge.data_source.to_string();
         info!("Storing knowledge for: {}", data_source);
-        let db_handle = if let Some(db) = &self.db {
-            db
-        } else {
-            &self
-                .connect(self.embedding_service.inner.embedding_len())
-                .await?
+        let db_handle = match &self.db {
+            Some(db) => db,
+            _ => {
+                &self
+                    .connect(self.embedding_service.inner.embedding_len())
+                    .await?
+            }
         };
 
         match db_handle

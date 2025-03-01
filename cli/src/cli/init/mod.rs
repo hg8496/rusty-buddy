@@ -293,14 +293,14 @@ mod tests {
     #[test]
     fn test_get_or_prompt_openai_key_with_env_var() {
         // Set an environment variable for OpenAI key
-        env::set_var("OPENAI_KEY", "test_key");
+        unsafe { env::set_var("OPENAI_KEY", "test_key") };
 
         let key = get_or_prompt_openai_key().expect("Failed to get OpenAI key");
 
         assert_eq!(key, "test_key");
 
         // Clean up the environment variable
-        env::remove_var("OPENAI_KEY");
+        unsafe { env::remove_var("OPENAI_KEY") };
     }
 
     #[test]

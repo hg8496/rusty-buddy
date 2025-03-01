@@ -98,8 +98,8 @@ fn check_environment() -> bool {
     get_config_file().is_ok()
 }
 
-fn print_completions<G: Generator>(gen: G, cmd: &mut Command) {
-    generate(gen, cmd, cmd.get_name().to_string(), &mut io::stdout());
+fn print_completions<G: Generator>(r#gen: G, cmd: &mut Command) {
+    generate(r#gen, cmd, cmd.get_name().to_string(), &mut io::stdout());
 }
 
 pub fn setup_logging() -> Result<(), Box<dyn std::error::Error>> {

@@ -157,12 +157,15 @@ fn handle_session_loading(
     load_name: &Option<String>,
 ) -> Result<(), Box<dyn Error>> {
     if continue_last {
-        if let Some(last_session) = get_last_session_name()? {
-            eprintln!("Continuing the last session: {}", last_session);
-            chat_service.load_history(&last_session)?;
-        } else {
-            eprintln!("No previous session found. Starting a new chat.");
-            chat_service.setup_context();
+        match get_last_session_name()? {
+            Some(last_session) => {
+                eprintln!("Continuing the last session: {}", last_session);
+                chat_service.load_history(&last_session)?;
+            }
+            _ => {
+                eprintln!("No previous session found. Starting a new chat.");
+                chat_service.setup_context();
+            }
         }
     } else if let Some(session_name) = load_name {
         eprintln!("Loading session: {}", session_name);

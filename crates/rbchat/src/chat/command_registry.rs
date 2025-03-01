@@ -69,10 +69,9 @@ impl CommandRegistry {
         args: &[&str],
         chat_service: &mut ChatService,
     ) -> Result<(), Box<dyn Error>> {
-        if let Some(command) = self.commands.get(name) {
-            command.command.execute(args, chat_service)
-        } else {
-            Err(format!("Command '{}' not found", name).into())
+        match self.commands.get(name) {
+            Some(command) => command.command.execute(args, chat_service),
+            _ => Err(format!("Command '{}' not found", name).into()),
         }
     }
 }
