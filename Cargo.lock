@@ -3819,7 +3819,7 @@ dependencies = [
 
 [[package]]
 name = "rbchat"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "async-openai",
  "async-trait",
@@ -4275,7 +4275,7 @@ checksum = "f7c45b9784283f1b2e7fb61b42047c2fd678ef0960d4f6f1eba131594cc369d4"
 
 [[package]]
 name = "rusty-buddy"
-version = "1.2.0"
+version = "1.2.1"
 dependencies = [
  "arboard",
  "async-channel",
