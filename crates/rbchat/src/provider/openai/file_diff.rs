@@ -74,6 +74,53 @@ pub async fn create_directory(path: &str) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+// Method to update a section of the file by replacing content from 'start_line' to 'end_line'
+pub async fn update_file_section(
+    file_path: &str,
+    start_line: usize,
+    end_line: usize,
+    new_content: &str,
+) -> Result<(), Box<dyn Error>> {
+    println!("Update file {}.", file_path);
+    // Open file for reading and writing
+    use std::fs::OpenOptions;
+    use std::io::{BufRead, BufReader, Write};
+
+    // Open the file
+    let file = OpenOptions::new().read(true).write(true).open(file_path)?;
+    let reader = BufReader::new(file);
+
+    // Collect lines into a vector
+    let mut lines: Vec<String> = reader.lines().collect::<Result<_, _>>()?;
+
+    // Check for invalid range
+    if start_line > end_line || end_line > lines.len() {
+        return Err("Invalid line range specified.".into());
+    }
+
+    // Replace the lines in the specified range
+    lines.splice(start_line..end_line, new_content.lines().map(String::from));
+
+    // Re-open the file for writing
+    let file = OpenOptions::new()
+        .write(true)
+        .truncate(true)
+        .open(file_path)?;
+    let mut writer = std::io::BufWriter::new(file);
+
+    // Write lines back to the file
+    for line in lines {
+        writeln!(writer, "{}", line)?;
+    }
+
+    println!(
+        "Updated file '{}' from lines {} to {}",
+        file_path, start_line, end_line
+    );
+
+    Ok(())
+}
+
 /// Creates or updates a file with the specified content.
 ///
 /// # Arguments

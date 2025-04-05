@@ -37,7 +37,7 @@
 use crate::chat::interface::{ChatBackend, Message, MessageInfo, MessageRole};
 use crate::knowledge::EmbeddingService;
 use crate::provider::openai::file_diff;
-use crate::provider::openai::file_diff::{create_directory, create_file};
+use crate::provider::openai::file_diff::{create_directory, create_file, update_file_section};
 use async_openai::config::OpenAIConfig;
 use async_openai::types::{
     ChatCompletionMessageToolCall, ChatCompletionRequestAssistantMessageArgs,
@@ -347,6 +347,7 @@ impl OpenAIInterface {
                     Self::create_diff_tool()?,
                     Self::create_new_dir_tool()?,
                     Self::create_new_file_tool()?,
+                    Self::create_update_file_section_tool()?,
                 ])
                 .tool_choice(ChatCompletionToolChoiceOption::Required)
                 .parallel_tool_calls(true);
@@ -410,7 +411,7 @@ impl OpenAIInterface {
                 FunctionObjectArgs::default()
                     .name("show_diff")
                     .description(
-                        "Shows the diff of a file and the string of the newly generated content of that file.",
+                        "Shows the diff between an existing file and the newly generated content of that file and asks the user to apply the changes.",
                     )
                     .parameters(serde_json::json!({
                                     "type": "object",
@@ -426,6 +427,42 @@ impl OpenAIInterface {
                                     },
                                     "required": ["diff_file", "diff_content"]
                                 }))
+                    .build()?,
+            )
+            .build()?)
+    }
+
+    fn create_update_file_section_tool() -> Result<ChatCompletionTool, Box<dyn Error>> {
+        Ok(ChatCompletionToolArgs::default()
+            .r#type(ChatCompletionToolType::Function)
+            .function(
+                FunctionObjectArgs::default()
+                    .name("update_file_section")
+                    .description(
+                        "Updates a section of a file specified by starting and ending lines with new content.",
+                    )
+                    .parameters(serde_json::json!({
+                    "type": "object",
+                    "properties": {
+                        "file_path": {
+                            "type": "string",
+                            "description": "The path to the file to update."
+                        },
+                        "start_line": {
+                            "type": "integer",
+                            "description": "The starting line number of the section to be updated."
+                        },
+                        "end_line": {
+                            "type": "integer",
+                            "description": "The ending line number of the section to be updated."
+                        },
+                        "new_content": {
+                            "type": "string",
+                            "description": "The new content that will replace the specified section."
+                        }
+                    },
+                    "required": ["file_path", "start_line", "end_line", "new_content"]
+                }))
                     .build()?,
             )
             .build()?)
@@ -477,6 +514,30 @@ impl OpenAIInterface {
                     .and_then(Value::as_str)
                     .ok_or("Missing 'diff_content' argument")?;
                 file_diff::show_diff_in_beyond_compare(diff_file, diff_content).await?;
+            }
+            "update_file_section" => {
+                // Handling 'update_file_section' by retrieving required arguments
+                let file_path = args_json
+                    .get("file_path")
+                    .and_then(Value::as_str)
+                    .ok_or("Missing 'file_path' argument")?;
+                let start_line = args_json
+                    .get("start_line")
+                    .and_then(Value::as_u64) // Line indices are typically usize
+                    .ok_or("Missing or invalid 'start_line' argument")?
+                    as usize;
+                let end_line = args_json
+                    .get("end_line")
+                    .and_then(Value::as_u64) // Line indices are typically usize
+                    .ok_or("Missing or invalid 'end_line' argument")?
+                    as usize;
+                let new_content = args_json
+                    .get("new_content")
+                    .and_then(Value::as_str)
+                    .ok_or("Missing 'new_content' argument")?;
+
+                // Call the method to replace content within specified lines
+                update_file_section(file_path, start_line, end_line, new_content).await?;
             }
             _ => {
                 return Err(Box::from("Unknown tool call name."));
