@@ -31,5 +31,10 @@
 
 use clap::Args;
 
+/// Command line arguments for the commit message generator.
 #[derive(Args)]
-pub struct CommitMessageArgs;
+pub struct CommitMessageArgs {
+    /// Optional developer intent to improve commit message context.
+    #[arg(short, long)]
+    pub developer_intent: Option<String>,
+}

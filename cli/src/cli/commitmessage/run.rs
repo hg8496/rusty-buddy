@@ -52,7 +52,17 @@ use std::process::Command;
 /// This is intended to help users create meaningful commit messages in line with best practices.
 ///
 /// The function returns a Result indicating success or an error if the process fails.
-pub async fn run_commitmessage() -> Result<(), Box<dyn std::error::Error>> {
+///
+/// # Arguments
+///
+/// * `developer_intent` - An optional string representing the developer's intent.
+///
+/// # Returns
+///
+/// A Result indicating success or failure.
+pub async fn run_commitmessage(
+    developer_intent: Option<String>,
+) -> Result<(), Box<dyn std::error::Error>> {
     let model = {
         let config = config::CONFIG.lock().unwrap();
         config.ai.commit_model.clone()
@@ -78,8 +88,13 @@ pub async fn run_commitmessage() -> Result<(), Box<dyn std::error::Error>> {
         .build()?;
 
     let diff = generate_git_diff_summary().await?;
+    let message = if let Some(intent) = developer_intent {
+        format!("{}\n\nGit Diff Summary:\n{}", intent, diff)
+    } else {
+        format!("Git Diff Summary:\n{}", diff)
+    };
     let summary = chat_service
-        .send_message(Cow::Owned(diff), &None, false)
+        .send_message(Cow::Owned(message), &None, false)
         .await?;
 
     println!("Summary of git diff (model: {}):\n{}", &model, summary);

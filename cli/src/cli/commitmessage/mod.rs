@@ -39,6 +39,6 @@ mod run;
 
 pub use cm_args::CommitMessageArgs;
 
-pub async fn run(_args: CommitMessageArgs) -> Result<(), Box<dyn std::error::Error>> {
-    run::run_commitmessage().await
+pub async fn run(args: CommitMessageArgs) -> Result<(), Box<dyn std::error::Error>> {
+    run::run_commitmessage(args.developer_intent).await
 }
