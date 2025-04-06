@@ -79,7 +79,7 @@ pub async fn run_wish(
         .persona(persona.clone())
         .directory(directory)
         .build()?;
-
+    chat_service.setup_context();
     // Get user input for their wish
     let user_input = get_multiline_input("What do you wish? ", vec![])
         .map_err(|e| format!("Failed to read user input: {}", e))?;
@@ -92,6 +92,7 @@ pub async fn run_wish(
 
     // Print the response and statistics
     println!("AI Context Response: {}", response);
+    chat_service.print_statistics();
 
     Ok(())
 }
