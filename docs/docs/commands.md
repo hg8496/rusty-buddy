@@ -48,6 +48,10 @@ Before diving into the specific commands, Rusty Buddy provides some options that
 
 Perform initial configurations, such as setting up API keys and default settings. The `init` command guides you through setting up Rusty Buddy for first-time use.
 
+**Tip:**
+The `init` command performs a recursive scan of your entire project folder, analyzing all files and subdirectories.
+This comprehensive directory listing is used to recommend the most relevant persona automatically for your current project.
+
 ### Usage
 
     :::bash
@@ -119,6 +123,8 @@ Search the knowledge database for relevant information:
     rusty-buddy knowledge search <search_term>
 
 - **`<search_term>`**: The string or phrase to search within the knowledge database.
+
+**Note:** The default output is a list of entries (e.g., file path or URL) with their similarity scores; the actual document text is *not* displayed but is available for the AI to use as context in chat.
 
 #### Add
 
@@ -493,5 +499,25 @@ Allows Rusty Buddy to create or modify files based on your instructions.
     rusty-buddy chat --help
 
 --- 
+## Troubleshooting & Error Handling
+
+- **No Configuration/Config File Not Found**
+    - Run `rusty-buddy init` to generate `.rusty/config.toml` if missing.
+    - Ensure you run Rusty Buddy within or below a directory containing `.rusty/config.toml`.
+- **Missing API Keys**
+    - OpenAI users: Ensure `OPENAI_KEY` is set in your `.env` or exported as an environment variable.
+    - Ollama users: Ensure Ollama is running and the model exists.
+- **Timeout Errors**
+    - If a model is taking too long, adjust `chat_timeout_secs` in `.rusty/config.toml`.
+- **Shell Completion Not Working**
+    - The `--completion <shell>` flag must be provided as the *very first* argument, e.g.:
+      ```bash
+      rusty-buddy --completion bash > ~/.bash_completion
+      ```
+- **Image Upload Fails**
+    - Only models that support vision can process images. For OpenAI, use `gpt-4o`; for Ollama, ensure you select a model with vision support.
+    - You may receive an error if you supply `--image` to a non-vision model.
+
+For more details or if issues persist, refer to [Contact Support](mailto:hg8496@cstolz.de).
 
 **Happy Coding with Rusty Buddy!**

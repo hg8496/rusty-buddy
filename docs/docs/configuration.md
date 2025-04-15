@@ -13,6 +13,8 @@ your_project/
 ├── .rusty/
 │   └── config.toml
 ```
+**Note:** Rusty Buddy will automatically search for `.rusty/config.toml` starting from your current directory and moving up through parent directories. Make sure you are working in or beneath a configured
+project directory.
 
 If the `.rusty` directory or `config.toml` does not exist, you can generate it by running:
 
@@ -85,6 +87,17 @@ name = "rust"
 chat_prompt = "As a seasoned Rust developer..."
 file_types = ["rs", "toml", "md", "yml"]
 ```
+
+### **5. Log Level Settings**
+
+Control logging outputs via your `.rusty/config.toml`:
+
+```toml
+console_log_level = "Warn"  # Controls what appears in your terminal
+file_log_level = "Info"     # Controls what appears in 'rusty.log'
+```
+
+Set to `Debug`, `Info`, `Warn`, or `Error` as needed.
 
 ---
 

@@ -134,12 +134,13 @@ The setup process will:
 
 2. **Persona Recommendation**
 
-   - Rusty Buddy analyzes your project directory and recommends a suitable persona.
+    - Rusty Buddy *recursively scans your project directory*, including all subfolders, to build a directory listing.
+      Based on the detected files and structure, it recommends the persona that best matches your project type.
 
-     ```plaintext
-     Analyzing project directory...
-     Recommended persona: [Persona]
-     ```
+      ```plaintext
+      Analyzing project directory...
+      Recommended persona: [Persona]
+      ```
 
 3. **Create Configuration Files**
 
