@@ -10,20 +10,37 @@ Rusty Buddy brings state-of-the-art machine learning directly to your terminal.
 
 ---
 
-## Rusty Buddy v1.2.0 Release Notes 🎉
+## Rusty Buddy v1.3.0 Release Notes 🚀
 
-We are thrilled to announce the release of Rusty Buddy v1.2.0, featuring groundbreaking improvements that elevate your development experience. The highlight of this release is the **Image-Inclusive Chat Feature**, enabling richer interactions with AI.
+We are excited to announce **Rusty Buddy v1.3.0**! This release delivers **robust improvements, smarter onboarding, and enhanced flexibility for power users and teams**. Here are the highlights:
 
-### 🚀 Major Features and Improvements
+---
 
-#### Image Upload in Chat 📷
-- **Visual Context Integration**: Enhance your chat sessions by uploading images alongside your textual inputs. This feature allows Rusty Buddy to analyze images and provide more insightful responses.
-- **Easy to Use**: Simply use the `--image` or `-i` flag with the chat command to include an image file.
+### 🎯 Major Improvements
 
-##### Example:
-```bash
-rusty-buddy chat --new --image ./path/to/your_image.png --persona rust
-```
+#### 1. **Smarter Persona Recommendation & Interactive Onboarding**
+- **Recursive Project Analysis:**  
+  Rusty Buddy now **recursively scans your full project directory (including all subfolders)** during `rusty-buddy init`. This enables automatic and highly-relevant persona recommendations based on *your* project's files and structure!
+- **Manual Persona Selection:**  
+  Prefer full control? Use
+  ```bash
+  rusty-buddy init --choose-persona
+  ```
+  to skip the scan and pick any available persona from a menu.
+
+#### 2. **Commit Message Generation With Context**
+- **Developer Intent Support:**  
+  The `commit-message` command now lets you provide an *optional developer intent* for more accurate, context-aware commit summaries:
+  ```bash
+  rusty-buddy commit-message --developer-intent "Implement feature X"
+  ```
+  This is especially useful for complex or multi-faceted changes.
+
+#### 3. **CLI Usability Enhancements**
+- **Command-Line Argument Parsing:**  
+  The command-line parser is improved: all `init` and `commit-message` options are now properly handled and documented in both `--help` and completions.
+- **Expanded Troubleshooting Section:**  
+  Documentation now covers edge cases for environment, configuration file location, missing API keys, and more.
 
 ---
 
