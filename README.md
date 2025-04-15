@@ -141,6 +141,8 @@ The setup process will:
       Analyzing project directory...
       Recommended persona: [Persona]
       ```
+    **Tip:** Prefer to handpick your persona?
+    Run `rusty-buddy init --choose-persona` and you'll pick from a menu. Otherwise, Rusty Buddy will auto-select based on a directory scan.
 
 3. **Create Configuration Files**
 

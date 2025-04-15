@@ -51,8 +51,8 @@ async fn main() {
         print_completions(completion, &mut args::Cli::command());
         std::process::exit(0);
     }
-    if let Some(args::Commands::Init) = cli.command {
-        run_init_command().await.unwrap();
+    if let Some(args::Commands::Init(ref init_args)) = cli.command {
+        run_init_command(init_args.choose_persona).await.unwrap();
     }
     if !check_environment() {
         eprintln!(
@@ -84,7 +84,7 @@ async fn main() {
             args::Commands::Wish(args) => {
                 cli::wish::run(args).await.unwrap();
             }
-            args::Commands::Init => {}
+            args::Commands::Init(_init_args) => {}
             args::Commands::Knowledge(args) => {
                 cli::knowledge::run_knowledge(args).await.unwrap();
             }

@@ -23,10 +23,16 @@ To start the configuration process, open your terminal and navigate to the direc
 ```bash
 rusty-buddy init
 ```
-**How Persona Selection Works:**
-During `rusty-buddy init`, Rusty Buddy **recursively scans your current directory and all subdirectories** to gather a complete listing of files and folders. It uses this structure and file types to
-intelligently determine the nature of your project—such as Rust, Python, Web, Embedded, etc.—and then recommends the most suitable persona.
-This ensures the AI interactions you receive are tailored precisely to your project’s ecosystem.
+By default, Rusty Buddy will recursively scan your project directory (including all subfolders) to recommend the best-matching persona.
+
+**Prefer to choose a persona manually?**
+Run:
+
+```bash
+rusty-buddy init --choose-persona
+```
+
+You'll receive a list of personas to pick from, skipping the automated detection step.
 
 ### Execution Flow and Features
 

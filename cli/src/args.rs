@@ -26,6 +26,7 @@ use crate::cli::chat::ChatArgs;
 use crate::cli::commitmessage::CommitMessageArgs;
 use crate::cli::createbackground::BackgroundArgs;
 use crate::cli::createicon::CreateIconArgs;
+use crate::cli::init::InitArgs;
 use crate::cli::knowledge::KnowledgeArgs;
 use crate::cli::wish::WishArgs;
 use clap::{Parser, Subcommand};
@@ -76,5 +77,5 @@ pub enum Commands {
     Knowledge(KnowledgeArgs),
 
     /// Initialize configuration and environment.
-    Init,
+    Init(InitArgs),
 }

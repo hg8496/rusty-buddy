@@ -6,7 +6,6 @@
 //! The entry point is the `run_init_command` function, which guides the
 //! user through the setup process and ensures that the application is
 //! ready for use with the selected AI backend (OpenAI or Ollama).
-//
 //! ## Key Functions
 //!
 //! - `run_init_command`: This asynchronous function is responsible for
@@ -50,11 +49,15 @@ use std::error::Error;
 use std::io::Write;
 use std::{env, fs};
 
+mod init_args;
+
+pub use init_args::InitArgs;
+
 /// This function represents the entry point of the init command.
 /// It initializes the configuration based on user choice of AI backend (OpenAI or Ollama),
 /// prompts for necessary configuration details (like API keys and model types),
 /// and sets up the environment and configuration files accordingly.
-pub async fn run_init_command() -> Result<(), Box<dyn Error>> {
+pub async fn run_init_command(choose_persona: bool) -> Result<(), Box<dyn Error>> {
     // Load existing environment variables
     dotenv().ok();
 
@@ -69,9 +72,10 @@ pub async fn run_init_command() -> Result<(), Box<dyn Error>> {
             let openai_key = get_or_prompt_openai_key()?;
             write_openai_key_to_env_file(&openai_key)?;
             let backend = OpenAIInterface::new("gpt-4o-mini".to_string(), 60);
-            let recommended_persona = recommend_persona(files, personas, Box::new(backend)).await?;
+            let selected_persona =
+                recommend_persona(files, personas, Box::new(backend), choose_persona).await?;
             write_config(
-                &recommended_persona,
+                &selected_persona,
                 "openai_complex",
                 "openai_fast",
                 "openai_embedding",
@@ -80,7 +84,7 @@ pub async fn run_init_command() -> Result<(), Box<dyn Error>> {
             )?;
             println!(
                 "Configuration successfully initialized with persona: {}",
-                recommended_persona
+                selected_persona
             );
         }
         AIBackend::Ollama => {
@@ -96,9 +100,10 @@ pub async fn run_init_command() -> Result<(), Box<dyn Error>> {
                 model = "llama3.2".to_string();
             }
             let backend = OllamaInterface::new(model.clone(), Some(ollama_url.clone()));
-            let recommended_persona = recommend_persona(files, personas, Box::new(backend)).await?;
+            let selected_persona =
+                recommend_persona(files, personas, Box::new(backend), choose_persona).await?;
             write_config(
-                &recommended_persona,
+                &selected_persona,
                 "ollama_complex",
                 "ollama_complex",
                 "ollama_embedding",
@@ -107,7 +112,7 @@ pub async fn run_init_command() -> Result<(), Box<dyn Error>> {
             )?;
             println!(
                 "Configuration successfully initialized with persona: {}",
-                recommended_persona
+                selected_persona
             );
         }
     }
@@ -128,30 +133,46 @@ fn truncate_to_max_bytes(s: &str, max_bytes: usize) -> &str {
     }
 }
 
-// Function to recommend a persona
+// Persona recommendation or manual selection logic
 async fn recommend_persona(
     dir_listing: String,
     personas: Vec<String>,
     backend: Box<dyn ChatBackend>,
+    manual: bool,
 ) -> Result<String, Box<dyn Error>> {
-    let storage = NilChatStorage {};
-    let persona = Persona {
-        name: "project".to_string(),
-        chat_prompt: "I know how to match projects to personas".to_string(),
-        file_types: vec![],
-    };
+    if manual {
+        // User selects from the list
+        println!("Available personas:");
+        for (idx, persona) in personas.iter().enumerate() {
+            println!("  {}: {}", idx + 1, persona);
+        }
+        let selection = get_user_input("Enter the number of your chosen persona: ")?;
+        let idx: usize = selection.trim().parse().unwrap_or(1) - 1;
+        Ok(personas
+            .get(idx)
+            .cloned()
+            .unwrap_or_else(|| personas[0].clone()))
+    } else {
+        // Old AI-based recommendation
+        let storage = NilChatStorage {};
+        let persona = Persona {
+            name: "project".to_string(),
+            chat_prompt: "I know how to match projects to personas".to_string(),
+            file_types: vec![],
+        };
 
-    let mut chat_service = ChatService::new(backend, Box::new(storage), persona.clone(), None);
-    let trunced_dir_listing = truncate_to_max_bytes(&dir_listing, 500_000);
-    let prompt = format!(
-        "Analyze the following directory structure:\n{}\n\nChoose the most suitable persona from this list: {:?}. Just answer with one value from that list. No explanation needed.",
-        trunced_dir_listing, personas
-    );
+        let mut chat_service = ChatService::new(backend, Box::new(storage), persona.clone(), None);
+        let trunced_dir_listing = truncate_to_max_bytes(&dir_listing, 500_000);
+        let prompt = format!(
+                "Analyze the following directory structure:\n{}\n\nChoose the most suitable persona from this list: {:?}. Just answer with one value from that list. No explanation needed.",
+                trunced_dir_listing, personas
+            );
 
-    let response = chat_service
-        .send_message(std::borrow::Cow::Borrowed(&prompt), &None, false)
-        .await?;
-    Ok(response.trim().to_string())
+        let response = chat_service
+            .send_message(std::borrow::Cow::Borrowed(&prompt), &None, false)
+            .await?;
+        Ok(response.trim().to_string())
+    }
 }
 
 // Function to get or prompt for OpenAI key

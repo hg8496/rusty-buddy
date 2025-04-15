@@ -54,42 +54,29 @@ This comprehensive directory listing is used to recommend the most relevant pers
 
 ### Usage
 
-    :::bash
-    rusty-buddy init
+You can initialize Rusty Buddy in one of two ways:
+
+- **Automated:** (default)
+`rusty-buddy init`
+This will **recursively scan all files and folders in your project directory** to recommend the most suitable persona for your development environment.
+
+- **Manual persona selection:**
+`rusty-buddy init --choose-persona`
+This skips the scan and provides a list of available personas for you to choose from.
 
 ### Execution Flow
 
 1. **Choose Your AI Backend**
 
-        :::plaintext
-        Choose backend to use (1 for OpenAI, 2 for Ollama): [User enters 1 or 2]
-
 2. **Enter API Keys or URLs**
 
-    - **OpenAI:**
-
-            :::plaintext
-            You chose OpenAI.
-            Please enter your OpenAI API key: [User enters key]
-
-    - **Ollama:**
-
-            :::plaintext
-            You chose Ollama.
-            Please enter the Ollama API URL (default: http://localhost:11434): [User enters URL or presses Enter]
-            Please enter the Ollama model (default: llama3.2): [User enters model name or presses Enter]
-
-3. **Project Analysis and Persona Recommendation**
-
-    Rusty Buddy analyzes your project and recommends a suitable persona.
-
-        :::plaintext
-        Analyzing project directory...
-        Recommended persona: [Persona]
+3. **Persona Selection**
+- If you use `--choose-persona`, you will be presented with a menu of personas and can select which one to use.
+- If you do not, Rusty Buddy will analyze your complete directory structure and auto-recommend a persona.
 
 4. **Configuration Files Creation**
 
-   Generates `.env` and `config.toml` files in the `.rusty` directory.
+5. **Finish**
 
 ---
 
