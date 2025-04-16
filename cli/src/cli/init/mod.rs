@@ -63,7 +63,6 @@ pub async fn run_init_command(choose_persona: bool) -> Result<(), Box<dyn Error>
 
     // Ask the user which backend to use
     let backend_choice = choose_backend_option()?;
-    let files = get_directory_listing(".");
     let personas = get_internal_personas();
 
     match backend_choice {
@@ -73,7 +72,7 @@ pub async fn run_init_command(choose_persona: bool) -> Result<(), Box<dyn Error>
             write_openai_key_to_env_file(&openai_key)?;
             let backend = OpenAIInterface::new("gpt-4o-mini".to_string(), 60);
             let selected_persona =
-                recommend_persona(files, personas, Box::new(backend), choose_persona).await?;
+                recommend_persona(personas, Box::new(backend), choose_persona).await?;
             write_config(
                 &selected_persona,
                 "openai_complex",
@@ -101,7 +100,7 @@ pub async fn run_init_command(choose_persona: bool) -> Result<(), Box<dyn Error>
             }
             let backend = OllamaInterface::new(model.clone(), Some(ollama_url.clone()));
             let selected_persona =
-                recommend_persona(files, personas, Box::new(backend), choose_persona).await?;
+                recommend_persona(personas, Box::new(backend), choose_persona).await?;
             write_config(
                 &selected_persona,
                 "ollama_complex",
@@ -135,7 +134,6 @@ fn truncate_to_max_bytes(s: &str, max_bytes: usize) -> &str {
 
 // Persona recommendation or manual selection logic
 async fn recommend_persona(
-    dir_listing: String,
     personas: Vec<String>,
     backend: Box<dyn ChatBackend>,
     manual: bool,
@@ -154,6 +152,8 @@ async fn recommend_persona(
             .unwrap_or_else(|| personas[0].clone()))
     } else {
         // Old AI-based recommendation
+        let dir_listing = get_directory_listing(".");
+
         let storage = NilChatStorage {};
         let persona = Persona {
             name: "project".to_string(),
