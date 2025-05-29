@@ -11,7 +11,7 @@ tokio = { version = "1", features = ["full"] }
 dotenvy = "0.15.7"
 clap = { version = "4", features = ["derive"] }
 clap_complete = "4"
-termimad = "0.31"
+termimad = "0.32"
 rustyline = { version = "15.0", features = ["derive"] }
 unicode-width = "0.2"
 atty = "0.2"
