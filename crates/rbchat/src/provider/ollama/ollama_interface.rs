@@ -28,9 +28,12 @@
 use crate::chat::interface::{ChatBackend, Message, MessageInfo, MessageRole};
 use crate::knowledge::EmbeddingService;
 use async_trait::async_trait;
+use base64::engine::general_purpose::STANDARD as BASE64_STANDARD;
+use base64::Engine;
 use chrono::Utc;
-use log::{debug, error, info}; // Ensure to import appropriate logging macros
+use log::{debug, error, info, warn}; // Ensure to import appropriate logging macros
 use ollama_rs::generation::embeddings::request::{EmbeddingsInput, GenerateEmbeddingsRequest};
+use ollama_rs::generation::images::Image;
 use ollama_rs::{
     generation::chat::{request::ChatMessageRequest, ChatMessage},
     IntoUrlSealed, Ollama,
@@ -61,7 +64,29 @@ impl OllamaInterface {
         messages
             .iter()
             .map(|msg| match msg.role {
-                MessageRole::User => ChatMessage::user(msg.content.clone()),
+                MessageRole::User => {
+                    let mut chat_message = ChatMessage::user(msg.content.clone());
+                    let image_path =
+                        if let Some(MessageInfo::UserInfo { image_path, .. }) = &msg.info {
+                            image_path.as_deref()
+                        } else {
+                            None
+                        };
+                    if let Some(image_path) = image_path {
+                        match std::fs::read(image_path) {
+                            Ok(image_data) => {
+                                info!("Adding image to Ollama user message from {}", image_path);
+                                let base64_image = BASE64_STANDARD.encode(image_data);
+                                chat_message =
+                                    chat_message.add_image(Image::from_base64(base64_image));
+                            }
+                            Err(e) => {
+                                warn!("Failed to read image file '{}': {}", image_path, e);
+                            }
+                        }
+                    }
+                    chat_message
+                }
                 MessageRole::Assistant => ChatMessage::assistant(msg.content.clone()),
                 MessageRole::Context | MessageRole::System | MessageRole::Knowledge => {
                     ChatMessage::system(msg.content.clone())

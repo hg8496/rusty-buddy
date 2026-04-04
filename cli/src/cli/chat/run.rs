@@ -102,8 +102,7 @@ pub async fn run_chat(args: ChatArgs) -> Result<(), Box<dyn Error>> {
         &args.load,
     )?;
 
-    if args.one_shot.is_some() {
-        let message = args.one_shot.as_ref().unwrap();
+    if let Some(message) = &args.one_shot {
         return handle_one_shot_mode(
             services,
             message.clone(),
@@ -396,10 +395,10 @@ async fn send_and_display_response(
     } else {
         None
     };
-    if knowledge.is_some() {
+    if let Some(knowledge) = knowledge {
         let knowledge = services
             .knowledge_store
-            .query_knowledge(user_input.clone(), knowledge.unwrap().unwrap_or(10))
+            .query_knowledge(user_input.clone(), knowledge.unwrap_or(10))
             .await?;
         services.chat_service.add_knowledge(knowledge).await?;
     }
