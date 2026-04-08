@@ -39,17 +39,18 @@ use crate::knowledge::EmbeddingService;
 use crate::provider::openai::file_diff;
 use crate::provider::openai::file_diff::{create_directory, create_file, update_file_section};
 use async_openai::config::OpenAIConfig;
-use async_openai::types::{
-    ChatCompletionMessageToolCall, ChatCompletionRequestAssistantMessageArgs,
-    ChatCompletionRequestMessage, ChatCompletionRequestMessageContentPartImageArgs,
+use async_openai::types::chat::{
+    ChatCompletionMessageToolCall, ChatCompletionMessageToolCalls,
+    ChatCompletionRequestAssistantMessageArgs, ChatCompletionRequestMessage,
+    ChatCompletionRequestMessageContentPartImageArgs,
     ChatCompletionRequestMessageContentPartTextArgs, ChatCompletionRequestSystemMessageArgs,
     ChatCompletionRequestUserMessageArgs, ChatCompletionRequestUserMessageContent,
     ChatCompletionRequestUserMessageContentPart, ChatCompletionResponseMessage, ChatCompletionTool,
-    ChatCompletionToolArgs, ChatCompletionToolChoiceOption, ChatCompletionToolType,
-    CompletionUsage, CreateChatCompletionRequest, CreateChatCompletionRequestArgs,
-    CreateChatCompletionResponse, CreateEmbeddingRequestArgs, FunctionObjectArgs, ImageDetail,
-    ImageUrlArgs,
+    ChatCompletionToolChoiceOption, ChatCompletionTools, CompletionUsage,
+    CreateChatCompletionRequest, CreateChatCompletionRequestArgs, CreateChatCompletionResponse,
+    FunctionObjectArgs, ImageDetail, ImageUrlArgs, ToolChoiceOptions,
 };
+use async_openai::types::embeddings::CreateEmbeddingRequestArgs;
 use async_openai::Client;
 use async_trait::async_trait;
 use base64::prelude::BASE64_STANDARD;
@@ -110,11 +111,11 @@ impl ChatBackend for OpenAIInterface {
             }
             Ok(Err(e)) => {
                 error!("Error while sending request to OpenAI: {:#?}", e);
-                return Err(e.into());
+                return Err(Box::new(e));
             }
             Err(e) => {
                 error!("Timeout error while waiting for OpenAI response: {:#?}", e);
-                return Err(e.into());
+                return Err(Box::new(e));
             }
         };
 
@@ -127,8 +128,10 @@ impl ChatBackend for OpenAIInterface {
         if use_tools {
             if let Some(tool_calls) = returned_message.tool_calls {
                 for tool_call in tool_calls {
-                    debug!("Handling tool call: {:?}", tool_call.function.name);
-                    self.handle_tool_call(tool_call).await?;
+                    if let ChatCompletionMessageToolCalls::Function(tc) = tool_call {
+                        debug!("Handling tool call: {:?}", tc.function.name);
+                        self.handle_tool_call(tc).await?;
+                    }
                 }
             }
         }
@@ -181,7 +184,7 @@ impl EmbeddingService for OpenAIInterface {
             }
             Err(e) => {
                 error!("Error creating embedding: {}", e);
-                return Err(e.into());
+                return Err(Box::new(e));
             }
         };
 
@@ -349,99 +352,90 @@ impl OpenAIInterface {
                     Self::create_new_file_tool()?,
                     Self::create_update_file_section_tool()?,
                 ])
-                .tool_choice(ChatCompletionToolChoiceOption::Required)
+                .tool_choice(ChatCompletionToolChoiceOption::Mode(
+                    ToolChoiceOptions::Required,
+                ))
                 .parallel_tool_calls(true);
         }
         debug!("Created request for OpenAI with tools: {}", use_tools);
         Ok(builder.build()?)
     }
 
-    fn create_new_file_tool() -> Result<ChatCompletionTool, Box<dyn Error>> {
-        Ok(ChatCompletionToolArgs::default()
-            .r#type(ChatCompletionToolType::Function)
-            .function(
-                FunctionObjectArgs::default()
-                    .name("create_file")
-                    .description("Creates a new file with given content at the specified path.")
-                    .parameters(serde_json::json!({
-                        "type": "object",
-                        "properties": {
-                            "file_path": {
-                                "type": "string",
-                                "description": "The path for the new file."
-                            },
-                            "file_content": {
-                                "type": "string",
-                                "description": "The content to write to the new file."
-                            }
+    fn create_new_file_tool() -> Result<ChatCompletionTools, Box<dyn Error>> {
+        Ok(ChatCompletionTools::Function(ChatCompletionTool {
+            function: FunctionObjectArgs::default()
+                .name("create_file")
+                .description("Creates a new file with given content at the specified path.")
+                .parameters(serde_json::json!({
+                    "type": "object",
+                    "properties": {
+                        "file_path": {
+                            "type": "string",
+                            "description": "The path for the new file."
                         },
-                        "required": ["file_path", "file_content"]
-                    }))
-                    .build()?,
-            )
-            .build()?)
+                        "file_content": {
+                            "type": "string",
+                            "description": "The content to write to the new file."
+                        }
+                    },
+                    "required": ["file_path", "file_content"]
+                }))
+                .build()?,
+        }))
     }
 
-    fn create_new_dir_tool() -> Result<ChatCompletionTool, Box<dyn Error>> {
-        Ok(ChatCompletionToolArgs::default()
-            .r#type(ChatCompletionToolType::Function)
-            .function(
-                FunctionObjectArgs::default()
-                    .name("create_directory")
-                    .description("Creates a new directory at the specified path.")
-                    .parameters(serde_json::json!({
-                        "type": "object",
-                        "properties": {
-                            "directory_path": {
-                                "type": "string",
-                                "description": "The path where the new directory should be created."
-                            }
+    fn create_new_dir_tool() -> Result<ChatCompletionTools, Box<dyn Error>> {
+        Ok(ChatCompletionTools::Function(ChatCompletionTool {
+            function: FunctionObjectArgs::default()
+                .name("create_directory")
+                .description("Creates a new directory at the specified path.")
+                .parameters(serde_json::json!({
+                    "type": "object",
+                    "properties": {
+                        "directory_path": {
+                            "type": "string",
+                            "description": "The path where the new directory should be created."
+                        }
+                    },
+                    "required": ["directory_path"]
+                }))
+                .build()?,
+        }))
+    }
+
+    fn create_diff_tool() -> Result<ChatCompletionTools, Box<dyn Error>> {
+        Ok(ChatCompletionTools::Function(ChatCompletionTool {
+            function: FunctionObjectArgs::default()
+                .name("show_diff")
+                .description(
+                    "Shows the diff between an existing file and the newly generated content of that file and asks the user to apply the changes.",
+                )
+                .parameters(serde_json::json!({
+                    "type": "object",
+                    "properties": {
+                        "diff_file": {
+                            "type": "string",
+                            "description": "The path to the original file."
                         },
-                        "required": ["directory_path"]
-                    }))
-                    .build()?,
-            )
-            .build()?)
+                        "diff_content": {
+                            "type": "string",
+                            "description": "The new content of the file to display."
+                        }
+                    },
+                    "required": ["diff_file", "diff_content"]
+                }))
+                .build()?,
+        }))
     }
 
-    fn create_diff_tool() -> Result<ChatCompletionTool, Box<dyn Error>> {
-        Ok(ChatCompletionToolArgs::default()
-            .r#type(ChatCompletionToolType::Function)
-            .function(
-                FunctionObjectArgs::default()
-                    .name("show_diff")
-                    .description(
-                        "Shows the diff between an existing file and the newly generated content of that file and asks the user to apply the changes.",
-                    )
-                    .parameters(serde_json::json!({
-                                    "type": "object",
-                                    "properties": {
-                                        "diff_file": {
-                                            "type": "string",
-                                            "description": "The path to the original file."
-                                        },
-                                        "diff_content": {
-                                            "type": "string",
-                                            "description": "The new content of the file to display."
-                                        }
-                                    },
-                                    "required": ["diff_file", "diff_content"]
-                                }))
-                    .build()?,
-            )
-            .build()?)
-    }
-
-    fn create_update_file_section_tool() -> Result<ChatCompletionTool, Box<dyn Error>> {
-        Ok(ChatCompletionToolArgs::default()
-            .r#type(ChatCompletionToolType::Function)
-            .function(
-                FunctionObjectArgs::default()
-                    .name("update_file_section")
-                    .description(
-                        "Updates a section of a file specified by starting and ending lines with new content.",
-                    )
-                    .parameters(serde_json::json!({
+    fn create_update_file_section_tool() -> Result<ChatCompletionTools, Box<dyn Error>> {
+        Ok(ChatCompletionTools::Function(ChatCompletionTool {
+            function: FunctionObjectArgs::default()
+                .name("update_file_section")
+                .description(
+                    "Updates a section of a file specified by starting and ending lines with new content.",
+                )
+                .parameters(serde_json::json!({
                     "type": "object",
                     "properties": {
                         "file_path": {
@@ -463,9 +457,8 @@ impl OpenAIInterface {
                     },
                     "required": ["file_path", "start_line", "end_line", "new_content"]
                 }))
-                    .build()?,
-            )
-            .build()?)
+                .build()?,
+        }))
     }
 
     fn extract_returned_message(

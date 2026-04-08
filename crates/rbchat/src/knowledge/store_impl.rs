@@ -1,7 +1,7 @@
 use crate::config::{get_knowledge_dir, CONFIG};
 use crate::knowledge::{
     ConnectionMode, EmbeddingData, EmbeddingServiceBuilder, EmbeddingServiceHandle,
-    KnowledgeResult, KnowledgeStore, Record,
+    KnowledgeResult, KnowledgeStore,
 };
 use async_trait::async_trait;
 use log::{info, warn};
@@ -99,8 +99,12 @@ impl KnowledgeStore for KnowledgeStoreImpl {
                 return Err(Box::new(e));
             }
         };
-        // Collect file names and create relevant knowledge messages for each document found
-        let files: Vec<KnowledgeResult> = results.take(0)?;
+        // Collect results as serde_json::Value (which implements SurrealValue) then deserialize
+        let raw: Vec<serde_json::Value> = results.take(0)?;
+        let files: Vec<KnowledgeResult> = raw
+            .into_iter()
+            .map(|v| serde_json::from_value(v).map_err(|e| Box::new(e) as Box<dyn Error>))
+            .collect::<Result<Vec<_>, _>>()?;
 
         Ok(files)
     }
@@ -118,14 +122,17 @@ impl KnowledgeStore for KnowledgeStoreImpl {
         };
 
         match db_handle
-            .upsert::<Option<Record>>(("context_embeddings", knowledge.data_source.to_string()))
-            .content(knowledge)
+            .upsert::<Option<serde_json::Value>>((
+                "context_embeddings",
+                knowledge.data_source.to_string(),
+            ))
+            .content(serde_json::to_value(knowledge)?)
             .await
         {
             Ok(_) => info!("Knowledge successfully stored!"),
             Err(err) => {
                 warn!("Failed to store knowledge for {}: {}", data_source, err);
-                return Err(err.into());
+                return Err(Box::new(err));
             }
         };
 

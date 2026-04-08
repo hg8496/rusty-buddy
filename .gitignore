@@ -1,7 +1,7 @@
 .cache
 commit.txt
 docs_env/
-venv_docs/
+.venv_docs/
 docs/site/
 release.txt
 release.md

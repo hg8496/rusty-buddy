@@ -5,7 +5,6 @@ use std::error::Error;
 use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::sync::Arc;
-use surrealdb::sql::Thing;
 
 /// Wrapper type for `Arc<dyn EmbeddingService>`            
 pub struct EmbeddingServiceHandle {
@@ -91,12 +90,6 @@ impl Display for DataSource {
             DataSource::LocalFiles(content) => write!(f, "LocalFiles.{}", content),
         }
     }
-}
-
-#[derive(Debug, Deserialize)]
-pub struct Record {
-    #[allow(dead_code)]
-    id: Thing,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

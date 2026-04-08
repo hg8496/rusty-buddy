@@ -1,5 +1,5 @@
 use async_openai::config::OpenAIConfig;
-use async_openai::types::{
+use async_openai::types::images::{
     CreateImageRequestArgs, Image, ImageModel, ImageQuality, ImageResponseFormat, ImageSize,
 };
 use async_openai::Client;
@@ -39,7 +39,7 @@ pub async fn create_image(
         .quality(ImageQuality::HD)
         .build()?;
 
-    let response = client.images().create(request).await?;
+    let response = client.images().generate(request).await?;
     if response.data.is_empty() {
         return Err("No image was returned by the API".into());
     }

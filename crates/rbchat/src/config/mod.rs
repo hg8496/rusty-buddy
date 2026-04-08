@@ -138,8 +138,8 @@ mod tests {
         //env::set_current_dir(&temp_dir).expect("Failed to set current directory");
 
         // Run the function you're testing
-        let result =
-            get_config_file_from_dir(temp_dir.into_path()).unwrap_or(PathBuf::from("/wrong_path"));
+        let temp_path = temp_dir.keep();
+        let result = get_config_file_from_dir(temp_path).unwrap_or(PathBuf::from("/wrong_path"));
 
         // Assert the expected outcome
         assert!(result.ends_with(config_path));
@@ -157,7 +157,8 @@ mod tests {
         // Change current working directory to the temporary directory
 
         // Call the function and assert the expected error message
-        let result = get_config_file_from_dir(temp_dir.into_path());
+        let temp_path = temp_dir.keep();
+        let result = get_config_file_from_dir(temp_path);
         assert!(result.is_err());
         assert_eq!(
             result.err(),

@@ -142,9 +142,7 @@ mod tests {
 
     #[test]
     fn test_save_and_load_session() {
-        let storage_dir = TempDir::new()
-            .expect("Failed to create temp dir")
-            .into_path();
+        let storage_dir = TempDir::new().expect("Failed to create temp dir").keep();
         let mut storage = DirectoryChatStorage::new(storage_dir.clone());
 
         let session_name = "test_session";
@@ -176,9 +174,7 @@ mod tests {
 
     #[test]
     fn test_list_sessions() {
-        let storage_dir = TempDir::new()
-            .expect("Failed to create temp dir")
-            .into_path();
+        let storage_dir = TempDir::new().expect("Failed to create temp dir").keep();
         let storage = DirectoryChatStorage::new(storage_dir.clone());
 
         let session_name_1 = "session_one";
@@ -207,9 +203,7 @@ mod tests {
 
     #[test]
     fn test_load_non_existent_session() {
-        let storage_dir = TempDir::new()
-            .expect("Failed to create temp dir")
-            .into_path();
+        let storage_dir = TempDir::new().expect("Failed to create temp dir").keep();
         let mut storage = DirectoryChatStorage::new(storage_dir.clone());
 
         let result = storage.load_session("non_existent_session");
